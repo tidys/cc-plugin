@@ -1,0 +1,18 @@
+<% const jsLength = htmlWebpackPlugin.files.js.length; %>
+<% const cssLength = htmlWebpackPlugin.files.css.length; %>
+<% for (let i = 0; i < jsLength; i++) { %>
+    const panel = Editor.require('<%= htmlWebpackPlugin.files.js[i] %>');
+<% } %>
+
+Editor.Panel.extend({
+style:"<%= htmlWebpackPlugin.options.ccPlugin.style %>",
+template:`<%= htmlWebpackPlugin.options.ccPlugin.template %>`,
+messages:"<%= htmlWebpackPlugin.options.ccPlugin.messages %>",
+ready:()=>{
+if(panel&&panel.default){
+const p=new panel.default();
+p.ready();
+}
+}
+})
+
