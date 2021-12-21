@@ -1,6 +1,6 @@
 # cc-plugin
 
-专为cocos creator插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。
+专为`Cocos Creator`插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。
 
 大致实现原理就是使用webpack抹平了v2、v3插件版本的底层差异，使开发插件更加工程化。
 
@@ -79,4 +79,13 @@ interface PanelOptions {
     message: string;
 }
 
+```
+
+## 创建运行项目
+```shell
+npm install cc-plugin -g
+cc-plugin create my-first-plugin
+cd ./my-first-plugin
+npm install
+cc-plugin serve
 ```
