@@ -37,7 +37,7 @@ export default class Panel {
                     filename,
                     chunks: [entryName],
                     ccPlugin: {
-                        template: '<div id="app"></div>',
+                        template: '<div id="app">{{tips}}</div>',
                         style: '.body{width:100%}',
                         messages: 'hello message',
                     }

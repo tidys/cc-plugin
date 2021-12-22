@@ -59,7 +59,7 @@ export interface CocosPluginV2 {
 }
 
 export abstract class AbstractPluginPanel {
-    abstract ready(): void;
+    abstract ready(rootElement: any, args: any): void;
 }
 
 export interface PluginMainWrapper {

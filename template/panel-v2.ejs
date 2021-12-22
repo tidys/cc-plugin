@@ -7,11 +7,12 @@
 Editor.Panel.extend({
 style:"<%= htmlWebpackPlugin.options.ccPlugin.style %>",
 template:`<%= htmlWebpackPlugin.options.ccPlugin.template %>`,
-messages:"<%= htmlWebpackPlugin.options.ccPlugin.messages %>",
-ready:()=>{
+message:"<%= htmlWebpackPlugin.options.ccPlugin.messages %>",
+messages:{},
+ready(...args){
 if(panel&&panel.default){
 const p=new panel.default();
-p.ready();
+p.ready(this.shadowRoot,args);
 }
 }
 })

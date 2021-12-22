@@ -116,7 +116,7 @@ function default_1(api, projectConfig) {
             const pluginName = projectConfig.manifest.name;
             webpackChain.output.path(output)
                 .libraryTarget('commonjs')
-                .publicPath(`packages://${pluginName}/dist/`);
+                .publicPath(`packages://${pluginName}/`);
             // rules
             webpackChain.module
                 .rule('css')
@@ -127,7 +127,9 @@ function default_1(api, projectConfig) {
             webpackChain.module
                 .rule('vue')
                 .test(/\.vue$/)
-                .use('vue-loader').loader('vue-loader');
+                .use('vue-loader')
+                .loader('vue-loader')
+                .options({ optimizeSSR: false });
             webpackChain.module
                 .rule('ts')
                 .test(/\.ts(x?)$/)
@@ -169,6 +171,10 @@ function default_1(api, projectConfig) {
                 return console.error(err);
             }
             if (stats === null || stats === void 0 ? void 0 : stats.hasErrors()) {
+                stats === null || stats === void 0 ? void 0 : stats.compilation.errors.forEach(error => {
+                    console.log(error.message);
+                    console.log(error.stack);
+                });
                 return console.log('Build failed with error');
             }
             stats === null || stats === void 0 ? void 0 : stats.compilation.emittedAssets.forEach((asset) => {
