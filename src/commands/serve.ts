@@ -12,6 +12,7 @@ import { existsSync } from 'fs';
 import CocosPluginPackageJson from './cocos-plugin-package.json';
 import NpmInstall from '../plugin/npm-install';
 import { PluginVersion } from '../declare';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 
 function getExternal(dir: string) {
     let map: Record<string, string> = {};
@@ -101,17 +102,22 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
 
             // rules
             webpackChain.module
-                .rule('css')
-                .test(/\.(less|css)$/)
-                .use('style-loader').loader('style-loader').end()
+                .rule('less')
+                .test(/\.less$/)
+                .use('extract').loader(MiniCssExtractPlugin.loader).end()
                 .use('css-loader').loader('css-loader').end()
                 .use('less-loader').loader('less-loader').end();
+
+            webpackChain.module
+                .rule('css')
+                .test(/\.css$/)
+                .use('extract').loader(MiniCssExtractPlugin.loader).end()
+                .use('css-loader').loader('css-loader').end()
+
             webpackChain.module
                 .rule('vue')
                 .test(/\.vue$/)
-                .use('vue-loader')
-                .loader('vue-loader')
-                .options({ optimizeSSR: false });
+                .use('vue-loader').loader('vue-loader').options({ optimizeSSR: false }).end();
 
             webpackChain.module
                 .rule('ts')
@@ -135,11 +141,19 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
             panel.dealPanels();
 
             // plugins
+            webpackChain.plugin('npm install')
+                .use(NpmInstall, [projectConfig.options.output!])
+            webpackChain.plugin('cc-plugin-package.json')
+                .use(CocosPluginPackageJson, [service])
             webpackChain
                 .plugin('vue')
                 .use(vueLoader.VueLoaderPlugin)
                 .end();
-
+            webpackChain.plugin('extract-css')
+                .use(MiniCssExtractPlugin, [{
+                    filename: '[name].css',
+                    chunkFilename: '[id].css'
+                }]).end();
             webpackChain
                 .plugin('clean')
                 .use(CleanWebpackPlugin, [{
@@ -148,12 +162,6 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
                     cleanOnceBeforeBuildPatterns: ['i18n/**', 'panel/**', 'main.js', 'package-lock.json', 'package.json'],
                 }])
                 .end();
-
-            webpackChain.plugin('cc-plugin-package.json')
-                .use(CocosPluginPackageJson, [service])
-
-            webpackChain.plugin('npm install')
-                .use(NpmInstall, [projectConfig.options.output!])
         });
         let webpackConfig = api.resolveChainWebpackConfig();
         const compiler = webpack(webpackConfig, ((err, stats) => {

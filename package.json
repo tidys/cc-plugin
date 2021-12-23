@@ -11,6 +11,7 @@
     "tsc-build": "tsc --watch"
   },
   "dependencies": {
+    "@types/mini-css-extract-plugin": "^2.4.0",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^6.5.1",
     "file-loader": "^6.2.0",
@@ -20,6 +21,7 @@
     "less-loader": "^10.2.0",
     "lint-staged": "^11.2.3",
     "lodash": "^4.17.21",
+    "mini-css-extract-plugin": "^2.4.5",
     "rechoir": "^0.8.0",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.2.6",
@@ -38,11 +40,11 @@
     "webpack-shebang-plugin": "^1.1.7"
   },
   "devDependencies": {
-    "@types/interpret": "^1.1.1",
-    "@types/rechoir": "^0.6.1",
     "@types/fs-extra": "^9.0.1",
+    "@types/interpret": "^1.1.1",
     "@types/lodash": "^4.14.178",
     "@types/node": "^16.11.12",
+    "@types/rechoir": "^0.6.1",
     "@types/webpack": "^5.28.0",
     "eslint": "7.32.0",
     "husky": "^3.1.0"

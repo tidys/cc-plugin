@@ -1,8 +1,19 @@
 <% const jsLength = htmlWebpackPlugin.files.js.length; %>
-<% const cssLength = htmlWebpackPlugin.files.css.length; %>
 <% for (let i = 0; i < jsLength; i++) { %>
     const panel = Editor.require('<%= htmlWebpackPlugin.files.js[i] %>');
 <% } %>
+
+function loadCss (parent, cssPaths) {
+if (!Array.isArray(cssPaths)) {
+cssPaths = [cssPaths];
+}
+cssPaths.forEach((cssPath) => {
+const link = document.createElement('link')
+link.rel = 'stylesheet';
+link.href = cssPath;
+parent.appendChild(link);
+})
+}
 
 Editor.Panel.extend({
 style:"<%= htmlWebpackPlugin.options.ccPlugin.style %>",
@@ -10,6 +21,13 @@ template:`<%= htmlWebpackPlugin.options.ccPlugin.template %>`,
 message:"<%= htmlWebpackPlugin.options.ccPlugin.messages %>",
 messages:{},
 ready(...args){
+
+<% const cssLength = htmlWebpackPlugin.files.css.length; %>
+<% for(let i = 0;i < cssLength;i++){ %>
+    loadCss(this.shadowRoot,'<%= htmlWebpackPlugin.files.css[i] %>')
+<% } %>
+
+
 if(panel&&panel.default){
 const p=new panel.default();
 p.ready(this.shadowRoot,args);

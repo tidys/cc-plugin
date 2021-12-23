@@ -31,14 +31,13 @@ class Panel {
                         minify: false,
                         hash: false,
                         filename,
-                        chunks: [entryName],
+                        chunks: ['vendor', entryName],
                         ccPlugin: {
                             template: '<div id="app">{{tips}}</div>',
                             style: '.body{width:100%}',
                             messages: 'hello message',
                         }
                     }]);
-                // const output = this.service.projectConfig.options.output;
                 return `${filename}`;
             }
         }

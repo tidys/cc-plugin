@@ -42,6 +42,7 @@ const fs_1 = require("fs");
 const cocos_plugin_package_json_1 = __importDefault(require("./cocos-plugin-package.json"));
 const npm_install_1 = __importDefault(require("../plugin/npm-install"));
 const declare_1 = require("../declare");
+const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
 function getExternal(dir) {
     let map = {};
     const nodeModules = Fs.readdirSync(Path.join(dir, 'node_modules'));
@@ -119,17 +120,20 @@ function default_1(api, projectConfig) {
                 .publicPath(`packages://${pluginName}/`);
             // rules
             webpackChain.module
-                .rule('css')
-                .test(/\.(less|css)$/)
-                .use('style-loader').loader('style-loader').end()
+                .rule('less')
+                .test(/\.less$/)
+                .use('extract').loader(mini_css_extract_plugin_1.default.loader).end()
                 .use('css-loader').loader('css-loader').end()
                 .use('less-loader').loader('less-loader').end();
             webpackChain.module
+                .rule('css')
+                .test(/\.css$/)
+                .use('extract').loader(mini_css_extract_plugin_1.default.loader).end()
+                .use('css-loader').loader('css-loader').end();
+            webpackChain.module
                 .rule('vue')
                 .test(/\.vue$/)
-                .use('vue-loader')
-                .loader('vue-loader')
-                .options({ optimizeSSR: false });
+                .use('vue-loader').loader('vue-loader').options({ optimizeSSR: false }).end();
             webpackChain.module
                 .rule('ts')
                 .test(/\.ts(x?)$/)
@@ -148,10 +152,19 @@ function default_1(api, projectConfig) {
             const panel = new panel_1.default(service, webpackChain);
             panel.dealPanels();
             // plugins
+            webpackChain.plugin('npm install')
+                .use(npm_install_1.default, [projectConfig.options.output]);
+            webpackChain.plugin('cc-plugin-package.json')
+                .use(cocos_plugin_package_json_1.default, [service]);
             webpackChain
                 .plugin('vue')
                 .use(vue_loader_1.default.VueLoaderPlugin)
                 .end();
+            webpackChain.plugin('extract-css')
+                .use(mini_css_extract_plugin_1.default, [{
+                    filename: '[name].css',
+                    chunkFilename: '[id].css'
+                }]).end();
             webpackChain
                 .plugin('clean')
                 .use(clean_webpack_plugin_1.CleanWebpackPlugin, [{
@@ -160,10 +173,6 @@ function default_1(api, projectConfig) {
                     cleanOnceBeforeBuildPatterns: ['i18n/**', 'panel/**', 'main.js', 'package-lock.json', 'package.json'],
                 }])
                 .end();
-            webpackChain.plugin('cc-plugin-package.json')
-                .use(cocos_plugin_package_json_1.default, [service]);
-            webpackChain.plugin('npm install')
-                .use(npm_install_1.default, [projectConfig.options.output]);
         });
         let webpackConfig = api.resolveChainWebpackConfig();
         const compiler = (0, webpack_1.default)(webpackConfig, ((err, stats) => {
