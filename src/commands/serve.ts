@@ -9,10 +9,14 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import Panel from '../panel';
 import * as Fs from 'fs';
 import { existsSync } from 'fs';
+import * as FsExtra from 'fs-extra';
 import CocosPluginPackageJson from './cocos-plugin-package.json';
 import NpmInstall from '../plugin/npm-install';
+import DevServer from '../plugin/dev-server';
 import { PluginVersion } from '../declare';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import webpackDevSever from 'webpack-dev-server'
+import PortFinder from 'portfinder'
 
 function getExternal(dir: string) {
     let map: Record<string, string> = {};
@@ -60,7 +64,8 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
         options: {}
     }, async (service: CocosPluginService) => {
 
-        api.chainWebpack((webpackChain: Config) => {
+        api.chainWebpack(async (webpackChain: Config) => {
+            webpackChain.watch(!!projectConfig.options.watch)
             webpackChain.mode('development');
             webpackChain.target('node');
             webpackChain.devtool(false);
@@ -68,7 +73,7 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
 
             // 排除模块
             // webpackChain.externals(getExternal(Path.join(__dirname,'../../')))
-
+            // webpackChain.externals({ 'socket.io-client': 'commonjs socket.io-client' })
             // i18n
             const { i18n_zh, i18n_en } = projectConfig.manifest;
             i18n_zh && webpackEntry(service, webpackChain, 'i18n/zh', i18n_zh);
@@ -141,6 +146,10 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
             panel.dealPanels();
 
             // plugins
+            const port = 2346;//await getPort();
+            webpackChain.plugin('dev-server')
+                .use(DevServer, [port])
+                .end();
             webpackChain.plugin('npm install')
                 .use(NpmInstall, [projectConfig.options.output!])
             webpackChain.plugin('cc-plugin-package.json')
@@ -162,6 +171,7 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
                     cleanOnceBeforeBuildPatterns: ['i18n/**', 'panel/**', 'main.js', 'package-lock.json', 'package.json'],
                 }])
                 .end();
+
         });
         let webpackConfig = api.resolveChainWebpackConfig();
         const compiler = webpack(webpackConfig, ((err, stats) => {
@@ -181,6 +191,29 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
             console.log('build complete')
         }));
 
+    })
+}
 
+async function getPort() {
+    PortFinder.basePort = 9087;
+    debugger
+    const port = await PortFinder.getPortPromise();
+    return port;
+}
+
+async function webpackServerTest(compiler: webpack.Compiler) {
+    const server = new webpackDevSever({
+        // inputFileSystem: FsExtra,
+        // outputFileSystem: FsExtra,
+        hot: true,
+        allowedHosts: ['all']
+    }, compiler);
+    const host = '0.0.0.0';
+    const port = await getPort();
+    server.listen(port, host, (err) => {
+        if (err) {
+            return console.log(err)
+        }
+        console.log(`webpack dev server listen ${port}`)
     })
 }

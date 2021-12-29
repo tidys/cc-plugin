@@ -5,9 +5,9 @@ export class CocosCreatorPlugin {
     public manifest: CocosPluginManifest | null = null;
     public options: CocosPluginOptions | null = null;
     public Panel: Panel | null = null;
-    public wrapper:   PluginMainWrapper | null = null;
+    public wrapper: PluginMainWrapper | null = null;
 
-    public init(manifest: CocosPluginManifest, options: CocosPluginOptions, wrapper:   PluginMainWrapper) {
+    public init(manifest: CocosPluginManifest, options: CocosPluginOptions, wrapper: PluginMainWrapper) {
         this.manifest = manifest;
         this.options = options;
         this.wrapper = wrapper;

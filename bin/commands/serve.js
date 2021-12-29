@@ -41,8 +41,11 @@ const Fs = __importStar(require("fs"));
 const fs_1 = require("fs");
 const cocos_plugin_package_json_1 = __importDefault(require("./cocos-plugin-package.json"));
 const npm_install_1 = __importDefault(require("../plugin/npm-install"));
+const dev_server_1 = __importDefault(require("../plugin/dev-server"));
 const declare_1 = require("../declare");
 const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
+const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
+const portfinder_1 = __importDefault(require("portfinder"));
 function getExternal(dir) {
     let map = {};
     const nodeModules = Fs.readdirSync(Path.join(dir, 'node_modules'));
@@ -83,13 +86,15 @@ function default_1(api, projectConfig) {
         usage: 'usage',
         options: {}
     }, (service) => __awaiter(this, void 0, void 0, function* () {
-        api.chainWebpack((webpackChain) => {
+        api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
+            webpackChain.watch(!!projectConfig.options.watch);
             webpackChain.mode('development');
             webpackChain.target('node');
             webpackChain.devtool(false);
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.json');
             // 排除模块
             // webpackChain.externals(getExternal(Path.join(__dirname,'../../')))
+            // webpackChain.externals({ 'socket.io-client': 'commonjs socket.io-client' })
             // i18n
             const { i18n_zh, i18n_en } = projectConfig.manifest;
             i18n_zh && webpackEntry(service, webpackChain, 'i18n/zh', i18n_zh);
@@ -152,6 +157,10 @@ function default_1(api, projectConfig) {
             const panel = new panel_1.default(service, webpackChain);
             panel.dealPanels();
             // plugins
+            const port = 2346; //await getPort();
+            webpackChain.plugin('dev-server')
+                .use(dev_server_1.default, [port])
+                .end();
             webpackChain.plugin('npm install')
                 .use(npm_install_1.default, [projectConfig.options.output]);
             webpackChain.plugin('cc-plugin-package.json')
@@ -173,7 +182,7 @@ function default_1(api, projectConfig) {
                     cleanOnceBeforeBuildPatterns: ['i18n/**', 'panel/**', 'main.js', 'package-lock.json', 'package.json'],
                 }])
                 .end();
-        });
+        }));
         let webpackConfig = api.resolveChainWebpackConfig();
         const compiler = (0, webpack_1.default)(webpackConfig, ((err, stats) => {
             if (err) {
@@ -194,3 +203,29 @@ function default_1(api, projectConfig) {
     }));
 }
 exports.default = default_1;
+function getPort() {
+    return __awaiter(this, void 0, void 0, function* () {
+        portfinder_1.default.basePort = 9087;
+        debugger;
+        const port = yield portfinder_1.default.getPortPromise();
+        return port;
+    });
+}
+function webpackServerTest(compiler) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const server = new webpack_dev_server_1.default({
+            // inputFileSystem: FsExtra,
+            // outputFileSystem: FsExtra,
+            hot: true,
+            allowedHosts: ['all']
+        }, compiler);
+        const host = '0.0.0.0';
+        const port = yield getPort();
+        server.listen(port, host, (err) => {
+            if (err) {
+                return console.log(err);
+            }
+            console.log(`webpack dev server listen ${port}`);
+        });
+    });
+}

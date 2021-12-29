@@ -41,6 +41,7 @@ export enum PluginVersion {
 }
 
 export interface CocosPluginOptions {
+    watch?: boolean;
     output?: string, // 最终都要变成绝对路径
     cwd?: string;
     version?: PluginVersion;

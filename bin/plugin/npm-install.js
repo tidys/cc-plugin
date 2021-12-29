@@ -20,16 +20,40 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process = __importStar(require("child_process"));
-const Fs = __importStar(require("fs"));
+const Fs = __importStar(require("fs-extra"));
+const Path = __importStar(require("path"));
 class NpmInstall {
     constructor(dir) {
         this.dir = dir;
     }
     apply(compiler) {
         compiler.hooks.afterDone.tap('npm-install', () => {
-            if (this.dir && Fs.existsSync(this.dir)) {
+            let canInstall = false;
+            const rootDir = compiler.options.output.path;
+            const packageJson = Path.join(rootDir, 'package.json');
+            const nodeModules = Path.join(rootDir, 'node_modules');
+            if (Fs.existsSync(nodeModules) && Fs.existsSync(packageJson)) {
+                const data = Fs.readJSONSync(packageJson);
+                if (data && data.dependencies) {
+                    const dirs = Fs.readdirSync(nodeModules);
+                    for (let key in data.dependencies) {
+                        if (!dirs.find(el => el === key)) {
+                            canInstall = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            else {
+                canInstall = true;
+            }
+            if (canInstall) {
+                // 判断下目录是否存在依赖，再决定是否npm i
                 console.log('npm install ...');
                 child_process.execSync('npm install', { cwd: this.dir });
+            }
+            else {
+                console.log('npm has installed.');
             }
         });
     }

@@ -35,7 +35,7 @@ export default class CocosPluginPackageJson {
                 if (!packageJson.hasOwnProperty(panelName)) {
                     // @ts-ignore
                     packageJson[`${panelName}`] = {
-                        main: panel.main, // TODO 找到这个panel的main
+                        main: panel.main,
                         title: panel.title,
                         type: panel.type,
                         width: panel.width,

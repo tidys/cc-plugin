@@ -1,7 +1,17 @@
 import CCP from './index'
+import ClientSocket from './client-socket';
 
-export const load = CCP.wrapper?.load || (() => {
+// 这个port需要动态获取
+const port = 2346;
+const hot = true;
+
+export const load = (() => {
     console.log('load')
+    if (hot) {
+        let client = new ClientSocket();
+        client.connect(port)
+    }
+    CCP.wrapper?.load();
     return 0;
 })
 
