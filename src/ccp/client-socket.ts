@@ -1,8 +1,10 @@
-import {Socket} from 'net';
+import { Socket } from 'net';
+import CCP from './index'
 
 export default class ClientSocket {
     private client: Socket;
     private isConn = false;
+    private reloadCallback: Function | null = null;
 
     constructor() {
         const client = new Socket();
@@ -23,8 +25,16 @@ export default class ClientSocket {
         this.client = client;
     }
 
-    private onMessage(data: string) {
+    setReloadCallback(cb: Function) {
+        this.reloadCallback = cb;
+    }
 
+    private onMessage(data: string) {
+        if (data === 'reload') {
+            this.client.end(() => {
+                this.reloadCallback && this.reloadCallback();
+            });
+        }
     }
 
     connect(port: number) {

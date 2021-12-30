@@ -9,6 +9,15 @@ export const load = (() => {
     console.log('load')
     if (hot) {
         let client = new ClientSocket();
+        client.setReloadCallback(() => {
+            const { name } = CCP.manifest!;
+            // @ts-ignore
+            const fsPath = Editor.url(`packages://${name}`)
+            // @ts-ignore
+            Editor.Package.reload(fsPath, () => {
+                console.log('reload success')
+            });
+        })
         client.connect(port)
     }
     CCP.wrapper?.load();
