@@ -4,6 +4,7 @@ const net_1 = require("net");
 class ClientSocket {
     constructor() {
         this.isConn = false;
+        this.reloadCallback = null;
         const client = new net_1.Socket();
         client.on('data', (data) => {
             const msg = data.toString();
@@ -20,7 +21,15 @@ class ClientSocket {
         });
         this.client = client;
     }
+    setReloadCallback(cb) {
+        this.reloadCallback = cb;
+    }
     onMessage(data) {
+        if (data === 'reload') {
+            this.client.end(() => {
+                this.reloadCallback && this.reloadCallback();
+            });
+        }
     }
     connect(port) {
         const { client } = this;

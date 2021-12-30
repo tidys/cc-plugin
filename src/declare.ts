@@ -42,11 +42,17 @@ export enum PluginVersion {
 
 export interface CocosPluginOptions {
     watch?: boolean;
+    hot?: boolean;
     output?: string, // 最终都要变成绝对路径
     cwd?: string;
     version?: PluginVersion;
     min?: boolean;// 压缩
     treeShaking?: boolean;
+}
+
+export interface CocosPluginConfig {
+    manifest: CocosPluginManifest,
+    options: CocosPluginOptions
 }
 
 export interface CocosPluginV2 {
@@ -57,10 +63,6 @@ export interface CocosPluginV2 {
     author?: string;
     'main-menu'?: Record<string, { icon?: string, message?: string, accelerator?: string }>;
     dependencies?: string[];
-}
-
-export abstract class AbstractPluginPanel {
-    abstract ready(rootElement: any, args: any): void;
 }
 
 export interface PluginMainWrapper {

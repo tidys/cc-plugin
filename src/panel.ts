@@ -27,6 +27,7 @@ export default class Panel {
             if (entryPoint) {
                 console.error(`has same entry ${entryName}`);
             } else {
+                const hotFile = join(this.service.root, './src/ccp/client-socket.ts')
                 webpackChain.entry(entryName).add(mainFile);
                 const filename = `${entryName}_panel.js`
                 webpackChain.plugin('panel').use(HtmlWebpackPlugin, [{
@@ -35,7 +36,7 @@ export default class Panel {
                     minify: false,
                     hash: false,
                     filename,
-                    chunks: ['vendor',entryName],
+                    chunks: ['vendor', entryName],
                     ccPlugin: {
                         template: '<div id="app">{{tips}}</div>',
                         style: '.body{width:100%}',

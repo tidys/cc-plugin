@@ -16,9 +16,7 @@ parent.appendChild(link);
 }
 
 Editor.Panel.extend({
-style:"<%= htmlWebpackPlugin.options.ccPlugin.style %>",
 template:`<%= htmlWebpackPlugin.options.ccPlugin.template %>`,
-message:"<%= htmlWebpackPlugin.options.ccPlugin.messages %>",
 messages:{},
 ready(...args){
 
@@ -27,11 +25,22 @@ ready(...args){
     loadCss(this.shadowRoot,'<%= htmlWebpackPlugin.files.css[i] %>')
 <% } %>
 
-
-if(panel&&panel.default){
-const p=new panel.default();
-p.ready(this.shadowRoot,args);
+let panelInstance = panel;
+if (panel && panel.default) {
+panelInstance = panel.default;
 }
+
+let targetPanel = panelInstance;
+if (typeof panelInstance === 'function') {
+targetPanel = new panelInstance();
+}
+
+if (targetPanel.hasOwnProperty('ready') &&
+typeof targetPanel.ready === 'function') {
+targetPanel.ready(this.shadowRoot, args);
+}
+
+
 }
 })
 

@@ -1,19 +1,21 @@
-import { PluginVersion } from '../declare';
-import { CocosCreatorPlugin } from './index';
+import { CocosPluginConfig, CocosPluginManifest, CocosPluginOptions, PluginVersion } from '../declare';
 
+// 这里面的代码和进程无关了
 export class Panel {
-    private plugin: CocosCreatorPlugin | null = null;
+    private config: CocosPluginConfig | null = null;
 
-    constructor(plugin: CocosCreatorPlugin) {
-        this.plugin = plugin;
+    setConfig(config: CocosPluginConfig) {
+        this.config = config;
     }
 
     open(panel: string) {
         const array = panel.split('.');
         if (array.length >= 2) {
             let [panelName, panelID] = array;
-
-            const { manifest, options } = this.plugin!;
+            if (!this.config) {
+                return;
+            }
+            const { manifest, options } = this.config!;
             if (options?.version === PluginVersion.v2) {
                 if (panelName === 'self') {
                     panelName = manifest!.name

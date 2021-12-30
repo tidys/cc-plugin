@@ -23,6 +23,7 @@ class Panel {
                 console.error(`has same entry ${entryName}`);
             }
             else {
+                const hotFile = (0, path_1.join)(this.service.root, './src/ccp/client-socket.ts');
                 webpackChain.entry(entryName).add(mainFile);
                 const filename = `${entryName}_panel.js`;
                 webpackChain.plugin('panel').use(html_webpack_plugin_1.default, [{

@@ -1,5 +1,4 @@
 import { Socket } from 'net';
-import CCP from './index'
 
 export default class ClientSocket {
     private client: Socket;

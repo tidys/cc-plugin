@@ -1,4 +1,4 @@
-import CCP from './index'
+import CCP from './entry-main'
 import ClientSocket from './client-socket';
 
 // 这个port需要动态获取

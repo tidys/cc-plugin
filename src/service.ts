@@ -1,4 +1,4 @@
-import { CocosPluginManifest, CocosPluginOptions, PluginVersion } from './declare';
+import { CocosPluginConfig, CocosPluginManifest, CocosPluginOptions, PluginVersion } from './declare';
 
 import * as Path from 'path';
 import serve from './commands/serve'
@@ -47,7 +47,7 @@ export default class CocosPluginService {
 
     }
 
-    private loadUserOptions(): { manifest: CocosPluginManifest, options: CocosPluginOptions } | null {
+    private loadUserOptions(): CocosPluginConfig | null {
         const configNames = ['./cc-plugin.config.js', './cc-plugin.config.ts'];
         let fileConfigPath = '';
         for (let name of configNames) {
