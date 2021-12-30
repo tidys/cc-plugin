@@ -61,9 +61,9 @@
   "remote": {
     "type": "copy",
     "registry": "npm",
-    "hash": "99335b71-6055-4a85-a3ce-704a209065f6-1640178559991",
+    "hash": "a93c304a-d99a-4a0f-8f26-cc928920ed2f-1640852103961",
     "reference": "/usr/local/lib/node_modules/cc-plugin"
   },
   "registry": "npm",
-  "hash": "99335b71-6055-4a85-a3ce-704a209065f6-1640178559991"
+  "hash": "a93c304a-d99a-4a0f-8f26-cc928920ed2f-1640852103961"
 }

@@ -39,6 +39,7 @@ const clean_webpack_plugin_1 = require("clean-webpack-plugin");
 const panel_1 = __importDefault(require("../panel"));
 const Fs = __importStar(require("fs"));
 const fs_1 = require("fs");
+const FsExtra = __importStar(require("fs-extra"));
 const cocos_plugin_package_json_1 = __importDefault(require("./cocos-plugin-package.json"));
 const npm_install_1 = __importDefault(require("../plugin/npm-install"));
 const dev_server_1 = __importDefault(require("../plugin/dev-server"));
@@ -46,15 +47,26 @@ const declare_1 = require("../declare");
 const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
 const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
 const portfinder_1 = __importDefault(require("portfinder"));
-function getExternal(dir) {
+function getExternal(dir, defaultModules = []) {
     let map = {};
-    const nodeModules = Fs.readdirSync(Path.join(dir, 'node_modules'));
-    nodeModules.forEach((module) => {
+    defaultModules.forEach(module => {
         map[module] = '';
     });
-    const { dependencies } = require('./package.json');
-    for (let key in dependencies) {
-        map[key] = '';
+    // const nodeModules = Fs.readdirSync(Path.join(dir, 'node_modules'));
+    // nodeModules.forEach((module) => {
+    //     map[module] = '';
+    // })
+    const packageFile = Path.join(dir, './package.json');
+    if (Fs.existsSync(packageFile)) {
+        try {
+            const { dependencies } = FsExtra.readJSONSync(packageFile);
+            for (let key in dependencies) {
+                map[key] = '';
+            }
+        }
+        catch (e) {
+            console.log(e);
+        }
     }
     for (let key in map) {
         map[key] = `commonjs ${key}`;
@@ -91,10 +103,10 @@ function default_1(api, projectConfig) {
             webpackChain.mode('development');
             webpackChain.target('node');
             webpackChain.devtool(false);
-            webpackChain.resolve.extensions.add('.ts').add('.vue').add('.json');
+            webpackChain.resolve.extensions.add('.js').add('.ts').add('.vue').add('.json');
             // 排除模块
-            // webpackChain.externals(getExternal(Path.join(__dirname,'../../')))
-            webpackChain.externals({ 'electron': 'commonjs electron' });
+            let externals = getExternal(service.context, ['electron', 'fs-extra', 'express']);
+            webpackChain.externals(externals);
             // i18n
             const { i18n_zh, i18n_en } = projectConfig.manifest;
             i18n_zh && webpackEntry(service, webpackChain, 'i18n/zh', i18n_zh);

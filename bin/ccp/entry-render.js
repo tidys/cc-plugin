@@ -13,6 +13,10 @@ class CocosCreatorPluginRender {
         this.options = null;
         this.Panel = new panel_1.Panel();
     }
+    require(name) {
+        // @ts-ignore
+        return Editor.require(`packages://${this.manifest.name}/node_modules/${name}`);
+    }
     init(config, options) {
         var _a;
         this.Panel.setConfig(config);
