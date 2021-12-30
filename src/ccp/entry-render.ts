@@ -24,7 +24,12 @@ export class CocosCreatorPluginRender {
                 let client = new ClientSocket();
                 client.setReloadCallback(() => {
                     // TODO 渲染进程HMR实现
-                    window.location.reload();
+                    console.log('reload')
+                    // window.location.reload();// 这种方式会导致chrome也打开网页
+                    // @ts-ignore
+                    const electron = require('electron')
+                    // @ts-ignore
+                    electron.remote.getCurrentWindow().reload()
                 })
                 client.connect(Port)
             }

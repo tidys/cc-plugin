@@ -73,7 +73,7 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
 
             // 排除模块
             // webpackChain.externals(getExternal(Path.join(__dirname,'../../')))
-            // webpackChain.externals({ 'socket.io-client': 'commonjs socket.io-client' })
+            webpackChain.externals({ 'electron': 'commonjs electron' })
             // i18n
             const { i18n_zh, i18n_en } = projectConfig.manifest;
             i18n_zh && webpackEntry(service, webpackChain, 'i18n/zh', i18n_zh);
