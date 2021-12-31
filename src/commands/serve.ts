@@ -79,7 +79,7 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
             webpackChain.mode('development');
             webpackChain.target('node');
             webpackChain.devtool(false);
-            webpackChain.resolve.extensions.add('.js').add('.ts').add('.vue').add('.json');
+            webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json');
 
             // 排除模块
             let externals = getExternal(service.context, ['electron', 'fs-extra', 'express'])
@@ -137,6 +137,7 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
             webpackChain.module
                 .rule('ts')
                 .test(/\.ts(x?)$/)
+                .exclude.add(/node_modules/).end()
                 .use('ts-loader')
                 .loader('ts-loader')
                 .options({

@@ -18,6 +18,7 @@
     "execa": "5.1.1",
     "express": "^4.17.2",
     "file-loader": "^6.2.0",
+    "fs-extra": "^10.0.0",
     "html-webpack-plugin": "^5.5.0",
     "inquirer": "^8.2.0",
     "interpret": "^2.2.0",
@@ -34,7 +35,6 @@
     "typescript": "^4.5.2",
     "vue": "2.6.14",
     "vue-class-component": "^7.2.6",
-    "vue-cli": "^2.9.6",
     "vue-loader": "^15.9.8",
     "vue-property-decorator": "^9.0.0",
     "vue-style-loader": "^4.1.2",
@@ -46,10 +46,10 @@
     "webpack-shebang-plugin": "^1.1.7"
   },
   "devDependencies": {
-    "@types/mini-css-extract-plugin": "^2.4.0",
     "@types/fs-extra": "^9.0.1",
     "@types/interpret": "^1.1.1",
     "@types/lodash": "^4.14.178",
+    "@types/mini-css-extract-plugin": "^2.4.0",
     "@types/node": "^16.11.12",
     "@types/rechoir": "^0.6.1",
     "@types/webpack": "^5.28.0",
