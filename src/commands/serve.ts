@@ -4,7 +4,7 @@ import Chain from 'webpack-chain';
 import webpack from 'webpack';
 import CocosPluginService, { ProjectConfig } from '../service';
 import * as Path from 'path';
-import vueLoader from 'vue-loader'
+import vueLoader, { VueLoaderPlugin } from 'vue-loader'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import Panel from '../panel';
 import * as Fs from 'fs';
@@ -17,6 +17,8 @@ import { PluginVersion } from '../declare';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import webpackDevSever from 'webpack-dev-server'
 import PortFinder from 'portfinder'
+import chalk from 'chalk';
+import printf from 'printf';
 
 function getExternal(dir: string, defaultModules: string[] = []) {
     let map: Record<string, string> = {};
@@ -42,7 +44,11 @@ function getExternal(dir: string, defaultModules: string[] = []) {
     for (let key in map) {
         map[key] = `commonjs ${key}`;
     }
-    delete map['vue-loader'];
+
+    ['vue-loader', 'tdesign-vue-next'].forEach(item => {
+        delete map[item];
+    });
+
     return map;
 }
 
@@ -73,6 +79,8 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
         usage: 'usage',
         options: {}
     }, async (service: CocosPluginService) => {
+        console.log(chalk.red(printf('%-20s %s', 'service root:    ', service.root)))
+        console.log(chalk.red(printf('%-20s %s', 'service context: ', service.context)))
 
         api.chainWebpack(async (webpackChain: Config) => {
             webpackChain.watch(!!projectConfig.options.watch)
@@ -121,18 +129,29 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
                 .test(/\.less$/)
                 .use('extract').loader(MiniCssExtractPlugin.loader).end()
                 .use('css-loader').loader('css-loader').end()
-                .use('less-loader').loader('less-loader').end();
+                .use('less-loader').loader('less-loader').end()
+                // .use('postcss-loader').loader('postcss-loader').end();
 
             webpackChain.module
                 .rule('css')
                 .test(/\.css$/)
                 .use('extract').loader(MiniCssExtractPlugin.loader).end()
                 .use('css-loader').loader('css-loader').end()
+                // .use('postcss-loader').loader('postcss-loader').end();
 
             webpackChain.module
                 .rule('vue')
                 .test(/\.vue$/)
-                .use('vue-loader').loader('vue-loader').options({ optimizeSSR: false }).end();
+                .use('vue-loader')
+                .loader('vue-loader')
+                .options({
+                    isServerBuild: false,
+                    compilerOptions: {
+                        isCustomElement(tag: any) {
+                            return /^ui-/i.test(String(tag));
+                        },
+                    }
+                }).end();
 
             webpackChain.module
                 .rule('ts')
@@ -167,7 +186,7 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
                 .use(CocosPluginPackageJson, [service])
             webpackChain
                 .plugin('vue')
-                .use(vueLoader.VueLoaderPlugin)
+                .use(VueLoaderPlugin)
                 .end();
             webpackChain.plugin('extract-css')
                 .use(MiniCssExtractPlugin, [{
@@ -191,8 +210,9 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
             }
             if (stats?.hasErrors()) {
                 stats?.compilation.errors.forEach(error => {
-                    console.log(error.message)
-                    console.log(error.stack)
+                    console.log(chalk.yellow(error.message))
+                    console.log(chalk.blue(error.details))
+                    console.log(chalk.red(error.stack || ''))
                 })
                 return console.log('Build failed with error');
             }

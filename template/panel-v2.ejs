@@ -9,7 +9,7 @@ if (!Array.isArray(cssPaths)) {
 cssPaths = [cssPaths];
 }
 cssPaths.forEach((cssPath) => {
-const id = CSS.escape();
+const id = CSS.escape(cssPath);
 const hasLoaded = parent.querySelector(`#${id}`)
 if (!hasLoaded) {
 const link = document.createElement('link')

@@ -2,7 +2,7 @@
   "manifest": {
     "name": "cc-plugin",
     "version": "1.0.0",
-    "description": "专为`Cocos Creator`插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。",
+    "description": "专为Cocos Creator插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。",
     "main": "index.js",
     "bin": {
       "cc-plugin": "./bin/index.js"
@@ -12,38 +12,48 @@
       "tsc-build": "tsc --watch"
     },
     "dependencies": {
+      "@vue/compiler-sfc": "^3.2.8",
+      "chalk": "2.4.2",
       "clean-webpack-plugin": "^4.0.0",
+      "commander": "^8.3.0",
       "css-loader": "^6.5.1",
+      "execa": "5.1.1",
+      "express": "^4.17.2",
       "file-loader": "^6.2.0",
+      "fs-extra": "^10.0.0",
       "html-webpack-plugin": "^5.5.0",
+      "inquirer": "^8.2.0",
       "interpret": "^2.2.0",
       "less": "^4.1.2",
       "less-loader": "^10.2.0",
       "lint-staged": "^11.2.3",
       "lodash": "^4.17.21",
+      "mini-css-extract-plugin": "^2.4.5",
+      "naive-ui": "^2.23.2",
+      "parseuri": "0.0.6",
+      "portfinder": "^1.0.28",
+      "printf": "^0.6.1",
       "rechoir": "^0.8.0",
       "style-loader": "^3.3.1",
       "ts-loader": "^9.2.6",
       "ts-node": "^10.4.0",
       "typescript": "^4.5.2",
-      "vue": "2.6.14",
-      "vue-class-component": "^7.2.6",
-      "vue-cli": "^2.9.6",
-      "vue-loader": "^15.9.8",
-      "vue-property-decorator": "^9.0.0",
+      "vue": "^3.2.26",
+      "vue-loader": "^16.8.3",
       "vue-style-loader": "^4.1.2",
-      "vue-template-compiler": "2.6.14",
       "webpack": "^5.65.0",
       "webpack-chain": "^6.5.1",
       "webpack-cli": "^4.9.1",
+      "webpack-dev-server": "^4.7.1",
       "webpack-shebang-plugin": "^1.1.7"
     },
     "devDependencies": {
-      "@types/interpret": "^1.1.1",
-      "@types/rechoir": "^0.6.1",
       "@types/fs-extra": "^9.0.1",
+      "@types/interpret": "^1.1.1",
       "@types/lodash": "^4.14.178",
+      "@types/mini-css-extract-plugin": "^2.4.0",
       "@types/node": "^16.11.12",
+      "@types/rechoir": "^0.6.1",
       "@types/webpack": "^5.28.0",
       "eslint": "7.32.0",
       "husky": "^3.1.0"
@@ -53,7 +63,7 @@
     },
     "license": "ISC",
     "_registry": "npm",
-    "_loc": "/Users/xyf/Library/Caches/Yarn/v4/npm-cc-plugin-1.0.0-83fa1023-b10e-4756-b645-1fe8c8ae9dae-1640178319807/node_modules/cc-plugin/package.json",
+    "_loc": "/Users/xyf/Library/Caches/Yarn/v4/npm-cc-plugin-1.0.0-acaea233-0aaf-4de2-a4a0-5390bce411db-1640957021290/node_modules/cc-plugin/package.json",
     "readmeFilename": "README.md",
     "readme": "# cc-plugin\n\n专为`Cocos Creator`插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。\n\n大致实现原理就是使用webpack抹平了v2、v3插件版本的底层差异，使开发插件更加工程化。\n\n推荐使用typescript开发插件，更丝滑流畅。\n\n## 使用\n\n`cc-plugin.config.ts`配置如下\n\n```typescript\nimport { CocosPluginManifest, CocosPluginOptions, Panel, PluginVersion } from 'cc-plugin/src/declare';\n\nconst manifest: CocosPluginManifest = {\n    name: 'test-plugin',// 插件的名字\n    version: '1.0.0',// 插件的版本号\n    description: 'my first plugin',// 插件的描述\n    author: \"cocos creator\",// 插件作者\n    main: './src/main.ts',// 主进程的代码相对路径\n    panels: [],// 插件的面板\n    menus: [],// 插件的菜单\n    i18n_en: './src/en.ts',\n    i18n_zh: './src/zh.ts',\n}\nconst options: CocosPluginOptions = {\n    version: PluginVersion.v2, // 发布的creator版本\n    output: '/cocos-creator/project/packages/test-plugin', // 最终插件的输出目录，必须是绝对路径\n    min: false,// 压缩代码\n    treeShaking: false,//剔除无效的代码逻辑\n}\nexport default { manifest, options };\n\n```\n\n为了保证代码的兼容性，插件的主进程代码`manifest.main`需要这样写\n\n```typescript\n\nimport pluginConfig from '../cc-plugin.config';\nimport CCP from 'cc-plugin/src/ccp/index';\n\nCCP.init(pluginConfig.manifest, pluginConfig.options, {\n    load: () => {\n        return 'plugin-load'\n    },\n    messages: {\n        showPanel() {\n            CCP.Panel.open('self.main');\n        }\n    }\n});\n\n```\n\n## panels\n\n```typescript\ninterface PanelOptions {\n    main: string;// 面板的入口逻辑相对路径 './src/panel/index.ts',\n    name: string;\n    title: string;\n    type?: string;//面板类型：可选值 Panel.Type.Dockable\n    width?: number;\n    height?: number;\n    minWidth?: number;\n    minHeight?: number;\n}\n```\n\n## menus\n\n```typescript\n interface MenuOptions {\n    path: string;\n    icon?: string;\n    accelerator?: string;\n    message: string;\n}\n\n```\n\n## 创建运行项目\n```shell\nnpm install cc-plugin -g\ncc-plugin create my-first-plugin\ncd ./my-first-plugin\nnpm install\ncc-plugin serve\n```\n"
   },
@@ -61,9 +71,9 @@
   "remote": {
     "type": "copy",
     "registry": "npm",
-    "hash": "7be155f8-2850-492a-84d8-3397f526f8e6-1640916978689",
+    "hash": "ba2ed31b-527f-4ab2-80e8-f24038c709f9-1641110076073",
     "reference": "/usr/local/lib/node_modules/cc-plugin"
   },
   "registry": "npm",
-  "hash": "7be155f8-2850-492a-84d8-3397f526f8e6-1640916978689"
+  "hash": "ba2ed31b-527f-4ab2-80e8-f24038c709f9-1641110076073"
 }

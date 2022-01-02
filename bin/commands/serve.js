@@ -34,7 +34,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const webpack_chain_1 = __importDefault(require("webpack-chain"));
 const webpack_1 = __importDefault(require("webpack"));
 const Path = __importStar(require("path"));
-const vue_loader_1 = __importDefault(require("vue-loader"));
+const vue_loader_1 = require("vue-loader");
 const clean_webpack_plugin_1 = require("clean-webpack-plugin");
 const panel_1 = __importDefault(require("../panel"));
 const Fs = __importStar(require("fs"));
@@ -47,6 +47,8 @@ const declare_1 = require("../declare");
 const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
 const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
 const portfinder_1 = __importDefault(require("portfinder"));
+const chalk_1 = __importDefault(require("chalk"));
+const printf_1 = __importDefault(require("printf"));
 function getExternal(dir, defaultModules = []) {
     let map = {};
     defaultModules.forEach(module => {
@@ -71,7 +73,9 @@ function getExternal(dir, defaultModules = []) {
     for (let key in map) {
         map[key] = `commonjs ${key}`;
     }
-    delete map['vue-loader'];
+    ['vue-loader', 'tdesign-vue-next'].forEach(item => {
+        delete map[item];
+    });
     return map;
 }
 function webpackEntry(service, webpackChain, entryName, file, prepend) {
@@ -98,6 +102,8 @@ function default_1(api, projectConfig) {
         usage: 'usage',
         options: {}
     }, (service) => __awaiter(this, void 0, void 0, function* () {
+        console.log(chalk_1.default.red((0, printf_1.default)('%-20s %s', 'service root:    ', service.root)));
+        console.log(chalk_1.default.red((0, printf_1.default)('%-20s %s', 'service context: ', service.context)));
         api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
             webpackChain.watch(!!projectConfig.options.watch);
             webpackChain.mode('development');
@@ -142,15 +148,26 @@ function default_1(api, projectConfig) {
                 .use('extract').loader(mini_css_extract_plugin_1.default.loader).end()
                 .use('css-loader').loader('css-loader').end()
                 .use('less-loader').loader('less-loader').end();
+            // .use('postcss-loader').loader('postcss-loader').end();
             webpackChain.module
                 .rule('css')
                 .test(/\.css$/)
                 .use('extract').loader(mini_css_extract_plugin_1.default.loader).end()
                 .use('css-loader').loader('css-loader').end();
+            // .use('postcss-loader').loader('postcss-loader').end();
             webpackChain.module
                 .rule('vue')
                 .test(/\.vue$/)
-                .use('vue-loader').loader('vue-loader').options({ optimizeSSR: false }).end();
+                .use('vue-loader')
+                .loader('vue-loader')
+                .options({
+                isServerBuild: false,
+                compilerOptions: {
+                    isCustomElement(tag) {
+                        return /^ui-/i.test(String(tag));
+                    },
+                }
+            }).end();
             webpackChain.module
                 .rule('ts')
                 .test(/\.ts(x?)$/)
@@ -180,7 +197,7 @@ function default_1(api, projectConfig) {
                 .use(cocos_plugin_package_json_1.default, [service]);
             webpackChain
                 .plugin('vue')
-                .use(vue_loader_1.default.VueLoaderPlugin)
+                .use(vue_loader_1.VueLoaderPlugin)
                 .end();
             webpackChain.plugin('extract-css')
                 .use(mini_css_extract_plugin_1.default, [{
@@ -203,8 +220,9 @@ function default_1(api, projectConfig) {
             }
             if (stats === null || stats === void 0 ? void 0 : stats.hasErrors()) {
                 stats === null || stats === void 0 ? void 0 : stats.compilation.errors.forEach(error => {
-                    console.log(error.message);
-                    console.log(error.stack);
+                    console.log(chalk_1.default.yellow(error.message));
+                    console.log(chalk_1.default.blue(error.details));
+                    console.log(chalk_1.default.red(error.stack || ''));
                 });
                 return console.log('Build failed with error');
             }
