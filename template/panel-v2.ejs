@@ -4,17 +4,22 @@
 <% } %>
 
 function loadCss (parent, cssPaths) {
+if (!parent) return
 if (!Array.isArray(cssPaths)) {
 cssPaths = [cssPaths];
 }
 cssPaths.forEach((cssPath) => {
+const id = CSS.escape();
+const hasLoaded = parent.querySelector(`#${id}`)
+if (!hasLoaded) {
 const link = document.createElement('link')
 link.rel = 'stylesheet';
 link.href = cssPath;
+link.id = id;
 parent.appendChild(link);
+}
 })
 }
-
 Editor.Panel.extend({
 template:`<%= htmlWebpackPlugin.options.ccPlugin.template %>`,
 messages:{},
@@ -23,6 +28,7 @@ ready(...args){
 <% const cssLength = htmlWebpackPlugin.files.css.length; %>
 <% for(let i = 0;i < cssLength;i++){ %>
     loadCss(this.shadowRoot,'<%= htmlWebpackPlugin.files.css[i] %>')
+    loadCss(document.head,'<%= htmlWebpackPlugin.files.css[i] %>')
 <% } %>
 
 let panelInstance = panel;
