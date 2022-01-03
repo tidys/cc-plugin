@@ -123,8 +123,8 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
             const pluginName = projectConfig.manifest.name;
             webpackChain.output.path(output)
                 .libraryTarget('commonjs')
+                .libraryExport('default')
                 .publicPath(`packages://${pluginName}/`);
-
             // rules
             webpackChain.module
                 .rule('less')

@@ -1,5 +1,5 @@
 import { ref, reactive } from 'vue'
-import * as chroma from 'chroma-js';
+import chroma from 'chroma-js'; // fixme 有时候有default，有时候没有
 
 interface styleOptions {
     background: string;
@@ -51,12 +51,10 @@ class TransitionColor extends CocosUiElement {
     }
 
     onMousedown(styles: styleOptions): void {
-        // @ts-ignore
         styles.background = chroma(this.color).darken(0.5).hex();
     }
 
     onMouseenter(styles: styleOptions): void {
-        // @ts-ignore
         styles.background = chroma(this.color).brighten(0.3).hex();
     }
 
