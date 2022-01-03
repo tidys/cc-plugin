@@ -101,6 +101,9 @@
     "src/**/*"
   ],
   "exclude": [
-    "./node_modules"
+    "./node_modules",
+    "./src/ui/**/*",
+    "./src/ccp/**/*",
+    "./src/test/**/*"
   ]
 }

@@ -87,6 +87,8 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
             webpackChain.mode('development');
             webpackChain.target('node');
             webpackChain.devtool(false);
+            const vuePath = Path.resolve(service.root, './node_modules/vue');
+            webpackChain.resolve.alias.set('vue', vuePath).end();
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json');
 
             // 排除模块
@@ -130,14 +132,14 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
                 .use('extract').loader(MiniCssExtractPlugin.loader).end()
                 .use('css-loader').loader('css-loader').end()
                 .use('less-loader').loader('less-loader').end()
-                // .use('postcss-loader').loader('postcss-loader').end();
+            // .use('postcss-loader').loader('postcss-loader').end();
 
             webpackChain.module
                 .rule('css')
                 .test(/\.css$/)
                 .use('extract').loader(MiniCssExtractPlugin.loader).end()
                 .use('css-loader').loader('css-loader').end()
-                // .use('postcss-loader').loader('postcss-loader').end();
+            // .use('postcss-loader').loader('postcss-loader').end();
 
             webpackChain.module
                 .rule('vue')

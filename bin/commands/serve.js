@@ -109,6 +109,8 @@ function default_1(api, projectConfig) {
             webpackChain.mode('development');
             webpackChain.target('node');
             webpackChain.devtool(false);
+            const vuePath = Path.resolve(service.root, './node_modules/vue');
+            webpackChain.resolve.alias.set('vue', vuePath).end();
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json');
             // 排除模块
             let externals = getExternal(service.context, ['electron', 'fs-extra', 'express']);
@@ -214,6 +216,7 @@ function default_1(api, projectConfig) {
                 .end();
         }));
         let webpackConfig = api.resolveChainWebpackConfig();
+        debugger;
         const compiler = (0, webpack_1.default)(webpackConfig, ((err, stats) => {
             if (err) {
                 return console.error(err);
