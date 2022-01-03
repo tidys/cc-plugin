@@ -23,6 +23,12 @@ module.exports = {
                     module: "commonjs",
                     allowSyntheticDefaultImports: true,
                     esModuleInterop: true,
+                    noImplicitAny: false,
+                    strict: false,
+                    // "target": "esnext",
+                    // "importHelpers": true,
+                    // "experimentalDecorators": true,
+                    // "skipLibCheck": true,
                 }
             });
     }

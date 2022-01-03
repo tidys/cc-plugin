@@ -1,4 +1,5 @@
 import { createApp } from 'vue';
+// @ts-ignore
 import App from './app.vue';
 import CCUI from './packages/index';
 

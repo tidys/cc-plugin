@@ -1,6 +1,6 @@
 <template>
   <div class="cc-input">
-    <label style="display: flex;">
+    <label style="display: flex;flex: 1;">
       <input @focusout="onFocusout"
              @focusin="onFocusin"
              type="text"/>
@@ -32,6 +32,8 @@ export default defineComponent({
 
 <style scoped lang="less">
 .cc-input {
+  display: flex;
+  flex: 1;
 
   input {
     border: 1px solid #171717;
