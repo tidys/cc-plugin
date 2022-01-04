@@ -26,9 +26,9 @@ module.exports = {
                     noImplicitAny: false,
                     strict: false,
                     // "target": "esnext",
-                    // "importHelpers": true,
+                    importHelpers: true,
                     // "experimentalDecorators": true,
-                    // "skipLibCheck": true,
+                    skipLibCheck: true,
                 }
             });
     }

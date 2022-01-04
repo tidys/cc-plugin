@@ -1,5 +1,6 @@
 import { withInstall, WithInstallType } from '../utils/withInstall';
-import CCButton from './index.vue';
+// @ts-ignore
+import CCSelect from './index.vue';
 
-export const Button: WithInstallType<typeof CCButton> = withInstall(CCButton)
-export default Button;
+export const Select: WithInstallType<typeof CCSelect> = withInstall(CCSelect)
+export default Select;
