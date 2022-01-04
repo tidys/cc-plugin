@@ -20,15 +20,18 @@ module.exports = {
                 onlyCompileBundledFiles: true,
                 appendTsSuffixTo: ['\\.vue$'],
                 compilerOptions: {
-                    module: "commonjs",
-                    allowSyntheticDefaultImports: true,
-                    esModuleInterop: true,
-                    noImplicitAny: false,
-                    strict: false,
-                    // "target": "esnext",
+                    target: "esnext",
+                    module: "esnext",
+                    strict: true,
+                    jsx:"preserve",
                     importHelpers: true,
-                    // "experimentalDecorators": true,
+                    moduleResolution: "node",
                     skipLibCheck: true,
+                    esModuleInterop: true,
+                    allowSyntheticDefaultImports: true,
+                    noImplicitAny: false,
+                    noImplicitThis: true,
+                    lib: ['esnext', 'dom','dom.iterable','scripthost'],
                 }
             });
     }

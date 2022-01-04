@@ -28,18 +28,19 @@ export default defineComponent({
     justify-content: left;
 
     .fold {
+      margin: 0 3px;
       cursor: pointer;
     }
 
     .arrow-right {
-      border: 10px solid transparent;
-      border-left: 20px solid #fd942b;
+      border: 4px solid transparent;
+      border-left: 7px solid #bdbdbd;
       border-right: 0;
     }
 
     .arrow-down {
-      border: 10px solid transparent;
-      border-top: 20px solid #fd942b;
+      border: 4px solid transparent;
+      border-top: 7px solid #bdbdbd;
       border-bottom: 0;
     }
   }

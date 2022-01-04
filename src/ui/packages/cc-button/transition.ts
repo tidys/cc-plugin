@@ -93,18 +93,18 @@ export class Transition implements CocosUiElement {
     }
 
     onMousedown(): void {
-        this.instance?.onMousedown(this.theme);
+        this.instance&&this.instance.onMousedown(this.theme);
     }
 
     onMouseenter(): void {
-        this.instance?.onMouseenter(this.theme);
+        this.instance&& this.instance.onMouseenter(this.theme);
     }
 
     onMouseleave(): void {
-        this.instance?.onMouseleave(this.theme);
+       this.instance&& this.instance.onMouseleave(this.theme);
     }
 
     onMouseup(): void {
-        this.instance?.onMouseup(this.theme);
+        this.instance&&this.instance.onMouseup(this.theme);
     }
 }
