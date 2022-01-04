@@ -9,7 +9,6 @@ module.exports = {
     },
     chainWebpack: config => {
         config.resolve.extensions.add('.json').add('.vue').add('.js').add('.ts');
-        // config.output.libraryExport('default').libraryTarget('commonjs')
         config.module
             .rule('ts')
             .test(/\.ts(x?)$/)
@@ -22,7 +21,7 @@ module.exports = {
                 compilerOptions: {
                     target: "esnext",
                     module: "esnext",
-                    strict: true,
+                    strict: false,
                     jsx:"preserve",
                     importHelpers: true,
                     moduleResolution: "node",
@@ -31,7 +30,7 @@ module.exports = {
                     allowSyntheticDefaultImports: true,
                     noImplicitAny: false,
                     noImplicitThis: true,
-                    lib: ['esnext', 'dom','dom.iterable','scripthost'],
+                    lib: ['esnext', 'dom'],
                 }
             });
     }

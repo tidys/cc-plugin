@@ -3,6 +3,8 @@
     <label style="display: flex;flex: 1;">
       <input @focusout="onFocusout"
              @focusin="onFocusin"
+             @blur="onBlur"
+             v-model="data"
              type="text"/>
     </label>
     <slot></slot>
@@ -14,16 +16,26 @@ import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
   name: 'cc-input',
+  props: {
+    data: {
+      type: String
+    }
+  },
   setup() {
     const focusColor = '#fd942b'
     const borderColor = ref('transparent')
+    const data = ref('')
     return {
+      data,
       borderColor,
       onFocusin() {
         borderColor.value = focusColor
       },
       onFocusout() {
         borderColor.value = 'transparent'
+      },
+      onBlur(){
+        console.log(data.value);
       },
     }
   }
@@ -44,7 +56,7 @@ export default defineComponent({
     display: inline-block;
     outline: none;
     background: #262626;
-    font-size: 1rem;
+    font-size: 12px;
     height: 21px;
     box-sizing: border-box;
     color: #fd942b;

@@ -35,7 +35,6 @@ export default defineComponent({
   },
   emits: [],
   setup(props: any, { emit }) {
-
     const isClick = ref(false);
     const isHover = ref(false);
     const transition = new Transition(props.transition, props);
@@ -83,7 +82,7 @@ export default defineComponent({
     padding: 0 18px;
     user-select: none;
     color: white;
-    font: 1rem bold;
+    font: 12px bold;
   }
 }
 

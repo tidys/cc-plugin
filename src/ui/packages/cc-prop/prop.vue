@@ -39,15 +39,16 @@ export default defineComponent({
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  margin: 2px 0;
 
   .name {
-    margin-left: 10px;
+    margin-left: 15px;
     display: flex;
     flex-direction: row;
     justify-content: left;
     align-items: center;
     width: 35%;
-    font-size: 1em;
+    font-size: 12px;
     color: #bdbdbd;
     white-space: nowrap;
     text-overflow: ellipsis;

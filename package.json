@@ -9,7 +9,8 @@
   "scripts": {
     "webpack-build": "webpack --config webpack.config.js",
     "tsc-build": "tsc --watch",
-    "demo-test": "vue-cli-service serve"
+    "demo-test": "vue-cli-service serve",
+    "demo-test-debug": "node --inspect=6666 ./node_modules/@vue/cli-service/bin/vue-cli-service.js serve"
   },
   "dependencies": {
     "@types/chroma-js": "^2.1.3",

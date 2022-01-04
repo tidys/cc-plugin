@@ -1,24 +1,26 @@
 <template>
   <div style="display: flex;flex-direction: column;">
-    <cc-section>
+    <cc-section title="生成Manifest">
       <template v-slot:header>
-        header
+        <div style="display: flex;flex-direction: row;">
+          <cc-button>a</cc-button>
+          <cc-button>b</cc-button>
+        </div>
       </template>
       <div>
-        <cc-button>test</cc-button>
+        <cc-prop name="test1">
+          <cc-input></cc-input>
+        </cc-prop>
+        <cc-prop name="test2">
+          <cc-select></cc-select>
+        </cc-prop>
       </div>
     </cc-section>
-    <cc-button>43453</cc-button>
-    <cc-input></cc-input>
-    <cc-prop name="test">
-      <cc-input></cc-input>
-    </cc-prop>
-    <cc-select></cc-select>
   </div>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue'
-// import CcButton from './packages/cc-button/index.vue';
+// import CcButton from './packages/cc-button/button.vue';
 // import CcSection from './packages/cc-section/index.vue';
 // import CcInput from './packages/cc-input/index.vue';
 // import CcProp from './packages/cc-prop/index.vue';
@@ -31,5 +33,6 @@ export default defineComponent({
 
 </script>
 <style>
-
+body{
+}
 </style>
