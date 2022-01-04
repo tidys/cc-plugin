@@ -8,7 +8,7 @@ module.exports = {
         }
     },
     chainWebpack: config => {
-        config.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json');
+        config.resolve.extensions.add('.json').add('.vue').add('.js').add('.ts');
         // config.output.libraryExport('default').libraryTarget('commonjs')
         config.module
             .rule('ts')
