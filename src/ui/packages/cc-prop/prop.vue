@@ -36,6 +36,7 @@ export default defineComponent({
 .cc-prop {
   display: flex;
   width: 100%;
+  height: 26px;
   flex-direction: row;
   align-items: center;
   justify-content: center;

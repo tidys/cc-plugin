@@ -2,10 +2,11 @@
   <div class="cc-input">
     <label style="display: flex;flex: 1;">
       <input @focusout="onFocusout"
-             :class="{'readonly':readonly}"
+             :class="{'readonly':readonly,'disabled':disabled}"
              @focusin="onFocusin"
              @blur="onBlur"
              :readonly="readonly"
+             :disabled="disabled"
              v-model="text"
              type="text"/>
     </label>
@@ -24,6 +25,10 @@ export default defineComponent({
       default: '',
     },
     readonly: {
+      type: Boolean,
+      default: false,
+    },
+    disabled: {
       type: Boolean,
       default: false,
     }
@@ -59,10 +64,17 @@ export default defineComponent({
   display: flex;
   flex: 1;
 
-  .readonly{
+  .readonly {
     border-color: #888888 !important;
     color: #bdbdbd !important;
   }
+
+  .disabled {
+    border-color: #888888 !important;
+    color: #888888 !important;
+    user-select: none !important;
+  }
+
   input {
     border: 1px solid #171717;
     border-radius: 3px;
