@@ -62,7 +62,7 @@ class CocosPluginService {
     }
     loadModule(file) {
         // 从当前package的node_modules中找依赖
-        (0, rechoir_1.prepare)(interpret_1.extensions, file, this.root);
+        rechoir_1.prepare(interpret_1.extensions, file, this.root);
         const module = require(file);
         if (module.hasOwnProperty('default')) {
             return module.default;
@@ -87,7 +87,7 @@ class CocosPluginService {
     init() {
         this.loadEnv();
         const userOptions = this.loadUserOptions();
-        this.projectConfig = (0, lodash_1.defaultsDeep)(userOptions, this.defaults);
+        this.projectConfig = lodash_1.defaultsDeep(userOptions, this.defaults);
         this.plugins.forEach(({ id, apply }) => {
             apply(new plugin_api_1.PluginApi(id, this), this.projectConfig);
         });

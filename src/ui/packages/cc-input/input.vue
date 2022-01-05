@@ -2,9 +2,11 @@
   <div class="cc-input">
     <label style="display: flex;flex: 1;">
       <input @focusout="onFocusout"
+             :class="{'readonly':readonly}"
              @focusin="onFocusin"
              @blur="onBlur"
-             v-model="data"
+             :readonly="readonly"
+             v-model="text"
              type="text"/>
     </label>
     <slot></slot>
@@ -12,21 +14,30 @@
 
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, toRefs, watch } from 'vue'
 
 export default defineComponent({
   name: 'cc-input',
   props: {
-    data: {
-      type: String
+    value: {
+      type: String,
+      default: '',
+    },
+    readonly: {
+      type: Boolean,
+      default: false,
     }
   },
-  setup() {
+  emits: ['update:value', 'change'],
+  setup(props, { emit }) {
     const focusColor = '#fd942b'
     const borderColor = ref('transparent')
-    const data = ref('')
+    const text = ref(props.value || '');
+    watch(() => props.value, (val) => {
+      text.value = val;
+    })
     return {
-      data,
+      text,
       borderColor,
       onFocusin() {
         borderColor.value = focusColor
@@ -34,8 +45,9 @@ export default defineComponent({
       onFocusout() {
         borderColor.value = 'transparent'
       },
-      onBlur(){
-        console.log(data.value);
+      onBlur() {
+        emit('update:value', text.value)
+        emit('change')
       },
     }
   }
@@ -47,6 +59,10 @@ export default defineComponent({
   display: flex;
   flex: 1;
 
+  .readonly{
+    border-color: #888888 !important;
+    color: #bdbdbd !important;
+  }
   input {
     border: 1px solid #171717;
     border-radius: 3px;

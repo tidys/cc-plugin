@@ -123,7 +123,7 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
             const pluginName = projectConfig.manifest.name;
             webpackChain.output.path(output)
                 .libraryTarget('commonjs')
-                .libraryExport('default')
+                // .libraryExport('default') // 这里暂时不能使用这个
                 .publicPath(`packages://${pluginName}/`);
             // rules
             webpackChain.module
@@ -163,7 +163,21 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
                 .loader('ts-loader')
                 .options({
                     onlyCompileBundledFiles: true,
-                    appendTsSuffixTo: [/\.vue$/],
+                    appendTsSuffixTo: ['\\.vue$'],
+                    compilerOptions: {
+                        target: "es6",
+                        module: "es6",
+                        // strict: false,
+                        // jsx: "preserve",
+                        // importHelpers: true,
+                        moduleResolution: "node",
+                        skipLibCheck: true,
+                        esModuleInterop: true,
+                        // allowSyntheticDefaultImports: true,
+                        // noImplicitAny: false,
+                        // noImplicitThis: false,
+                        lib: ['es6', 'dom'],
+                    }
                 });
 
             webpackChain.module

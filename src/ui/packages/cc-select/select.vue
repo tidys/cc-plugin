@@ -4,9 +4,9 @@
       <label>
         <select @change="onSelectChange" v-model="curValue">
           <option
-            v-for="(item, index) in data"
-            :key="index"
-            :value="item.value"
+              v-for="(item, index) in data"
+              :key="index"
+              :value="item.value"
           >
             {{ item.label }}
           </option>
@@ -17,33 +17,36 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, PropType, watch } from "vue";
+
+interface Option {
+  label: string,
+  value: string,
+}
 
 export default defineComponent({
   name: "cc-select",
   props: {
     data: {
-      type: Array,
+      type: Array as PropType<Option[]>,
+      required: true,
       default() {
-        return [
-          { label: 1, value: "a" },
-          { label: 2, value: "b" },
-          { label: 3, value: "c" },
-        ];
+        return [];
       },
     },
+    value: String,
   },
-  emits: ["change"],
-  setup(props, { emit }) {
-    const curValue = ref("c");
-    // @ts-ignore
-    const data = ref(props.data || []);
+  emits: ["change", 'update:data', 'update:value'],
+  setup(props: any, { emit }) {
+    const curValue = ref(props.value || '')
+    watch(() => props.value, (val) => {
+      curValue.value = val;
+    })
     return {
-      data,
       curValue,
       onSelectChange() {
-        console.log(curValue.value);
-        emit("change", curValue.value);
+        emit("update:value", curValue.value.toString());
+        emit("change");
       },
     };
   },

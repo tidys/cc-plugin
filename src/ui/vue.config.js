@@ -19,18 +19,18 @@ module.exports = {
                 onlyCompileBundledFiles: true,
                 appendTsSuffixTo: ['\\.vue$'],
                 compilerOptions: {
-                    target: "esnext",
-                    module: "esnext",
+                    target: "es6",
+                    module: "es6",
                     strict: false,
-                    jsx:"preserve",
-                    importHelpers: true,
+                    // jsx: "preserve",
+                    // importHelpers: true,
                     moduleResolution: "node",
                     skipLibCheck: true,
                     esModuleInterop: true,
                     allowSyntheticDefaultImports: true,
                     noImplicitAny: false,
-                    noImplicitThis: true,
-                    lib: ['esnext', 'dom'],
+                    // noImplicitThis: false,
+                    lib: ['es6', 'dom'],
                 }
             });
     }

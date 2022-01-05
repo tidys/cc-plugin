@@ -93,7 +93,7 @@ function buildTargetNode(service) {
     let config = new webpack_chain_1.default();
     config.target('node').devtool(false).mode('development').resolve.extensions.add('.ts');
     let cfg = config.toConfig();
-    (0, webpack_1.default)(cfg, (error, status) => {
+    webpack_1.default(cfg, (error, status) => {
     });
 }
 function default_1(api, projectConfig) {
@@ -102,8 +102,8 @@ function default_1(api, projectConfig) {
         usage: 'usage',
         options: {}
     }, (service) => __awaiter(this, void 0, void 0, function* () {
-        console.log(chalk_1.default.red((0, printf_1.default)('%-20s %s', 'service root:    ', service.root)));
-        console.log(chalk_1.default.red((0, printf_1.default)('%-20s %s', 'service context: ', service.context)));
+        console.log(chalk_1.default.red(printf_1.default('%-20s %s', 'service root:    ', service.root)));
+        console.log(chalk_1.default.red(printf_1.default('%-20s %s', 'service context: ', service.context)));
         api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
             webpackChain.watch(!!projectConfig.options.watch);
             webpackChain.mode('development');
@@ -135,13 +135,14 @@ function default_1(api, projectConfig) {
             // out
             let output = projectConfig.options.output;
             let resolvePath = Path.resolve(service.context, output);
-            if ((0, fs_1.existsSync)(resolvePath)) {
+            if (fs_1.existsSync(resolvePath)) {
                 // 处理相对路径
                 output = resolvePath;
             }
             const pluginName = projectConfig.manifest.name;
             webpackChain.output.path(output)
                 .libraryTarget('commonjs')
+                // .libraryExport('default') // 这里暂时不能使用这个
                 .publicPath(`packages://${pluginName}/`);
             // rules
             webpackChain.module
@@ -178,7 +179,21 @@ function default_1(api, projectConfig) {
                 .loader('ts-loader')
                 .options({
                 onlyCompileBundledFiles: true,
-                appendTsSuffixTo: [/\.vue$/],
+                appendTsSuffixTo: ['\\.vue$'],
+                compilerOptions: {
+                    target: "es6",
+                    module: "es6",
+                    // strict: false,
+                    // jsx: "preserve",
+                    // importHelpers: true,
+                    moduleResolution: "node",
+                    skipLibCheck: true,
+                    esModuleInterop: true,
+                    // allowSyntheticDefaultImports: true,
+                    // noImplicitAny: false,
+                    // noImplicitThis: false,
+                    lib: ['es6', 'dom'],
+                }
             });
             webpackChain.module
                 .rule('file')
@@ -216,8 +231,7 @@ function default_1(api, projectConfig) {
                 .end();
         }));
         let webpackConfig = api.resolveChainWebpackConfig();
-        debugger;
-        const compiler = (0, webpack_1.default)(webpackConfig, ((err, stats) => {
+        const compiler = webpack_1.default(webpackConfig, ((err, stats) => {
             if (err) {
                 return console.error(err);
             }

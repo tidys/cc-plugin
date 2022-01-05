@@ -42,6 +42,7 @@ export default defineComponent({
   margin: 2px 0;
 
   .name {
+    user-select: none;
     margin-left: 15px;
     display: flex;
     flex-direction: row;
@@ -61,6 +62,8 @@ export default defineComponent({
   .value {
     display: flex;
     flex: 1;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>

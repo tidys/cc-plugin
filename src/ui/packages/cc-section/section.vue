@@ -3,7 +3,7 @@
     <div class="header">
       <div class="left" @click.stop="fold=!fold">
         <div class="fold" :class="fold?'arrow-right':'arrow-down'"></div>
-        <div class="title">{{ title }}</div>
+        <div class="title">{{ name }}</div>
       </div>
       <slot name="header"></slot>
     </div>
@@ -16,20 +16,21 @@ import { defineComponent, ref } from 'vue'
 export default defineComponent({
   name: 'cc-section',
   props: {
-    title: {
+    name: {
       type: String
     }
   },
   setup(props, { emit }) {
     const fold = ref(false);
-    const title = ref(props.title || '');
-    return { fold, title }
+    const name = ref(props.name || '');
+    return { fold, name }
   }
 })
 </script>
 <style scoped lang="less">
 .cc-section {
   .header {
+    height: 26px;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -47,7 +48,8 @@ export default defineComponent({
     }
 
     .title {
-      color: #bdbdbd;
+      //color: #bdbdbd;
+      color: #11ff00;
       user-select: none;
       font-size: 12px;
       font-weight: bold;
