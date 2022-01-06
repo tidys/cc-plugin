@@ -30,6 +30,8 @@ const lodash_1 = require("lodash");
 const FS = __importStar(require("fs"));
 const interpret_1 = require("interpret");
 const rechoir_1 = require("rechoir");
+const dotenv_1 = __importDefault(require("dotenv"));
+const dotenv_expand_1 = __importDefault(require("dotenv-expand"));
 class CocosPluginService {
     constructor(context) {
         this.webpackChainFns = [];
@@ -44,6 +46,14 @@ class CocosPluginService {
         this.plugins.push({ id: 'serve', apply: serve_1.default });
     }
     loadEnv() {
+        const dirs = [this.context, this.root];
+        dirs.forEach(dir => {
+            const file = Path.resolve(dir, '.env');
+            if (FS.existsSync(file)) {
+                const env = dotenv_1.default.config({ path: file });
+                dotenv_expand_1.default(env);
+            }
+        });
     }
     loadUserOptions() {
         const configNames = ['./cc-plugin.config.js', './cc-plugin.config.ts'];
@@ -62,7 +72,7 @@ class CocosPluginService {
     }
     loadModule(file) {
         // 从当前package的node_modules中找依赖
-        rechoir_1.prepare(interpret_1.extensions, file, this.root);
+        rechoir_1.prepare(interpret_1.extensions, file);
         const module = require(file);
         if (module.hasOwnProperty('default')) {
             return module.default;

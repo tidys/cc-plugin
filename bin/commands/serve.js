@@ -49,6 +49,7 @@ const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
 const portfinder_1 = __importDefault(require("portfinder"));
 const chalk_1 = __importDefault(require("chalk"));
 const printf_1 = __importDefault(require("printf"));
+const path_1 = require("path");
 function getExternal(dir, defaultModules = []) {
     let map = {};
     defaultModules.forEach(module => {
@@ -171,9 +172,11 @@ function default_1(api, projectConfig) {
                     },
                 }
             }).end();
+            const packageSource = path_1.resolve(service.root, 'src');
             webpackChain.module
                 .rule('ts')
                 .test(/\.ts(x?)$/)
+                .include.add(packageSource).end()
                 .exclude.add(/node_modules/).end()
                 .use('ts-loader')
                 .loader('ts-loader')
