@@ -7,7 +7,8 @@ import { defaultsDeep } from 'lodash'
 import * as FS from 'fs';
 import { extensions } from 'interpret'
 import { prepare } from 'rechoir'
-
+import dotenv from 'dotenv'
+import dotenvExpand from 'dotenv-expand'
 
 export interface ServiceCommands {
     fn: Function,
@@ -44,7 +45,14 @@ export default class CocosPluginService {
 
 
     private loadEnv() {
-
+        const dirs = [this.context, this.root];
+        dirs.forEach(dir => {
+            const file = Path.resolve(dir, '.env')
+            if (FS.existsSync(file)) {
+                const env = dotenv.config({ path: file })
+                dotenvExpand(env);
+            }
+        })
     }
 
     private loadUserOptions(): CocosPluginConfig | null {
@@ -65,7 +73,7 @@ export default class CocosPluginService {
 
     private loadModule(file: string) {
         // 从当前package的node_modules中找依赖
-        prepare(extensions, file, this.root);
+        prepare(extensions, file);
         const module = require(file);
         if (module.hasOwnProperty('default')) {
             return module.default;
