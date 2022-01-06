@@ -19,6 +19,7 @@ import webpackDevSever from 'webpack-dev-server'
 import PortFinder from 'portfinder'
 import chalk from 'chalk';
 import printf from 'printf';
+import { resolve } from 'path'
 
 function getExternal(dir: string, defaultModules: string[] = []) {
     let map: Record<string, string> = {};
@@ -155,9 +156,11 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
                     }
                 }).end();
 
+            const packageSource = resolve(service.root, 'src');
             webpackChain.module
                 .rule('ts')
                 .test(/\.ts(x?)$/)
+                .include.add(packageSource).end()
                 .exclude.add(/node_modules/).end()
                 .use('ts-loader')
                 .loader('ts-loader')
