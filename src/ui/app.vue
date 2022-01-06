@@ -22,13 +22,15 @@
         </cc-prop>
         <cc-prop name="test2">
           <cc-select
-              @change="onChangeSelect"
-              v-model:data="selectData"
-              v-model:value="selectValue">
+            @change="onChangeSelect"
+            v-model:data="selectData"
+            v-model:value="selectValue">
           </cc-select>
         </cc-prop>
       </div>
     </cc-section>
+    <i class="iconfont icon-refresh"></i>
+    <div style="width: 100px; height: 100px;background: green;" class="iconfont icon-doc"></div>
   </div>
 </template>
 <script lang="ts">

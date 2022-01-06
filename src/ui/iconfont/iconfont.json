@@ -1,0 +1,30 @@
+{
+  "id": "3119913",
+  "name": "cc-plugin",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "4936624",
+      "name": "folder-open-fill",
+      "font_class": "folder",
+      "unicode": "e85e",
+      "unicode_decimal": 59486
+    },
+    {
+      "icon_id": "7008920",
+      "name": "document",
+      "font_class": "doc",
+      "unicode": "e6f3",
+      "unicode_decimal": 59123
+    },
+    {
+      "icon_id": "8634413",
+      "name": "刷新",
+      "font_class": "refresh",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    }
+  ]
+}

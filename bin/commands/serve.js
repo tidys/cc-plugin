@@ -195,11 +195,22 @@ function default_1(api, projectConfig) {
                     lib: ['es6', 'dom'],
                 }
             });
-            webpackChain.module
-                .rule('file')
-                .test(/\.(png|jpg|gif|svg|eot|woff|ttf)/)
-                .use('file-loader')
-                .loader('file-loader');
+            // webpackChain.module
+            //     .rule('image')
+            //     .test(/\.(png|jpe?g|gif|svg)$/)
+            //     .use('url-loader')
+            //     .loader('url-loader')
+            //     .options({
+            //         name:'images/[name].[ext]'
+            //     })
+            // webpackChain.module
+            //     .rule('font')
+            //     .test(/\.(ttf|woff2|woff|otf|eot)$/)
+            //     .use('url-loader')
+            //     .loader('url-loader')
+            //     .options({
+            //         name:'fonts/[name].[ext]'
+            //     })
             // 处理面板
             const panel = new panel_1.default(service, webpackChain);
             panel.dealPanels();
