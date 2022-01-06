@@ -16,6 +16,8 @@ module.exports = {
             .use('ts-loader')
             .loader('ts-loader')
             .options({
+                // happyPackMode: true,
+                transpileOnly: true,
                 onlyCompileBundledFiles: true,
                 appendTsSuffixTo: ['\\.vue$'],
                 compilerOptions: {
