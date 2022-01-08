@@ -13,7 +13,7 @@ export default class NpmInstall {
     apply(compiler: webpack.Compiler) {
         compiler.hooks.afterDone.tap('npm-install', () => {
             let canInstall = false;
-            const rootDir = compiler.options.output.path!;
+            const rootDir = compiler.options.output.path! as string;
             const packageJson = Path.join(rootDir, 'package.json');
             const nodeModules = Path.join(rootDir, 'node_modules')
             if (Fs.existsSync(nodeModules) && Fs.existsSync(packageJson)) {

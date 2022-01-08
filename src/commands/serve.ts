@@ -10,7 +10,7 @@ import Panel from '../panel';
 import * as Fs from 'fs';
 import { existsSync } from 'fs';
 import * as FsExtra from 'fs-extra';
-import CocosPluginPackageJson from './cocos-plugin-package.json';
+import CocosPluginPackageJson from './package.json';
 import NpmInstall from '../plugin/npm-install';
 import DevServer from '../plugin/dev-server';
 import { PluginVersion } from '../declare';
@@ -20,6 +20,7 @@ import PortFinder from 'portfinder'
 import chalk from 'chalk';
 import printf from 'printf';
 import { resolve } from 'path'
+import { log } from '../log'
 
 function getExternal(dir: string, defaultModules: string[] = []) {
     let map: Record<string, string> = {};
@@ -80,8 +81,8 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
         usage: 'usage',
         options: {}
     }, async (service: CocosPluginService) => {
-        console.log(chalk.red(printf('%-20s %s', 'service root:    ', service.root)))
-        console.log(chalk.red(printf('%-20s %s', 'service context: ', service.context)))
+        log.red(printf('%-20s %s', 'service root:    ', service.root))
+        log.red(printf('%-20s %s', 'service context: ', service.context))
 
         api.chainWebpack(async (webpackChain: Config) => {
             webpackChain.watch(!!projectConfig.options.watch)
@@ -115,7 +116,7 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
 
 
             // out
-            let output = projectConfig.options.output!;
+            let output: string = projectConfig.options.output! as string;
             let resolvePath = Path.resolve(service.context, output);
             if (existsSync(resolvePath)) {
                 // 处理相对路径
@@ -220,7 +221,7 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
                 .use(DevServer, [port])
                 .end();
             webpackChain.plugin('npm install')
-                .use(NpmInstall, [projectConfig.options.output!])
+                .use(NpmInstall, [projectConfig.options.output! as string])
             webpackChain.plugin('cc-plugin-package.json')
                 .use(CocosPluginPackageJson, [service])
             webpackChain
@@ -249,9 +250,9 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
             }
             if (stats?.hasErrors()) {
                 stats?.compilation.errors.forEach(error => {
-                    console.log(chalk.yellow(error.message))
-                    console.log(chalk.blue(error.details))
-                    console.log(chalk.red(error.stack || ''))
+                    log.yellow(error.message)
+                    log.blue(error.details)
+                    log.red(error.stack || '')
                 })
                 return console.log('Build failed with error');
             }

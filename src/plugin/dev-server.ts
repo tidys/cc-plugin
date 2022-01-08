@@ -64,7 +64,7 @@ export default class DevServer {
     }
 
     apply(compiler: webpack.Compiler) {
-        this.app.use(express.static(compiler.options.output.path!))
+        this.app.use(express.static(compiler.options.output.path! as string))
         compiler.hooks.done.tap('cc-plugin', (stats) => {
             console.log('cc-plugin done')
             // 通知插件刷新

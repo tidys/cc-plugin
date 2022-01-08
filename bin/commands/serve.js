@@ -40,16 +40,16 @@ const panel_1 = __importDefault(require("../panel"));
 const Fs = __importStar(require("fs"));
 const fs_1 = require("fs");
 const FsExtra = __importStar(require("fs-extra"));
-const cocos_plugin_package_json_1 = __importDefault(require("./cocos-plugin-package.json"));
+const package_json_1 = __importDefault(require("./package.json"));
 const npm_install_1 = __importDefault(require("../plugin/npm-install"));
 const dev_server_1 = __importDefault(require("../plugin/dev-server"));
 const declare_1 = require("../declare");
 const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
 const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
 const portfinder_1 = __importDefault(require("portfinder"));
-const chalk_1 = __importDefault(require("chalk"));
 const printf_1 = __importDefault(require("printf"));
 const path_1 = require("path");
+const log_1 = require("../log");
 function getExternal(dir, defaultModules = []) {
     let map = {};
     defaultModules.forEach(module => {
@@ -103,8 +103,8 @@ function default_1(api, projectConfig) {
         usage: 'usage',
         options: {}
     }, (service) => __awaiter(this, void 0, void 0, function* () {
-        console.log(chalk_1.default.red(printf_1.default('%-20s %s', 'service root:    ', service.root)));
-        console.log(chalk_1.default.red(printf_1.default('%-20s %s', 'service context: ', service.context)));
+        log_1.log.red(printf_1.default('%-20s %s', 'service root:    ', service.root));
+        log_1.log.red(printf_1.default('%-20s %s', 'service context: ', service.context));
         api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
             webpackChain.watch(!!projectConfig.options.watch);
             webpackChain.mode('development');
@@ -236,7 +236,7 @@ function default_1(api, projectConfig) {
             webpackChain.plugin('npm install')
                 .use(npm_install_1.default, [projectConfig.options.output]);
             webpackChain.plugin('cc-plugin-package.json')
-                .use(cocos_plugin_package_json_1.default, [service]);
+                .use(package_json_1.default, [service]);
             webpackChain
                 .plugin('vue')
                 .use(vue_loader_1.VueLoaderPlugin)
@@ -262,9 +262,9 @@ function default_1(api, projectConfig) {
             }
             if (stats === null || stats === void 0 ? void 0 : stats.hasErrors()) {
                 stats === null || stats === void 0 ? void 0 : stats.compilation.errors.forEach(error => {
-                    console.log(chalk_1.default.yellow(error.message));
-                    console.log(chalk_1.default.blue(error.details));
-                    console.log(chalk_1.default.red(error.stack || ''));
+                    log_1.log.yellow(error.message);
+                    log_1.log.blue(error.details);
+                    log_1.log.red(error.stack || '');
                 });
                 return console.log('Build failed with error');
             }

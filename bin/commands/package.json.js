@@ -25,6 +25,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const declare_1 = require("../declare");
 const path_1 = __importDefault(require("path"));
 const FsExtra = __importStar(require("fs-extra"));
+const package_worker_1 = require("./package-worker");
 class CocosPluginPackageJson {
     constructor(service) {
         this.service = service;
@@ -35,42 +36,32 @@ class CocosPluginPackageJson {
         });
     }
     buildPackageJsonFile() {
-        var _a, _b, _c;
+        var _a, _b;
         let packageJson = {
             name: this.manifest.name,
             version: this.manifest.version,
+            description: this.manifest.description || '',
+            author: this.manifest.author || 'cocos-plugin-cli',
             main: './main.js',
         };
-        packageJson.description = this.manifest.description || '';
-        packageJson.author = this.manifest.author || 'cocos-plugin-cli';
-        (_a = this.manifest.panels) === null || _a === void 0 ? void 0 : _a.map((panel) => {
-            if (this.options.version === declare_1.PluginVersion.v2) {
-                const panelName = !!panel.name ? `panel.${panel.name}` : 'panel';
-                if (!packageJson.hasOwnProperty(panelName)) {
-                    // @ts-ignore
-                    packageJson[`${panelName}`] = {
-                        main: panel.main,
-                        title: panel.title,
-                        type: panel.type,
-                        width: panel.width,
-                        height: panel.height,
-                        'min-width': panel.minWidth,
-                        'min-height': panel.minHeight,
-                    };
-                }
-                else {
-                    console.log('重复的panel');
-                }
-            }
-        });
-        if ((_b = this.manifest.menus) === null || _b === void 0 ? void 0 : _b.length) {
-            let menus = packageJson['main-menu'] = {};
-            (_c = this.manifest.menus) === null || _c === void 0 ? void 0 : _c.map((menu) => {
-                if (this.options.version === declare_1.PluginVersion.v2) {
-                    menus[menu.path] = { message: menu.message };
-                }
-            });
+        const { version } = this.options;
+        let packageWorker = null;
+        if (version === declare_1.PluginVersion.v2) {
+            packageWorker = new package_worker_1.PackageV2(this.service.projectConfig, packageJson);
         }
+        else if (version === declare_1.PluginVersion.v3) {
+            packageWorker = new package_worker_1.PackageV3(this.service.projectConfig, packageJson);
+        }
+        // 面板
+        packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.panelReady();
+        (_a = this.manifest.panels) === null || _a === void 0 ? void 0 : _a.map((panel) => {
+            packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.panelBuild(panel);
+        });
+        // 菜单
+        packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.menuReady();
+        (_b = this.manifest.menus) === null || _b === void 0 ? void 0 : _b.map((menu) => {
+            packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.menuBuild(menu);
+        });
         const dependencies = this.getDependencies();
         if (dependencies) {
             packageJson.dependencies = dependencies;

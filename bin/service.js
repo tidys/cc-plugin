@@ -32,6 +32,7 @@ const interpret_1 = require("interpret");
 const rechoir_1 = require("rechoir");
 const dotenv_1 = __importDefault(require("dotenv"));
 const dotenv_expand_1 = __importDefault(require("dotenv-expand"));
+const log_1 = require("./log");
 class CocosPluginService {
     constructor(context) {
         this.webpackChainFns = [];
@@ -83,6 +84,7 @@ class CocosPluginService {
     }
     get defaults() {
         const options = {
+            outputProject: './',
             output: './dist',
             version: declare_1.PluginVersion.v2,
             min: false,
@@ -97,10 +99,72 @@ class CocosPluginService {
     init() {
         this.loadEnv();
         const userOptions = this.loadUserOptions();
+        userOptions && this.checkUserOptions(userOptions);
         this.projectConfig = lodash_1.defaultsDeep(userOptions, this.defaults);
         this.plugins.forEach(({ id, apply }) => {
             apply(new plugin_api_1.PluginApi(id, this), this.projectConfig);
         });
+    }
+    checkIsProjectDir(projDir) {
+        // 必须存在这个目录
+        const needDirs = ['assets'];
+        let isProject = true;
+        for (let i = 0; i < needDirs.length; i++) {
+            const dir = needDirs[i];
+            const assets = Path.join(projDir, dir);
+            if (!FS.existsSync(assets)) {
+                isProject = false;
+                break;
+            }
+            if (FS.statSync(projDir).isFile()) {
+                isProject = false;
+                break;
+            }
+        }
+        return isProject;
+    }
+    catchOutput(projectDir, pluginDir, pluginName) {
+        let output = projectDir;
+        if (this.checkIsProjectDir(projectDir)) {
+            output = Path.join(projectDir, pluginDir, pluginName);
+        }
+        else {
+            log_1.log.yellow(`options.outputProject推荐配置为Creator生成的项目目录：${projectDir}`);
+            output = projectDir;
+        }
+        return output;
+    }
+    getPluginDir(version) {
+        if (version === declare_1.PluginVersion.v2) {
+            return 'packages';
+        }
+        else if (version === declare_1.PluginVersion.v3) {
+            return 'extensions';
+        }
+    }
+    checkUserOptions(userOptions) {
+        // 根据配置，将output目录统一变为绝对路径
+        const { options, manifest } = userOptions;
+        let { version, outputProject } = options;
+        const pluginDir = this.getPluginDir(version);
+        if (typeof outputProject === 'object') {
+            const { v2, v3 } = outputProject;
+            if (v2 && version === declare_1.PluginVersion.v2) {
+                options.output = this.catchOutput(v2, pluginDir, manifest.name);
+            }
+            else if (v3 && version === declare_1.PluginVersion.v3) {
+                options.output = this.catchOutput(v3, pluginDir, manifest.name);
+            }
+        }
+        else {
+            options.output = this.catchOutput(outputProject, pluginDir, manifest.name);
+        }
+        if (!options.output) {
+            log_1.log.red(`无效的output：${options.output}`);
+        }
+        if (!FS.existsSync(options.output)) {
+            log_1.log.yellow(`output不存在：${options.output}`);
+        }
     }
     run() {
         this.init();

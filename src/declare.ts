@@ -2,7 +2,10 @@ export interface MenuOptions {
     path: string;
     icon?: string;
     accelerator?: string;
-    message: string;
+    message: {
+        panel?: string, // 发送给哪个面板
+        name: string, // 消息名字
+    };
 }
 
 export interface PanelOptions {
@@ -43,7 +46,8 @@ export enum PluginVersion {
 export interface CocosPluginOptions {
     watch?: boolean;
     hot?: boolean;
-    output?: string | { v2?: string, v3?: string }, // 最终都要变成绝对路径
+    outputProject: string | { v2?: string, v3?: string },// 输出的项目路径
+    output?: string, // 最终都要变成绝对路径
     cwd?: string;
     version?: PluginVersion;
     min?: boolean;// 压缩
@@ -62,6 +66,22 @@ export interface CocosPluginV2 {
     main: string;
     author?: string;
     'main-menu'?: Record<string, { icon?: string, message?: string, accelerator?: string }>;
+    dependencies?: string[];
+}
+
+export interface CocosPluginV3 {
+    name: string;
+    version: string;
+    description?: string;
+    package_version?: number;
+    main: string;
+    author?: string;
+    contributions?: {
+        menu?: Array<{ path: string, label: string, message: string }>,
+        messages?: Record<string, { methods?: string[] }>,
+        shortcuts?: Array<{ message?: string, win?: string, mac?: string }>,
+    };
+    panels?: Record<string, { title: string, type: string, main: string }>;
     dependencies?: string[];
 }
 
