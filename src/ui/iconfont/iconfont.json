@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "1262302",
+      "name": "trash",
+      "font_class": "trash",
+      "unicode": "e726",
+      "unicode_decimal": 59174
+    },
+    {
       "icon_id": "4936624",
       "name": "folder-open-fill",
       "font_class": "folder",
