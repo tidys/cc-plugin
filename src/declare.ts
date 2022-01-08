@@ -43,7 +43,7 @@ export enum PluginVersion {
 export interface CocosPluginOptions {
     watch?: boolean;
     hot?: boolean;
-    output?: string, // 最终都要变成绝对路径
+    output?: string | { v2?: string, v3?: string }, // 最终都要变成绝对路径
     cwd?: string;
     version?: PluginVersion;
     min?: boolean;// 压缩

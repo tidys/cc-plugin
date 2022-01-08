@@ -9,6 +9,7 @@ import { extensions } from 'interpret'
 import { prepare } from 'rechoir'
 import dotenv from 'dotenv'
 import dotenvExpand from 'dotenv-expand'
+import chalk from 'chalk';
 
 export interface ServiceCommands {
     fn: Function,
@@ -100,10 +101,32 @@ export default class CocosPluginService {
     private init() {
         this.loadEnv();
         const userOptions = this.loadUserOptions();
+        userOptions && this.checkUserOptions(userOptions);
         this.projectConfig = defaultsDeep(userOptions, this.defaults);
         this.plugins.forEach(({ id, apply }) => {
             apply(new PluginApi(id, this), this.projectConfig)
         })
+    }
+
+    private checkUserOptions(userOptions: CocosPluginConfig) {
+        // 根据配置，将output目录统一变为绝对路径
+        const { options } = userOptions;
+        let { output, version } = options;
+        if (typeof output === 'object') {
+            const { v2, v3 } = output;
+            if (v2 && version === PluginVersion.v2) {
+                options.output = v2;
+            }
+            if (v3 && version === PluginVersion.v3) {
+                options.output = v3;
+            }
+        }
+        if (!options.output) {
+            console.log(chalk.red(`无效的output：${options.output}`));
+        }
+        if (!FS.existsSync(options.output as string)) {
+            console.log(chalk.yellow(`output不存在：${options.output}`))
+        }
     }
 
     run() {
