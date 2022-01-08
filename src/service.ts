@@ -10,6 +10,7 @@ import { prepare } from 'rechoir'
 import dotenv from 'dotenv'
 import dotenvExpand from 'dotenv-expand'
 import chalk from 'chalk';
+import { log } from './log';
 
 export interface ServiceCommands {
     fn: Function,
@@ -85,6 +86,7 @@ export default class CocosPluginService {
 
     get defaults() {
         const options: CocosPluginOptions = {
+            outputProject: './',
             output: './dist',
             version: PluginVersion.v2,
             min: false,
@@ -108,24 +110,66 @@ export default class CocosPluginService {
         })
     }
 
+    private checkIsProjectDir(projDir: string) {
+        // 必须存在这个目录
+        const needDirs = ['assets'];
+        let isProject = true;
+
+        for (let i = 0; i < needDirs.length; i++) {
+            const dir = needDirs[i];
+            const assets = Path.join(projDir, dir)
+            if (!FS.existsSync(assets)) {
+                isProject = false;
+                break;
+            }
+
+            if (FS.statSync(projDir).isFile()) {
+                isProject = false;
+                break;
+            }
+        }
+        return isProject;
+    }
+
+    private catchOutput(projectDir: string, pluginDir: string, pluginName: string) {
+        let output = projectDir;
+        if (this.checkIsProjectDir(projectDir)) {
+            output = Path.join(projectDir, pluginDir, pluginName);
+        } else {
+            log.yellow(`options.outputProject推荐配置为Creator生成的项目目录：${projectDir}`);
+            output = projectDir;
+        }
+        return output;
+    }
+
+    getPluginDir(version: PluginVersion) {
+        if (version === PluginVersion.v2) {
+            return 'packages';
+        } else if (version === PluginVersion.v3) {
+            return 'extensions';
+        }
+    }
+
     private checkUserOptions(userOptions: CocosPluginConfig) {
         // 根据配置，将output目录统一变为绝对路径
-        const { options } = userOptions;
-        let { output, version } = options;
-        if (typeof output === 'object') {
-            const { v2, v3 } = output;
+        const { options, manifest } = userOptions;
+        let { version, outputProject } = options;
+        const pluginDir = this.getPluginDir(version!);
+        if (typeof outputProject === 'object') {
+            const { v2, v3 } = outputProject!;
             if (v2 && version === PluginVersion.v2) {
-                options.output = v2;
+                options.output = this.catchOutput(v2, pluginDir!, manifest.name);
+            } else if (v3 && version === PluginVersion.v3) {
+                options.output = this.catchOutput(v3, pluginDir!, manifest.name);
             }
-            if (v3 && version === PluginVersion.v3) {
-                options.output = v3;
-            }
+        } else {
+            options.output = this.catchOutput(outputProject, pluginDir!, manifest.name);
         }
         if (!options.output) {
-            console.log(chalk.red(`无效的output：${options.output}`));
+            log.red(`无效的output：${options.output}`)
         }
         if (!FS.existsSync(options.output as string)) {
-            console.log(chalk.yellow(`output不存在：${options.output}`))
+            log.yellow(`output不存在：${options.output}`)
         }
     }
 
