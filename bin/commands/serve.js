@@ -111,7 +111,7 @@ function default_1(api, projectConfig) {
             webpackChain.target('node');
             webpackChain.devtool(false);
             const vuePath = Path.resolve(service.root, './node_modules/vue');
-            webpackChain.resolve.alias.set('vue', vuePath).end();
+            // webpackChain.resolve.alias.set('vue', vuePath).end();
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json');
             // 排除模块
             let externals = getExternal(service.context, ['electron', 'fs-extra', 'express']);
@@ -176,23 +176,26 @@ function default_1(api, projectConfig) {
             webpackChain.module
                 .rule('ts')
                 .test(/\.ts(x?)$/)
-                .include.add(packageSource).end()
-                .exclude.add(/node_modules/).end()
+                .include.add(packageSource).add(service.context).end()
+                // .exclude.add(/node_modules/).end()
                 .use('ts-loader')
                 .loader('ts-loader')
                 .options({
                 onlyCompileBundledFiles: true,
                 appendTsSuffixTo: ['\\.vue$'],
+                transpileOnly: true,
+                allowTsInNodeModules: true,
+                // happyPackMode: true,
                 compilerOptions: {
                     target: "es6",
                     module: "es6",
-                    // strict: false,
+                    strict: false,
                     // jsx: "preserve",
                     // importHelpers: true,
                     moduleResolution: "node",
                     skipLibCheck: true,
                     esModuleInterop: true,
-                    // allowSyntheticDefaultImports: true,
+                    allowSyntheticDefaultImports: true,
                     // noImplicitAny: false,
                     // noImplicitThis: false,
                     lib: ['es6', 'dom'],
@@ -206,14 +209,22 @@ function default_1(api, projectConfig) {
             //     .options({
             //         name:'images/[name].[ext]'
             //     })
-            // webpackChain.module
-            //     .rule('font')
-            //     .test(/\.(ttf|woff2|woff|otf|eot)$/)
-            //     .use('url-loader')
-            //     .loader('url-loader')
-            //     .options({
-            //         name:'fonts/[name].[ext]'
-            //     })
+            webpackChain.module
+                .rule('font')
+                .test(/\.(ttf|woff2|woff|otf|eot)$/)
+                // @ts-ignore
+                .type('asset/inline');
+            // .use('url-loader')
+            // .loader('url-loader')
+            // .options({
+            //     esModule: false,
+            //     fallback: {
+            //         loader: 'file-loader',
+            //         options: {
+            //             name: 'fonts/[name].[ext]'
+            //         }
+            //     }
+            // })
             // 处理面板
             const panel = new panel_1.default(service, webpackChain);
             panel.dealPanels();
