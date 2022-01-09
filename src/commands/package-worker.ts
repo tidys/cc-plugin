@@ -36,7 +36,7 @@ export class PackageV2 extends PackageInterface {
         let menus = this.packageData!['main-menu']!;
         const { name } = menu.message;
         const panel = menu.message.panel || this.config.manifest.name;
-        menus[menu.path] = { message: `${panel}:${name}` };
+        menus[trim(menu.path, '/')] = { message: `${panel}:${name}` };
     }
 
     panelReady() {
