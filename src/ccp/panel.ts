@@ -16,18 +16,17 @@ export class Panel {
                 return;
             }
             const { manifest, options } = this.config!;
-            if (options?.version === PluginVersion.v2) {
-                if (panelName === 'self') {
-                    panelName = manifest!.name
-                    // 查找panelID是否存在
-                    if (!manifest?.panels?.find(el => el.name === panelID)) {
-                        console.error(`open failed: ${panel}`)
-                        return
-                    }
+            // if (options?.version === PluginVersion.v2) { }
+            if (panelName === 'self') {
+                panelName = manifest!.name
+                // 查找panelID是否存在
+                if (!manifest?.panels?.find(el => el.name === panelID)) {
+                    console.error(`open failed: ${panel}`)
+                    return
                 }
-                //@ts-ignore
-                Editor.Panel.open(`${panelName}.${panelID}`);
             }
+            //@ts-ignore
+            Editor.Panel.open(`${panelName}.${panelID}`);
         }
     }
 
