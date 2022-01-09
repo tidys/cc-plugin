@@ -1,4 +1,6 @@
 import { CocosPluginConfig, CocosPluginV2, CocosPluginV3, MenuOptions, PanelOptions } from '../declare';
+import { log } from '../log';
+import { trim } from 'lodash'
 
 export abstract class PackageInterface {
     protected config: CocosPluginConfig;
@@ -93,11 +95,37 @@ export class PackageV3 extends PackageInterface {
         super.menuBuild(menuOpts);
         let menu = this.packageData!.contributions!.menu!;
         let msgKey = this.addMessage(menuOpts);
+        let { newLabel, newPath } = this.dealPath(menuOpts.path);
         menu.push({
-            path: menuOpts.path,
-            label: menuOpts.path,
+            path: newPath,
+            label: newLabel,
             message: msgKey,
         })
+    }
+
+    private dealPath(path: string) {
+        let newPath = '', newLabel = ''
+        path = trim(path, '/')
+        const items = path.split('/');
+        if (items.length >= 2) {
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (i === items.length - 1) {
+                    newLabel = item;
+                } else {
+                    newPath += item + '/';
+                }
+            }
+        } else {
+            const item = items[0];
+            if (item) {
+                newPath = newLabel = item;
+            }
+            log.yellow(`没有以/分割菜单，默认配置为`);
+        }
+        newPath = trim(newPath, '/');
+        newLabel = trim(newLabel, '/')
+        return { newLabel, newPath };
     }
 
     private addMessage(menu: MenuOptions) {
