@@ -12,7 +12,8 @@ export interface PanelOptions {
     main: string;
     name: string;
     title: string;
-    type?: string;
+    type: string;
+    icon?: string;
     width?: number;
     height?: number;
     minWidth?: number;
@@ -81,7 +82,16 @@ export interface CocosPluginV3 {
         messages?: Record<string, { methods?: string[] }>,
         shortcuts?: Array<{ message?: string, win?: string, mac?: string }>,
     };
-    panels?: Record<string, { title: string, type: string, main: string }>;
+    panels?: Record<string, {
+        type: string,
+        main: string,
+        title?: string,
+        icon?: string,
+        width?:number,
+        height?:number,
+        'min-width'?:number,
+        'min-height'?:number,
+    }>;
     dependencies?: string[];
 }
 

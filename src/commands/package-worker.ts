@@ -48,15 +48,17 @@ export class PackageV2 extends PackageInterface {
         const panelName = !!panel.name ? `panel.${panel.name}` : 'panel';
         if (!this.packageData!.hasOwnProperty(panelName)) {
             // @ts-ignore
-            packageJson[`${panelName}`] = {
+            let cfg: any = this.packageData[`${panelName}`] = {
                 main: panel.main,
                 title: panel.title,
                 type: panel.type,
-                width: panel.width,
-                height: panel.height,
-                'min-width': panel.minWidth,
-                'min-height': panel.minHeight,
             }
+            panel.icon && (cfg.icon = panel.icon);
+            panel.width && (cfg.width = panel.width);
+            panel.height && (cfg.height = panel.height);
+            panel.minWidth && (cfg['min-width'] = panel.minWidth);
+            panel.minHeight && (cfg['min-height'] = panel.minHeight);
+
         } else {
             console.log('重复的panel')
         }
@@ -75,11 +77,23 @@ export class PackageV3 extends PackageInterface {
 
     panelReady() {
         super.panelReady();
+        this.packageData!.panels = {}
     }
 
     panelBuild(panel: PanelOptions) {
-
-
+        super.panelBuild(panel);
+        const panels = this.packageData!.panels!;
+        const panelName = panel.name || 'default';
+        let cfg: any = panels[panelName] = {
+            main: panel.main,
+            title: panel.title,
+            type: panel.type,
+        }
+        panel.icon && (cfg.icon = panel.icon);
+        panel.width && (cfg.width = panel.width);
+        panel.height && (cfg.height = panel.height);
+        panel.minWidth && (cfg['min-width'] = panel.minWidth);
+        panel.minHeight && (cfg['min-height'] = panel.minHeight);
     }
 
     menuReady() {
