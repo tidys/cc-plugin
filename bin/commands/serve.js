@@ -34,6 +34,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const webpack_chain_1 = __importDefault(require("webpack-chain"));
 const webpack_1 = __importDefault(require("webpack"));
 const Path = __importStar(require("path"));
+const path_1 = require("path");
 const vue_loader_1 = require("vue-loader");
 const clean_webpack_plugin_1 = require("clean-webpack-plugin");
 const panel_1 = __importDefault(require("../panel"));
@@ -48,8 +49,8 @@ const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plug
 const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
 const portfinder_1 = __importDefault(require("portfinder"));
 const printf_1 = __importDefault(require("printf"));
-const path_1 = require("path");
 const log_1 = require("../log");
+const require_v3_1 = __importDefault(require("../plugin/require-v3"));
 function getExternal(dir, defaultModules = []) {
     let map = {};
     defaultModules.forEach(module => {
@@ -140,7 +141,9 @@ function default_1(api, projectConfig) {
                 // 处理相对路径
                 output = resolvePath;
             }
+            const { version } = service.projectConfig.options;
             const pluginName = projectConfig.manifest.name;
+            // const publicPath = version === PluginVersion.v2 ? `packages://${pluginName}/` : '';
             webpackChain.output.path(output)
                 .libraryTarget('commonjs')
                 // .libraryExport('default') // 这里暂时不能使用这个
@@ -246,6 +249,11 @@ function default_1(api, projectConfig) {
                     filename: '[name].css',
                     chunkFilename: '[id].css'
                 }]).end();
+            if (version === declare_1.PluginVersion.v3) {
+                webpackChain.plugin('require-v3')
+                    .use(require_v3_1.default)
+                    .end();
+            }
             webpackChain
                 .plugin('clean')
                 .use(clean_webpack_plugin_1.CleanWebpackPlugin, [{

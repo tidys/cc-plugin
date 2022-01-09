@@ -4,7 +4,8 @@ import Chain from 'webpack-chain';
 import webpack from 'webpack';
 import CocosPluginService, { ProjectConfig } from '../service';
 import * as Path from 'path';
-import vueLoader, { VueLoaderPlugin } from 'vue-loader'
+import { resolve } from 'path';
+import { VueLoaderPlugin } from 'vue-loader'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import Panel from '../panel';
 import * as Fs from 'fs';
@@ -17,10 +18,9 @@ import { PluginVersion } from '../declare';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import webpackDevSever from 'webpack-dev-server'
 import PortFinder from 'portfinder'
-import chalk from 'chalk';
 import printf from 'printf';
-import { resolve } from 'path'
 import { log } from '../log'
+import requireV3 from '../plugin/require-v3'
 
 function getExternal(dir: string, defaultModules: string[] = []) {
     let map: Record<string, string> = {};
@@ -122,7 +122,9 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
                 // 处理相对路径
                 output = resolvePath;
             }
+            const { version } = service.projectConfig.options;
             const pluginName = projectConfig.manifest.name;
+            // const publicPath = version === PluginVersion.v2 ? `packages://${pluginName}/` : '';
             webpackChain.output.path(output)
                 .libraryTarget('commonjs')
                 // .libraryExport('default') // 这里暂时不能使用这个
@@ -233,6 +235,11 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
                     filename: '[name].css',
                     chunkFilename: '[id].css'
                 }]).end();
+            if (version === PluginVersion.v3) {
+                webpackChain.plugin('require-v3')
+                    .use(requireV3)
+                    .end();
+            }
             webpackChain
                 .plugin('clean')
                 .use(CleanWebpackPlugin, [{

@@ -3,7 +3,7 @@ import ClientSocket from './client-socket';
 import { Panel } from './panel'
 
 import { Port } from './index'
-import * as Path from 'path';
+import { requireWithUrl, urlToFsPath } from './require-v3';
 
 interface PanelOptions {
     ready: (rootElement: any, args: any) => void;
@@ -14,16 +14,27 @@ export class CocosCreatorPluginRender {
     public options: CocosPluginOptions | null = null;
     public Panel: Panel = new Panel();
 
-    require(name: string): any {
-        const { version } = this.options!;
+    url(url: string) {
+        if (this.isV2) {
+            // @ts-ignore
+            return Editor.url(string)
+        } else {
+            return urlToFsPath(url);
+        }
+    }
 
-        if (version === PluginVersion.v2) {
+    get isV2() {
+        const { version } = this.options!;
+        return version === PluginVersion.v2;
+    }
+
+    require(name: string): any {
+
+        if (this.isV2) {
             // @ts-ignore
             return Editor.require(`packages://${this.manifest!.name}/node_modules/${name}`)
-        } else if (version === PluginVersion.v3) {
-            // @ts-ignore
-            let editorModules = Path.join(Editor.App.path, 'node_modules');
-            module.paths.push(editorModules);
+        } else {
+            return requireWithUrl(`packages://${this.manifest!.name}/node_modules/${name}`)
         }
     }
 

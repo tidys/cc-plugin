@@ -1,12 +1,9 @@
 import { CocosPluginOptions, PanelOptions, PluginVersion } from './declare';
-import { extname, join } from 'path'
-import { existsSync, readFileSync } from 'fs-extra'
+import { join } from 'path'
+import { existsSync } from 'fs-extra'
 import CocosPluginService from './service';
 import Config from 'webpack-chain';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import * as Path from 'path';
-
-const EJSTemplate = join(__dirname, '../template/panel-v2.ejs');
 
 
 export default class Panel {
@@ -19,8 +16,16 @@ export default class Panel {
     }
 
     dealPanel(panel: PanelOptions, options: CocosPluginOptions) {
+        const { version } = options;
+        let ejsTemplate = '';
+        if (version === PluginVersion.v3) {
+            ejsTemplate = join(__dirname, '../template/panel-v3.ejs');
+        } else if (version === PluginVersion.v2) {
+            ejsTemplate = join(__dirname, '../template/panel-v2.ejs');
+        }
+
         const mainFile = join(this.service.context, panel.main);
-        if (existsSync(mainFile)) {
+        if (ejsTemplate && existsSync(mainFile)) {
             let { webpackChain } = this;
             const entryName = `panel/${panel.name}`;
             let entryPoint = webpackChain.entryPoints.get(entryName);
@@ -31,14 +36,14 @@ export default class Panel {
                 webpackChain.entry(entryName).add(mainFile);
                 const filename = `${entryName}_panel.js`
                 webpackChain.plugin('panel').use(HtmlWebpackPlugin, [{
-                    template: EJSTemplate,
+                    template: ejsTemplate,
                     inject: false,
                     minify: false,
                     hash: false,
                     filename,
                     chunks: ['vendor', entryName],
                     ccPlugin: {
-                        template: `<div id="app">${panel.name}</div>`,
+                        template: `<div id="app" style="width:100%;height:100%;display:flex;">${panel.name}</div>`,
                         style: '.body{width:100%}',
                         messages: 'hello message',
                     }
@@ -54,12 +59,10 @@ export default class Panel {
         const options: CocosPluginOptions = this.service.projectConfig.options;
         if (panels && panels.length) {
             // 主要是处理main的字段
-            if (options.version === PluginVersion.v2) {
-                panels.forEach(panel => {
-                    // 需要知道这个面板被哪个HTMLWebpack chunk
-                    panel.main = this.dealPanel(panel, options);
-                })
-            }
+            panels.forEach(panel => {
+                // 需要知道这个面板被哪个HTMLWebpack chunk
+                panel.main = this.dealPanel(panel, options);
+            })
             return panels;
         }
     }

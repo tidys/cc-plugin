@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PackageV3 = exports.PackageV2 = exports.PackageInterface = void 0;
+const log_1 = require("../log");
+const lodash_1 = require("lodash");
 class PackageInterface {
     constructor(config) {
         this.config = config;
@@ -30,7 +32,7 @@ class PackageV2 extends PackageInterface {
         let menus = this.packageData['main-menu'];
         const { name } = menu.message;
         const panel = menu.message.panel || this.config.manifest.name;
-        menus[menu.path] = { message: `${panel}:${name}` };
+        menus[lodash_1.trim(menu.path, '/')] = { message: `${panel}:${name}` };
     }
     panelReady() {
         super.panelReady();
@@ -40,15 +42,16 @@ class PackageV2 extends PackageInterface {
         const panelName = !!panel.name ? `panel.${panel.name}` : 'panel';
         if (!this.packageData.hasOwnProperty(panelName)) {
             // @ts-ignore
-            packageJson[`${panelName}`] = {
+            let cfg = this.packageData[`${panelName}`] = {
                 main: panel.main,
                 title: panel.title,
                 type: panel.type,
-                width: panel.width,
-                height: panel.height,
-                'min-width': panel.minWidth,
-                'min-height': panel.minHeight,
             };
+            panel.icon && (cfg.icon = panel.icon);
+            panel.width && (cfg.width = panel.width);
+            panel.height && (cfg.height = panel.height);
+            panel.minWidth && (cfg['min-width'] = panel.minWidth);
+            panel.minHeight && (cfg['min-height'] = panel.minHeight);
         }
         else {
             console.log('重复的panel');
@@ -65,8 +68,22 @@ class PackageV3 extends PackageInterface {
     }
     panelReady() {
         super.panelReady();
+        this.packageData.panels = {};
     }
     panelBuild(panel) {
+        super.panelBuild(panel);
+        const panels = this.packageData.panels;
+        const panelName = panel.name || 'default';
+        let cfg = panels[panelName] = {
+            main: panel.main,
+            title: panel.title,
+            type: panel.type,
+        };
+        panel.icon && (cfg.icon = panel.icon);
+        panel.width && (cfg.width = panel.width);
+        panel.height && (cfg.height = panel.height);
+        panel.minWidth && (cfg['min-width'] = panel.minWidth);
+        panel.minHeight && (cfg['min-height'] = panel.minHeight);
     }
     menuReady() {
         super.panelReady();
@@ -80,11 +97,38 @@ class PackageV3 extends PackageInterface {
         super.menuBuild(menuOpts);
         let menu = this.packageData.contributions.menu;
         let msgKey = this.addMessage(menuOpts);
+        let { newLabel, newPath } = this.dealPath(menuOpts.path);
         menu.push({
-            path: menuOpts.path,
-            label: menuOpts.path,
+            path: newPath,
+            label: newLabel,
             message: msgKey,
         });
+    }
+    dealPath(path) {
+        let newPath = '', newLabel = '';
+        path = lodash_1.trim(path, '/');
+        const items = path.split('/');
+        if (items.length >= 2) {
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                if (i === items.length - 1) {
+                    newLabel = item;
+                }
+                else {
+                    newPath += item + '/';
+                }
+            }
+        }
+        else {
+            const item = items[0];
+            if (item) {
+                newPath = newLabel = item;
+            }
+            log_1.log.yellow(`没有以/分割菜单，默认配置为`);
+        }
+        newPath = lodash_1.trim(newPath, '/');
+        newLabel = lodash_1.trim(newLabel, '/');
+        return { newLabel, newPath };
     }
     addMessage(menu) {
         let msgKey = '';

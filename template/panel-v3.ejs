@@ -1,0 +1,81 @@
+const Path = require('path')
+const URL = require('url')
+
+
+function urlToFsPath(urlPath) {
+const result = URL.parse(urlPath)
+if (result.protocol === 'packages:') {
+return Path.join(Editor.Project.path, 'extensions', result.hostname, result.pathname)
+}
+}
+
+function relativeUrlPath(urlPath) {
+const fsPath = urlToFsPath(urlPath);
+return Path.relative(__dirname, fsPath);
+}
+
+function requireWithUrl(urlPath) {
+const fsPath = urlToFsPath(urlPath);
+if (fsPath) {
+return require(fsPath)
+}
+return null;
+}
+
+<% const jsLength = htmlWebpackPlugin.files.js.length; %>
+<% for (let i = 0; i < jsLength; i++) { %>
+    const panel = requireWithUrl('<%= htmlWebpackPlugin.files.js[i] %>');
+<% } %>
+
+function loadCss (parent, cssPaths) {
+if (!parent) return
+if (!Array.isArray(cssPaths)) {
+cssPaths = [cssPaths];
+}
+cssPaths.forEach((cssPath) => {
+const id = CSS.escape(cssPath);
+const hasLoaded = parent.querySelector(`#${id}`)
+if (!hasLoaded) {
+const link = document.createElement('link')
+link.rel = 'stylesheet';
+link.href = cssPath;
+link.id = id;
+parent.appendChild(link);
+}
+})
+}
+
+
+
+exports.template=`<%= htmlWebpackPlugin.options.ccPlugin.template %>`;
+exports.$={app:'#app'};
+exports.ready=function(...args){
+// 加载css
+<% const cssLength = htmlWebpackPlugin.files.css.length; %>
+<% for(let i = 0;i < cssLength;i++){ %>
+    loadCss(this.$.app.parentNode,'<%= htmlWebpackPlugin.files.css[i] %>')
+    loadCss(document.head,'<%= htmlWebpackPlugin.files.css[i] %>')
+<% } %>
+
+
+let panelInstance = panel;
+if (panel && panel.default) {
+panelInstance = panel.default;
+}
+
+let targetPanel = panelInstance;
+if (typeof panelInstance === 'function') {
+targetPanel = new panelInstance();
+}
+
+if (targetPanel.hasOwnProperty('ready') &&
+typeof targetPanel.ready === 'function') {
+targetPanel.ready(this.$.app.parentNode, args);
+}
+
+}
+
+exports.close=function(){
+
+
+}
