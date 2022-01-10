@@ -1,9 +1,8 @@
 import { CocosPluginConfig, CocosPluginManifest, CocosPluginOptions, PluginVersion } from '../declare';
 import ClientSocket from './client-socket';
-import { Panel } from './panel'
 
 import { Port } from './index'
-import { requireWithUrl, urlToFsPath } from './require-v3';
+import adaptation, { Adaptation } from './adaptation';
 
 interface PanelOptions {
     ready: (rootElement: any, args: any) => void;
@@ -12,34 +11,12 @@ interface PanelOptions {
 export class CocosCreatorPluginRender {
     public manifest: CocosPluginManifest | null = null;
     public options: CocosPluginOptions | null = null;
-    public Panel: Panel = new Panel();
-
-    url(url: string) {
-        if (this.isV2) {
-            // @ts-ignore
-            return Editor.url(string)
-        } else {
-            return urlToFsPath(url);
-        }
-    }
-
-    get isV2() {
-        const { version } = this.options!;
-        return version === PluginVersion.v2;
-    }
-
-    require(name: string): any {
-
-        if (this.isV2) {
-            // @ts-ignore
-            return Editor.require(`packages://${this.manifest!.name}/node_modules/${name}`)
-        } else {
-            return requireWithUrl(`packages://${this.manifest!.name}/node_modules/${name}`)
-        }
-    }
+    public Adaptation: Adaptation = adaptation;
+    public isV2: boolean = true;
 
     public init(config: CocosPluginConfig, options: PanelOptions) {
-        this.Panel.setConfig(config);
+        this.isV2 = config.options.version === PluginVersion.v2;
+        this.Adaptation.init(config, this.isV2);
         this.manifest = config.manifest;
         this.options = config.options;
         // hot
