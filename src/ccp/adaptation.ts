@@ -1,5 +1,7 @@
 import { CocosPluginConfig, PanelOptions, PluginVersion } from '../declare';
+import { versionApi, Versions } from './version-api';
 
+const { V246, V247 } = Versions;
 const Path = require('path')
 const URL = require('url')
 
@@ -10,8 +12,21 @@ let adaptation: Adaptation;
 class Project {
     get path(): string {
         if (v2) {
-            // @ts-ignore
-            return Editor.projectInfo.path;
+            return versionApi(
+                adaptation.CCEditor.version,
+                [
+                    {
+                        version: [V246, V247],
+                        fn: () => {
+                            // @ts-ignore
+                            return Editor.Project.path;
+                        }
+                    }
+                ],
+                () => {
+                    // @ts-ignore
+                    return Editor.projectInfo.path;
+                })
         } else {
             // @ts-ignore
             return Editor.Project.path;
@@ -145,16 +160,74 @@ class Builder {
     }
 }
 
+class Env {
+    get isWin() {
+        return process.platform === 'win32'
+    }
+
+    get isMac() {
+        return process.platform === 'darwin';
+    }
+}
+
+class Simulator {
+    // 模拟器的完整路径
+    get path(): string {
+        if (v2) {
+            return Path.join(adaptation.CCEditor.path, 'cocos2d-x/simulator/');
+        } else {
+            if (adaptation.Env.isWin) {
+                throw new Error('没有适配')
+            } else if (adaptation.Env.isMac) {
+                return Path.join(adaptation.CCEditor.path, 'resources/3d/engine-native/simulator/Debug/')
+            }
+        }
+        return '';
+    }
+
+    get remoteAssetDir() {
+        const macFixPath = 'Contents/Resources/remote-asset'
+        if (v2) {
+            if (adaptation.Env.isWin) {
+                return Path.join(this.path, 'win32/remote-asset');
+            } else if (adaptation.Env.isMac) {
+                return Path.join(this.path, 'mac/Simulator.app/', macFixPath);
+            }
+        } else {
+            if (adaptation.Env.isWin) {
+                throw new Error('没有适配')
+            } else if (adaptation.Env.isMac) {
+                return Path.join(this.path, 'SimulatorApp-Mac.app', macFixPath);
+            }
+        }
+    }
+}
+
 // 为啥取这个名字，因为被Editor编辑器占用了
 class CCEditor {
     get path(): string {
         if (v2) {
             //@ts-ignore
-            return Editor.appPath;
+            return Path.dirname(Editor.appPath);
         } else {
             //@ts-ignore
-            return Editor.App.path;
+            return Path.dirname(Editor.App.path);
         }
+    }
+
+    private _version = '';
+    get version() {
+        // 因为牵扯到remote，所以对这个变量做了一次缓存
+        if (this._version) {
+            return this._version;
+        }
+        if (v2) {
+            // @ts-ignore
+            this._version = Editor.remote.App.version;
+        } else {
+            throw new Error('没有适配')
+        }
+        return this._version;
     }
 }
 
@@ -200,6 +273,8 @@ class Dialog {
 
 export class Adaptation {
     public Util = new Util();
+    public Env = new Env();
+    public Simulator = new Simulator();
     public Project = new Project();
     public Panel = new Panel();
     public CCEditor = new CCEditor();
@@ -226,7 +301,7 @@ export class Adaptation {
     public url(url: string) {
         if (v2) {
             // @ts-ignore
-            return Editor.url(string)
+            return Editor.url(url)
         } else {
             return adaptation.Util.urlToFspath(url);
         }
