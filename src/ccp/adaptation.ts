@@ -1,5 +1,6 @@
 import { CocosPluginConfig, PanelOptions, PluginVersion } from '../declare';
 import { versionApi, Versions } from './version-api';
+import * as Fs from 'fs';
 
 const { V246, V247 } = Versions;
 const Path = require('path')
@@ -130,33 +131,72 @@ class Panel {
 
 // 目前先加一些自己关心的，后续慢慢添加完善
 interface BuilderOptions {
-    outputPath: string;
-    platform: string;
-    md5Cache: string;
+    buildPath: string;// 构建的输入根目录: build/
+    outputPath: string;// 当前平台输出的目录： build/web-mobile
+    platform: string; // web-mobile
+    md5Cache: boolean;
+}
+
+export const Platform = {
+    WebMobile: 'web-mobile',
+    WebDesktop: 'web-desktop',
+    Android: 'android',
+    Ios: 'ios',
+    Mac: 'mac',
+    Windows: 'windows',
 }
 
 class Builder {
+    static Platform = Platform;
+
+    public isNativePlatform(platform: string) {
+        return !![Platform.Android, Platform.Ios, Platform.Mac, Platform.Windows].includes(platform);
+    }
+
     async getConfig(): Promise<BuilderOptions[]> {
+        // 为了配合3.x，统一返回array
+        let ret: BuilderOptions[] = [];
         if (v2) {
-            return [];
+            const buildCfgFile = Path.join(adaptation.Project.path, 'local/builder.json');
+            if (Fs.existsSync(buildCfgFile)) {
+                const buildData: { template: string, buildPath: string, platform: string } = JSON.parse(Fs.readFileSync(buildCfgFile, 'utf-8'))
+                const buildPath = Path.join(adaptation.Project.path, buildData.buildPath)
+
+                if (this.isNativePlatform(buildData.platform)) {
+                    // native平台使用的是jsb-xxx目录
+                    let outputPath = Path.join(buildPath, `jsb-${buildData.template}`)
+                    ret.push({
+                        buildPath: buildPath, outputPath,
+                        platform: buildData.platform,
+                        md5Cache: false,// todo 后续完善
+                    })
+                } else {
+                    let outputPath = Path.join(buildPath, buildData.platform);
+                    ret.push({
+                        buildPath: buildPath, outputPath,
+                        platform: buildData.platform,
+                        md5Cache: false,// todo 后续完善这个字段的获取逻辑
+                    });
+                }
+            }
         } else {
-            let ret: BuilderOptions[] = [];
             // @ts-ignore
             let cfg = await Editor.Profile.getConfig('builder', 'BuildTaskManager.taskMap', 'local');
             Object.keys(cfg).forEach(key => {
                 const item: any = cfg[key].options;
                 if (item) {
-                    const fullPath = adaptation.Util.urlToFspath(item.buildPath);
-                    const outputPath = fullPath ? Path.join(fullPath, item.outputName) : item.buildPath;
+                    const buildPath = adaptation.Util.urlToFspath(item.buildPath);
+                    const outputPath = buildPath ? Path.join(buildPath, item.outputName) : item.buildPath;
                     ret.push({
+                        buildPath: buildPath,
                         outputPath: outputPath,
                         platform: item.platform,
                         md5Cache: item.md5Cache,
                     })
                 }
             })
-            return ret;
         }
+        return ret;
     }
 }
 
