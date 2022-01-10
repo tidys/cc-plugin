@@ -265,7 +265,8 @@ class CCEditor {
             // @ts-ignore
             this._version = Editor.remote.App.version;
         } else {
-            throw new Error('没有适配')
+            // @ts-ignore
+            this._version = Editor.App.version;
         }
         return this._version;
     }
@@ -298,11 +299,24 @@ export interface SelectDialogOptions {
 }
 
 class Dialog {
-    async select(options: SelectDialogOptions) {
+    async select(options: SelectDialogOptions): Promise<string[]> {
         if (v2) {
-            throw new Error('需要适配下');
-            //@ts-ignore
-            return Editor.Dialog.openFile(options)
+            let properties = '';
+            if (options.type === 'directory') {
+                properties = 'openDirectory'
+            } else if (options.type === 'file') {
+                properties = 'openFile';
+            }
+            //@ts-ignore 更多的参数后续慢慢适配
+            const ret = Editor.Dialog.openFile({
+                title: options.title,
+                defaultPath: options.path,
+                properties: [properties],
+            })
+            if (ret === -1) {
+                return []
+            }
+            return ret || [];
         } else {
             // @ts-ignore
             const ret = await Editor.Dialog.select(options);

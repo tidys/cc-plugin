@@ -248,7 +248,12 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
                     cleanOnceBeforeBuildPatterns: ['i18n/**', 'panel/**', 'main.js', 'package-lock.json', 'package.json'],
                 }])
                 .end();
-
+            webpackChain
+                .plugin('vue_env')
+                .use(webpack.DefinePlugin, [{
+                    __VUE_OPTIONS_API__: true,
+                    __VUE_PROD_DEVTOOLS__: false
+                }]);
         });
         let webpackConfig = api.resolveChainWebpackConfig();
         const compiler = webpack(webpackConfig, ((err, stats) => {
