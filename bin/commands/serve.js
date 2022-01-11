@@ -83,7 +83,7 @@ function getExternal(dir, defaultModules = []) {
 function webpackEntry(service, webpackChain, entryName, file, prepend) {
     const mainFile = Path.resolve(service.context, file);
     if (!Fs.existsSync(mainFile)) {
-        console.error('main file not exists: ', mainFile);
+        log_1.log.red(`main file not exists: ${mainFile}`);
         process.exit(0);
     }
     let entryPoint = webpackChain.entry(entryName).add(mainFile);
@@ -104,9 +104,12 @@ function default_1(api, projectConfig) {
         usage: 'usage',
         options: {}
     }, (service) => __awaiter(this, void 0, void 0, function* () {
-        log_1.log.red(printf_1.default('%-20s %s', 'service root:    ', service.root));
-        log_1.log.red(printf_1.default('%-20s %s', 'service context: ', service.context));
+        log_1.log.blue(printf_1.default('%-20s %s', 'service root:    ', service.root));
+        log_1.log.blue(printf_1.default('%-20s %s', 'service context: ', service.context));
         api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
+            const { version } = service.projectConfig.options;
+            const pluginName = projectConfig.manifest.name;
+            const isV3 = version === declare_1.PluginVersion.v3;
             webpackChain.watch(!!projectConfig.options.watch);
             webpackChain.mode('development');
             webpackChain.target('node');
@@ -121,6 +124,15 @@ function default_1(api, projectConfig) {
             const { i18n_zh, i18n_en } = projectConfig.manifest;
             i18n_zh && webpackEntry(service, webpackChain, 'i18n/zh', i18n_zh);
             i18n_en && webpackEntry(service, webpackChain, 'i18n/en', i18n_en);
+            // builder&hooks
+            if (isV3) {
+                const builderEntry = 'builder';
+                const builderFile = Path.resolve(service.root, 'src/ccp/builder/builder.ts');
+                webpackEntry(service, webpackChain, builderEntry, builderFile);
+                const hooksEntry = 'hooks';
+                const hooksFile = Path.resolve(service.root, 'src/ccp/builder/hooks.ts');
+                webpackEntry(service, webpackChain, hooksEntry, hooksFile);
+            }
             // 主进程代码
             let mainFile = '';
             if (projectConfig.options.version === declare_1.PluginVersion.v2) {
@@ -141,8 +153,6 @@ function default_1(api, projectConfig) {
                 // 处理相对路径
                 output = resolvePath;
             }
-            const { version } = service.projectConfig.options;
-            const pluginName = projectConfig.manifest.name;
             // const publicPath = version === PluginVersion.v2 ? `packages://${pluginName}/` : '';
             webpackChain.output.path(output)
                 .libraryTarget('commonjs')
@@ -249,7 +259,7 @@ function default_1(api, projectConfig) {
                     filename: '[name].css',
                     chunkFilename: '[id].css'
                 }]).end();
-            if (version === declare_1.PluginVersion.v3) {
+            if (isV3) {
                 webpackChain.plugin('require-v3')
                     .use(require_v3_1.default)
                     .end();
@@ -262,6 +272,12 @@ function default_1(api, projectConfig) {
                     cleanOnceBeforeBuildPatterns: ['i18n/**', 'panel/**', 'main.js', 'package-lock.json', 'package.json'],
                 }])
                 .end();
+            webpackChain
+                .plugin('vue_env')
+                .use(webpack_1.default.DefinePlugin, [{
+                    __VUE_OPTIONS_API__: true,
+                    __VUE_PROD_DEVTOOLS__: false
+                }]);
         }));
         let webpackConfig = api.resolveChainWebpackConfig();
         const compiler = webpack_1.default(webpackConfig, ((err, stats) => {

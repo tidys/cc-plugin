@@ -1,4 +1,4 @@
-import { CocosPluginConfig, PanelOptions, PluginVersion } from '../declare';
+import { BuilderOptions, CocosPluginConfig, PanelOptions, PluginVersion } from '../declare';
 import { versionApi, Versions } from './version-api';
 import * as Fs from 'fs';
 
@@ -129,13 +129,6 @@ class Panel {
 
 }
 
-// 目前先加一些自己关心的，后续慢慢添加完善
-interface BuilderOptions {
-    buildPath: string;// 构建的输入根目录: build/
-    outputPath: string;// 当前平台输出的目录： build/web-mobile
-    platform: string; // web-mobile
-    md5Cache: boolean;
-}
 
 export const Platform = {
     WebMobile: 'web-mobile',

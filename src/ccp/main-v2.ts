@@ -24,4 +24,6 @@ export const load = (() => {
     return 0;
 })
 
+
+// 接管一下builder
 export const messages = CCP.wrapper?.messages || {}

@@ -42,6 +42,10 @@ export class CocosCreatorPluginRender {
         }
         return options;
     }
+
+    public builder(){
+
+    }
 }
 
 const CCP = new CocosCreatorPluginRender();

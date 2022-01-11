@@ -78,6 +78,7 @@ export interface CocosPluginV3 {
     main: string;
     author?: string;
     contributions?: {
+        builder?: string,
         menu?: Array<{ path: string, label: string, message: string }>,
         messages?: Record<string, { methods?: string[] }>,
         shortcuts?: Array<{ message?: string, win?: string, mac?: string }>,
@@ -87,16 +88,26 @@ export interface CocosPluginV3 {
         main: string,
         title?: string,
         icon?: string,
-        width?:number,
-        height?:number,
-        'min-width'?:number,
-        'min-height'?:number,
+        width?: number,
+        height?: number,
+        'min-width'?: number,
+        'min-height'?: number,
     }>;
     dependencies?: string[];
 }
 
 export interface PluginMainWrapper {
-    load: Function
+    load: Function,
+    unload?: Function,
+    builder?: Record<string | 'onAfterBuild', Function>,
     messages?: Record<string, Function>;
+}
+
+// 目前先加一些自己关心的，后续慢慢添加完善
+export interface BuilderOptions {
+    buildPath: string;// 构建的输入根目录: build/
+    outputPath: string;// 当前平台输出的目录： build/web-mobile
+    platform: string; // web-mobile
+    md5Cache: boolean;
 }
 
