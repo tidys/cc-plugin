@@ -1,7 +1,5 @@
-// import CCP from '../entry-render'
 import * as Path from 'path'
 import * as Fs from 'fs';
-import { BuilderOptions } from '../../declare';
 
 // 运行在渲染进程
 export function onAfterBuild(buildOptions: any, buildResult: any) {
@@ -16,8 +14,12 @@ export function onAfterBuild(buildOptions: any, buildResult: any) {
     if (pkgName) {
         // todo 这个参数也是写死的，后续需要优化
         const func = 'onBuilder';
+        // 参数暂时放到main-v3中进行整理
         const { buildPath, name, outputName, platform, md5Cache } = buildOptions;
         // @ts-ignore 发送到主进程
-        Editor.Message.request(pkgName, func, { buildPath, name, outputName, platform, md5Cache });
+        Editor.Message.request(pkgName, func, {
+            type: 'onAfterBuild',
+            data: { buildPath, name, outputName, platform, md5Cache }
+        });
     }
 }

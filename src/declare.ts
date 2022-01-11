@@ -45,14 +45,31 @@ export enum PluginVersion {
 }
 
 export interface CocosPluginOptions {
-    watch?: boolean;
-    hot?: boolean;
+    // hmr server
+    server?: {
+        enabled?: boolean,
+        port?: number, // 监听端口，需要优化判断下端口是否占用的问题
+    }
+    watchBuild?: boolean; // 监听构建
     outputProject: string | { v2?: string, v3?: string },// 输出的项目路径
     output?: string, // 最终都要变成绝对路径
     cwd?: string;
     version?: PluginVersion;
     min?: boolean;// 压缩
     treeShaking?: boolean;
+}
+
+// 一些默认值
+export const DefaultCocosPluginOptions: CocosPluginOptions = {
+    outputProject: './',
+    output: './dist',
+    version: PluginVersion.v2,
+    server: {
+        enabled: false,
+        port: 2022,
+    },
+    watchBuild: false,
+    min: false,
 }
 
 export interface CocosPluginConfig {

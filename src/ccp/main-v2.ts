@@ -1,13 +1,12 @@
 import CCP from './entry-main'
 import ClientSocket from './client-socket';
-
-// 这个port需要动态获取
-const port = 2346;
-const hot = true;
+import { BuilderOptions } from '../declare';
+import * as Path from 'path';
 
 export const load = (() => {
-    console.log('load')
-    if (hot) {
+    // 发布后的不再进行watch
+    const { enabled, port } = CCP.options?.server!;
+    if (!!enabled) {
         let client = new ClientSocket();
         client.setReloadCallback(() => {
             const { name } = CCP.manifest!;
@@ -18,7 +17,7 @@ export const load = (() => {
                 console.log('reload success')
             });
         })
-        client.connect(port)
+        client.connect(port!)
     }
     CCP.wrapper?.load();
     return 0;
@@ -26,4 +25,15 @@ export const load = (() => {
 
 
 // 接管一下builder
-export const messages = CCP.wrapper?.messages || {}
+export const messages = Object.assign(CCP.wrapper?.messages || {}, {
+    'editor:build-finished'(event: any, options: any) {
+        const { platform, md5Cache, dest } = options;
+        const param: BuilderOptions = {
+            platform,
+            md5Cache,
+            outputPath: dest,
+            buildPath: Path.dirname(dest),
+        }
+        CCP.wrapper?.builder?.onAfterBuild(param);
+    }
+})

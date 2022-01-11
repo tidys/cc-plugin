@@ -13,12 +13,11 @@ export default class DevServer {
     constructor(port: number) {
         this.app = express();
         this.httpServer = this.createHttpServer();
-        this.createSocketServer();
+        this.createSocketServer(port);
         // this.listen(port)
     }
 
-    createSocketServer() {
-        const port = 2346;
+    createSocketServer(port: number) {
         let server = net.createServer((socket) => {
             console.log('has client connection')
             socket.write('hello')

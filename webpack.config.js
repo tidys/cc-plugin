@@ -32,7 +32,6 @@ module.exports = {
         path: Path.join(__dirname, "./dist"),
         libraryTarget: "commonjs",
         // filename: (pathdata)=>{
-        //     debugger
         //     if (pathdata.chunk.name === 'index') {
         //         return '[name]/[name].js'
         //     }else{

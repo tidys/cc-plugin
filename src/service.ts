@@ -1,4 +1,10 @@
-import { CocosPluginConfig, CocosPluginManifest, CocosPluginOptions, PluginVersion } from './declare';
+import {
+    CocosPluginConfig,
+    CocosPluginManifest,
+    CocosPluginOptions,
+    DefaultCocosPluginOptions,
+    PluginVersion
+} from './declare';
 
 import * as Path from 'path';
 import serve from './commands/serve'
@@ -85,12 +91,7 @@ export default class CocosPluginService {
     }
 
     get defaults() {
-        const options: CocosPluginOptions = {
-            outputProject: './',
-            output: './dist',
-            version: PluginVersion.v2,
-            min: false,
-        };
+        const options: CocosPluginOptions = DefaultCocosPluginOptions;
         const manifest: CocosPluginManifest = {
             name: 'cocos-creator-plugin',
             version: '0.0.0',

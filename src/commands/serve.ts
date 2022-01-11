@@ -90,7 +90,8 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
 
             const isV3 = version === PluginVersion.v3;
 
-            webpackChain.watch(!!projectConfig.options.watch)
+            // 当server开启时，一般来说都需要启用watchBuild，不然没有实际意义
+            webpackChain.watch(!!projectConfig.options.watchBuild || projectConfig.options.server?.enabled!)
             webpackChain.mode('development');
             webpackChain.target('node');
             webpackChain.devtool(false);
@@ -229,10 +230,13 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
             panel.dealPanels();
 
             // plugins
-            const port = 2346;//await getPort();
-            webpackChain.plugin('dev-server')
-                .use(DevServer, [port])
-                .end();
+            const { enabled, port } = service.projectConfig.options.server!;
+            if (enabled) {
+                webpackChain.plugin('dev-server')
+                    .use(DevServer, [port!])
+                    .end();
+            }
+
             webpackChain.plugin('npm install')
                 .use(NpmInstall, [projectConfig.options.output! as string])
             webpackChain.plugin('cc-plugin-package.json')
@@ -290,7 +294,6 @@ export default function (api: PluginApi, projectConfig: ProjectConfig) {
 
 async function getPort() {
     PortFinder.basePort = 9087;
-    debugger
     const port = await PortFinder.getPortPromise();
     return port;
 }

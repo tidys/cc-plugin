@@ -107,10 +107,12 @@ function default_1(api, projectConfig) {
         log_1.log.blue(printf_1.default('%-20s %s', 'service root:    ', service.root));
         log_1.log.blue(printf_1.default('%-20s %s', 'service context: ', service.context));
         api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const { version } = service.projectConfig.options;
             const pluginName = projectConfig.manifest.name;
             const isV3 = version === declare_1.PluginVersion.v3;
-            webpackChain.watch(!!projectConfig.options.watch);
+            // 当server开启时，一般来说都需要启用watchBuild，不然没有实际意义
+            webpackChain.watch(!!projectConfig.options.watchBuild || ((_a = projectConfig.options.server) === null || _a === void 0 ? void 0 : _a.enabled));
             webpackChain.mode('development');
             webpackChain.target('node');
             webpackChain.devtool(false);
@@ -242,10 +244,12 @@ function default_1(api, projectConfig) {
             const panel = new panel_1.default(service, webpackChain);
             panel.dealPanels();
             // plugins
-            const port = 2346; //await getPort();
-            webpackChain.plugin('dev-server')
-                .use(dev_server_1.default, [port])
-                .end();
+            const { enabled, port } = service.projectConfig.options.server;
+            if (enabled) {
+                webpackChain.plugin('dev-server')
+                    .use(dev_server_1.default, [port])
+                    .end();
+            }
             webpackChain.plugin('npm install')
                 .use(npm_install_1.default, [projectConfig.options.output]);
             webpackChain.plugin('cc-plugin-package.json')
@@ -303,7 +307,6 @@ exports.default = default_1;
 function getPort() {
     return __awaiter(this, void 0, void 0, function* () {
         portfinder_1.default.basePort = 9087;
-        debugger;
         const port = yield portfinder_1.default.getPortPromise();
         return port;
     });

@@ -83,12 +83,7 @@ class CocosPluginService {
         }
     }
     get defaults() {
-        const options = {
-            outputProject: './',
-            output: './dist',
-            version: declare_1.PluginVersion.v2,
-            min: false,
-        };
+        const options = declare_1.DefaultCocosPluginOptions;
         const manifest = {
             name: 'cocos-creator-plugin',
             version: '0.0.0',

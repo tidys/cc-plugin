@@ -65,6 +65,13 @@ class PackageV3 extends PackageInterface {
         this.packageData = null;
         this.packageData = packageData;
         this.packageData.package_version = 2;
+        this.packageData.contributions = {
+            builder: './builder.js',
+            messages: {},
+            menu: [],
+            shortcuts: [],
+        };
+        this.addMessageToContributions('onBuilder', 'onBuilder');
     }
     panelReady() {
         super.panelReady();
@@ -87,11 +94,6 @@ class PackageV3 extends PackageInterface {
     }
     menuReady() {
         super.panelReady();
-        this.packageData.contributions = {
-            messages: {},
-            menu: [],
-            shortcuts: [],
-        };
     }
     menuBuild(menuOpts) {
         super.menuBuild(menuOpts);
@@ -130,31 +132,31 @@ class PackageV3 extends PackageInterface {
         newLabel = lodash_1.trim(newLabel, '/');
         return { newLabel, newPath };
     }
-    addMessage(menu) {
-        let msgKey = '';
-        let panel = menu.message.panel;
-        let funcName = menu.message.name;
-        let isSendToSelf = !menu.message.panel || menu.message.panel === this.config.manifest.name;
-        if (isSendToSelf) {
-            // 发送给自己，消息名字直接用函数的名字
-            panel = menu.message.panel || this.config.manifest.name;
-            msgKey = funcName;
-        }
+    addMessageToContributions(msgKey, methodName) {
         let messages = this.packageData.contributions.messages;
         let item = Object.keys(messages).find(el => el === msgKey);
         if (!item) {
             messages[msgKey] = { methods: [] };
         }
         let message = messages[msgKey];
-        if (!message.methods.find(el => el === funcName)) {
-            // 发送给自己，就不用.分割了
-            if (isSendToSelf) {
-                message.methods.push(`${funcName}`);
-            }
-            else {
-                message.methods.push(`${panel}.${funcName}`);
-            }
+        if (!message.methods.find(el => el === methodName)) {
+            message.methods.push(methodName);
         }
+    }
+    addMessage(menu) {
+        const pkgName = this.config.manifest.name;
+        const panel = menu.message.panel || pkgName; // panel参数不填写，默认为自己
+        const funcName = menu.message.name;
+        let msgKey = '', methodName = '';
+        if (panel === pkgName) {
+            // 发送给自己，消息名字直接用函数的名字
+            msgKey = methodName = funcName;
+        }
+        else {
+            msgKey = methodName = `${panel}.${funcName}`;
+            log_1.log.yellow(`未验证的逻辑`);
+        }
+        this.addMessageToContributions(msgKey, methodName);
         return msgKey;
     }
 }

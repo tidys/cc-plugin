@@ -3,14 +3,14 @@ import ClientSocket from './client-socket';
 import { BuilderOptions } from '../declare';
 import * as Path from 'path';
 
-// 这个port需要动态获取
-const port = 2346;
-const hot = true;
-
 export function load() {
-    console.log('load');
-    if (hot) {
-
+    const { enabled, port } = CCP.options?.server!;
+    if (!!enabled) {
+        const client = new ClientSocket();
+        client.setReloadCallback(() => {
+            throw new Error('没有实现')
+        });
+        client.connect(port!);
     }
     CCP.wrapper?.load();
 }
@@ -24,8 +24,8 @@ export const methods = Object.assign(
     {
         // 接收来自builder的消息，wrapper中不能含有这个key
         onBuilder(options: any) {
-            const { buildPath, name, outputName, platform, md5Cache } = options;
-            debugger
+            const { type, data } = options;
+            const { buildPath, name, outputName, platform, md5Cache } = data;
             const buildFsPath = CCP.Adaptation.Util.urlToFspath(buildPath);
             const param: BuilderOptions = {
                 buildPath: buildFsPath,
@@ -33,7 +33,10 @@ export const methods = Object.assign(
                 platform,
                 md5Cache,
             }
-            CCP.wrapper?.builder?.onAfterBuild(param);
+
+            if (type === 'onAfterBuild') {
+                CCP.wrapper?.builder?.onAfterBuild(param);
+            }
         }
     }
 )
