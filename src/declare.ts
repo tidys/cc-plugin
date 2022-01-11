@@ -128,3 +128,13 @@ export interface BuilderOptions {
     md5Cache: boolean;
 }
 
+export const Platform = {
+    WebMobile: 'web-mobile',
+    WebDesktop: 'web-desktop',
+    Android: 'android',
+    Ios: 'ios',
+    Mac: 'mac',
+    Win32: 'win32',
+}
+
+

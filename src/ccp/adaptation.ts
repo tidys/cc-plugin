@@ -1,4 +1,4 @@
-import { BuilderOptions, CocosPluginConfig, PanelOptions, PluginVersion } from '../declare';
+import { BuilderOptions, CocosPluginConfig, PanelOptions, PluginVersion, Platform } from '../declare';
 import { versionApi, Versions } from './version-api';
 import * as Fs from 'fs';
 
@@ -129,21 +129,9 @@ class Panel {
 
 }
 
-
-export const Platform = {
-    WebMobile: 'web-mobile',
-    WebDesktop: 'web-desktop',
-    Android: 'android',
-    Ios: 'ios',
-    Mac: 'mac',
-    Windows: 'windows',
-}
-
 class Builder {
-    static Platform = Platform;
-
     public isNativePlatform(platform: string) {
-        return !![Platform.Android, Platform.Ios, Platform.Mac, Platform.Windows].includes(platform);
+        return !![Platform.Android, Platform.Ios, Platform.Mac, Platform.Win32].includes(platform);
     }
 
     async getConfig(): Promise<BuilderOptions[]> {
