@@ -33,14 +33,15 @@ export class CocosCreatorPluginRender {
                     // TODO 渲染进程HMR实现
                     console.log('reload')
                     if (this.isV2) {
-                        // window.location.reload();// 这种方式会导致chrome也打开网页
-                        // @ts-ignore
-                        const electron = require('electron')
-                        // @ts-ignore
-                        electron.remote.getCurrentWindow().reload()
+
                     } else {
-                        throw new Error('没有适配')
+
                     }
+                    // window.location.reload();// 这种方式会导致chrome也打开网页
+                    // @ts-ignore
+                    const electron = require('electron')
+                    // @ts-ignore
+                    electron.remote.getCurrentWindow().reload()
                 })
                 client.connect(port!)
             }

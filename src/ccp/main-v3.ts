@@ -8,7 +8,9 @@ export function load() {
     if (!!enabled) {
         const client = new ClientSocket();
         client.setReloadCallback(() => {
-            throw new Error('没有实现')
+            const pkgDir = CCP.Adaptation.Util.urlToFspath(`packages://${CCP.manifest!.name}`)
+            // @ts-ignore 这个会把窗口也关闭了，需需要考虑下判断
+            Editor.Message.request('extension', 'reload', pkgDir);
         });
         client.connect(port!);
     }

@@ -41,7 +41,7 @@ export default class ClientSocket {
         client.connect(port, '127.0.0.1', () => {
             console.log('connect websocket server')
             this.isConn = true;
-            this.send('ping')
+            this.send('hi server');
         })
     }
 

@@ -11,14 +11,13 @@ class DevServer {
         this.clients = [];
         this.app = express_1.default();
         this.httpServer = this.createHttpServer();
-        this.createSocketServer();
+        this.createSocketServer(port);
         // this.listen(port)
     }
-    createSocketServer() {
-        const port = 2346;
+    createSocketServer(port) {
         let server = net_1.default.createServer((socket) => {
             console.log('has client connection');
-            socket.write('hello');
+            socket.write('hello client ');
             socket.on('data', data => {
                 console.log('data', data.toString());
             });

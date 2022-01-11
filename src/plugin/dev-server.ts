@@ -20,7 +20,7 @@ export default class DevServer {
     createSocketServer(port: number) {
         let server = net.createServer((socket) => {
             console.log('has client connection')
-            socket.write('hello')
+            socket.write('hello client ')
             socket.on('data', data => {
                 console.log('data', data.toString())
             })
