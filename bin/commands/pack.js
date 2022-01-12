@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -16,8 +35,8 @@ const plugin_api_1 = require("../plugin-api");
 const webpack_1 = __importDefault(require("webpack"));
 const log_1 = require("../log");
 const zip_1 = __importDefault(require("../plugin/zip"));
-const clean_webpack_plugin_1 = require("clean-webpack-plugin");
 const terser_webpack_plugin_1 = __importDefault(require("terser-webpack-plugin"));
+const Path = __importStar(require("path"));
 class Pack extends plugin_api_1.PluginApi {
     exit() {
         process.exit(0);
@@ -32,20 +51,29 @@ class Pack extends plugin_api_1.PluginApi {
                     {
                         extractComments: false,
                         // @ts-ignore
-                        compress: {
-                            drop_console: true,
-                            drop_debugger: true,
+                        terserOptions: {
+                            // @ts-ignore
+                            compress: {
+                                drop_console: true,
+                                drop_debugger: true,
+                            }
                         }
                     }
                 ]);
-                webpackChain
-                    .plugin('clean')
-                    .use(clean_webpack_plugin_1.CleanWebpackPlugin, [{
-                        verbose: true,
-                        cleanStaleWebpackAssets: false,
-                        cleanOnceBeforeBuildPatterns: ['**/*'],
-                    }])
-                    .end();
+                // 修改配置，主要是把server参数关闭了
+                webpackChain.module.rule('config-loader')
+                    .test(/\.config.ts$/)
+                    .use('cc-plugin-config-loader')
+                    .loader(Path.join(__dirname, '../plugin/cc-plugin-config.loader.js'))
+                    .options({});
+                // webpackChain
+                //     .plugin('clean')
+                //     .use(CleanWebpackPlugin, [{
+                //         verbose: true,
+                //         cleanStaleWebpackAssets: false,
+                //         cleanOnceBeforeBuildPatterns: ['**/*'],
+                //     }])
+                //     .end();
                 const { name, version } = service.projectConfig.manifest;
                 webpackChain.plugin('zip').use(zip_1.default, [name, version]);
             }));

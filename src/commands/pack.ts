@@ -7,6 +7,7 @@ import { log } from '../log';
 import Zip from '../plugin/zip';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin'
+import * as Path from 'path';
 
 export default class Pack extends PluginApi {
     exit() {
@@ -26,21 +27,31 @@ export default class Pack extends PluginApi {
                         {
                             extractComments: false,
                             // @ts-ignore
-                            compress: {
-                                drop_console: true,
-                                drop_debugger: true,
+                            terserOptions: {
+                                // @ts-ignore
+                                compress: {
+                                    drop_console: true,
+                                    drop_debugger: true,
+                                }
                             }
+
                         }
                     ])
 
-                    webpackChain
-                        .plugin('clean')
-                        .use(CleanWebpackPlugin, [{
-                            verbose: true,
-                            cleanStaleWebpackAssets: false,
-                            cleanOnceBeforeBuildPatterns: ['**/*'],
-                        }])
-                        .end();
+                    // 修改配置，主要是把server参数关闭了
+                    webpackChain.module.rule('config-loader')
+                        .test(/\.config.ts$/)
+                        .use('cc-plugin-config-loader')
+                        .loader(Path.join(__dirname, '../plugin/cc-plugin-config.loader.js'))
+                        .options({})
+                    // webpackChain
+                    //     .plugin('clean')
+                    //     .use(CleanWebpackPlugin, [{
+                    //         verbose: true,
+                    //         cleanStaleWebpackAssets: false,
+                    //         cleanOnceBeforeBuildPatterns: ['**/*'],
+                    //     }])
+                    //     .end();
                     const { name, version } = service.projectConfig.manifest;
                     webpackChain.plugin('zip').use(Zip, [name, version])
                 })

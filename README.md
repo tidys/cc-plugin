@@ -13,6 +13,7 @@
 ```typescript
 import { CocosPluginManifest, CocosPluginOptions, Panel, PluginVersion } from 'cc-plugin/src/declare';
 
+// 插件的清单信息
 const manifest: CocosPluginManifest = {
     name: 'test-plugin',// 插件的名字
     version: '1.0.0',// 插件的版本号
@@ -24,9 +25,18 @@ const manifest: CocosPluginManifest = {
     i18n_en: './src/en.ts',
     i18n_zh: './src/zh.ts',
 }
+
+// 插件的构建配置
 const options: CocosPluginOptions = {
-    version: PluginVersion.v2, // 发布的creator版本
-    output: '/cocos-creator/project/packages/test-plugin', // 最终插件的输出目录，必须是绝对路径
+    version: PluginVersion.v2, // 发布的creator插件版本
+    server: { // hot reload server，开发过程中会自动进行插件的reload
+        enabled: true,
+        port: 2022,
+    },
+    outputProject: { // 最终插件的输出目录，必须是绝对路径，指向项目路径即可
+        v2: '/cocos-creator/project-v2/',
+        v3: '/cocos-creator/project-v3/',
+    },
     min: false,// 压缩代码
     treeShaking: false,//剔除无效的代码逻辑
 }
@@ -40,10 +50,16 @@ export default { manifest, options };
 
 import pluginConfig from '../cc-plugin.config';
 import CCP from 'cc-plugin/src/ccp/index';
+import { BuilderOptions } from 'cc-plugin/src/declare'
 
-CCP.init(pluginConfig.manifest, pluginConfig.options, {
+CCP.init(pluginConfig, {
     load: () => {
         return 'plugin-load'
+    },
+    builder: {
+        onAfterBuild(target: BuilderOptions) {
+
+        }
     },
     messages: {
         showPanel() {
@@ -53,35 +69,17 @@ CCP.init(pluginConfig.manifest, pluginConfig.options, {
 });
 
 ```
-
-## panels
-
-```typescript
-interface PanelOptions {
-    main: string;// 面板的入口逻辑相对路径 './src/panel/index.ts',
-    name: string;
-    title: string;
-    type?: string;//面板类型：可选值 Panel.Type.Dockable
-    width?: number;
-    height?: number;
-    minWidth?: number;
-    minHeight?: number;
-}
-```
-
-## menus
+插件的渲染进程
 
 ```typescript
- interface MenuOptions {
-    path: string;
-    icon?: string;
-    accelerator?: string;
-    message: string;
-}
+
 
 ```
+ 
+ 
 
 ## 创建运行项目
+
 ```shell
 npm install cc-plugin -g
 cc-plugin create my-first-plugin
