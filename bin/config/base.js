@@ -32,7 +32,6 @@ const npm_install_1 = __importDefault(require("../plugin/npm-install"));
 const package_json_1 = __importDefault(require("../commands/package.json"));
 const vue_loader_1 = require("vue-loader");
 const require_v3_1 = __importDefault(require("../plugin/require-v3"));
-const clean_webpack_plugin_1 = require("clean-webpack-plugin");
 const webpack_1 = __importDefault(require("webpack"));
 const log_1 = require("../log");
 const FsExtra = __importStar(require("fs-extra"));
@@ -231,14 +230,6 @@ class Base extends plugin_api_1.PluginApi {
                     .use(require_v3_1.default)
                     .end();
             }
-            webpackChain
-                .plugin('clean')
-                .use(clean_webpack_plugin_1.CleanWebpackPlugin, [{
-                    verbose: true,
-                    cleanStaleWebpackAssets: false,
-                    cleanOnceBeforeBuildPatterns: ['i18n/**', 'panel/**', 'main.js', 'package-lock.json', 'package.json'],
-                }])
-                .end();
             webpackChain
                 .plugin('vue_env')
                 .use(webpack_1.default.DefinePlugin, [{

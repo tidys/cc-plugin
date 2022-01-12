@@ -16,6 +16,8 @@ const plugin_api_1 = require("../plugin-api");
 const webpack_1 = __importDefault(require("webpack"));
 const log_1 = require("../log");
 const zip_1 = __importDefault(require("../plugin/zip"));
+const clean_webpack_plugin_1 = require("clean-webpack-plugin");
+const terser_webpack_plugin_1 = __importDefault(require("terser-webpack-plugin"));
 class Pack extends plugin_api_1.PluginApi {
     exit() {
         process.exit(0);
@@ -25,8 +27,27 @@ class Pack extends plugin_api_1.PluginApi {
             api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
                 webpackChain.mode('production');
                 webpackChain.devtool(false);
-                const name = service.projectConfig.manifest.name;
-                webpackChain.plugin('zip').use(zip_1.default, [name]);
+                webpackChain.optimization.minimizer('TerserPlugin').use(terser_webpack_plugin_1.default, [
+                    // @ts-ignore 不输出license.txt
+                    {
+                        extractComments: false,
+                        // @ts-ignore
+                        compress: {
+                            drop_console: true,
+                            drop_debugger: true,
+                        }
+                    }
+                ]);
+                webpackChain
+                    .plugin('clean')
+                    .use(clean_webpack_plugin_1.CleanWebpackPlugin, [{
+                        verbose: true,
+                        cleanStaleWebpackAssets: false,
+                        cleanOnceBeforeBuildPatterns: ['**/*'],
+                    }])
+                    .end();
+                const { name, version } = service.projectConfig.manifest;
+                webpackChain.plugin('zip').use(zip_1.default, [name, version]);
             }));
             const webpackConfig = api.resolveChainWebpackConfig();
             webpack_1.default(webpackConfig, ((err, stats) => {
@@ -41,7 +62,7 @@ class Pack extends plugin_api_1.PluginApi {
                     });
                     return this.exit();
                 }
-                log_1.log.green('打包成功');
+                log_1.log.green('构建成功');
             }));
         });
     }

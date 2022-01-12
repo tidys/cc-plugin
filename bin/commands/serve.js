@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const plugin_api_1 = require("../plugin-api");
 const webpack_chain_1 = __importDefault(require("webpack-chain"));
 const webpack_1 = __importDefault(require("webpack"));
+const clean_webpack_plugin_1 = require("clean-webpack-plugin");
 const dev_server_1 = __importDefault(require("../plugin/dev-server"));
 const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
 const portfinder_1 = __importDefault(require("portfinder"));
@@ -42,6 +43,14 @@ class Serve extends plugin_api_1.PluginApi {
                 webpackChain.watch(!!options.watchBuild || ((_a = options.server) === null || _a === void 0 ? void 0 : _a.enabled));
                 webpackChain.mode('development');
                 webpackChain.devtool(false);
+                webpackChain
+                    .plugin('clean')
+                    .use(clean_webpack_plugin_1.CleanWebpackPlugin, [{
+                        verbose: true,
+                        cleanStaleWebpackAssets: false,
+                        cleanOnceBeforeBuildPatterns: ['i18n/**', 'panel/**', 'main.js', 'package-lock.json', 'package.json'],
+                    }])
+                    .end();
                 const { enabled, port } = options.server;
                 if (enabled) {
                     webpackChain.plugin('dev-server')

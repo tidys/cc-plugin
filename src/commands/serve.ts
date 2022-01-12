@@ -48,6 +48,15 @@ export default class Serve extends PluginApi {
                 webpackChain.mode('development');
                 webpackChain.devtool(false);
 
+                webpackChain
+                    .plugin('clean')
+                    .use(CleanWebpackPlugin, [{
+                        verbose: true,
+                        cleanStaleWebpackAssets: false,
+                        cleanOnceBeforeBuildPatterns: ['i18n/**', 'panel/**', 'main.js', 'package-lock.json', 'package.json'],
+                    }])
+                    .end();
+
                 const { enabled, port } = options.server!;
                 if (enabled) {
                     webpackChain.plugin('dev-server')

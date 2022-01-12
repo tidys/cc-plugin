@@ -5,6 +5,8 @@ import webpack from 'webpack'
 import { PluginMgr } from '../plugin-mgr';
 import { log } from '../log';
 import Zip from '../plugin/zip';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+import TerserPlugin from 'terser-webpack-plugin'
 
 export default class Pack extends PluginApi {
     exit() {
@@ -19,8 +21,28 @@ export default class Pack extends PluginApi {
                     webpackChain.mode('production')
                     webpackChain.devtool(false);
 
-                    const name = service.projectConfig.manifest.name;
-                    webpackChain.plugin('zip').use(Zip, [name])
+                    webpackChain.optimization.minimizer('TerserPlugin').use(TerserPlugin, [
+                        // @ts-ignore 不输出license.txt
+                        {
+                            extractComments: false,
+                            // @ts-ignore
+                            compress: {
+                                drop_console: true,
+                                drop_debugger: true,
+                            }
+                        }
+                    ])
+
+                    webpackChain
+                        .plugin('clean')
+                        .use(CleanWebpackPlugin, [{
+                            verbose: true,
+                            cleanStaleWebpackAssets: false,
+                            cleanOnceBeforeBuildPatterns: ['**/*'],
+                        }])
+                        .end();
+                    const { name, version } = service.projectConfig.manifest;
+                    webpackChain.plugin('zip').use(Zip, [name, version])
                 })
                 const webpackConfig = api.resolveChainWebpackConfig();
                 webpack(webpackConfig, ((err, stats) => {
@@ -35,7 +57,7 @@ export default class Pack extends PluginApi {
                         })
                         return this.exit();
                     }
-                    log.green('打包成功')
+                    log.green('构建成功')
                 }))
             }
         )

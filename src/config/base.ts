@@ -224,14 +224,7 @@ export default class Base extends PluginApi {
                     .use(requireV3)
                     .end();
             }
-            webpackChain
-                .plugin('clean')
-                .use(CleanWebpackPlugin, [{
-                    verbose: true,
-                    cleanStaleWebpackAssets: false,
-                    cleanOnceBeforeBuildPatterns: ['i18n/**', 'panel/**', 'main.js', 'package-lock.json', 'package.json'],
-                }])
-                .end();
+
             webpackChain
                 .plugin('vue_env')
                 .use(webpack.DefinePlugin, [{

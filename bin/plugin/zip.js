@@ -24,17 +24,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Fs = __importStar(require("fs"));
 const Path = __importStar(require("path"));
+const child_process_1 = require("child_process");
+const OS = __importStar(require("os"));
 // @ts-ignore
 const jszip_1 = __importDefault(require("jszip"));
 class Zip {
-    constructor(fileName) {
+    constructor(fileName, version) {
         this.fileName = '';
-        if (!fileName.endsWith('.zip')) {
-            this.fileName = `${fileName}.zip`;
-        }
-        else {
-            this.fileName = fileName;
-        }
+        this.version = '';
+        this.fileName = fileName;
+        this.version = version;
     }
     _packageDir(rootPath, zip) {
         let dir = Fs.readdirSync(rootPath);
@@ -72,17 +71,40 @@ class Zip {
         })
             .pipe(Fs.createWriteStream(zipFilePath))
             .on('finish', () => {
-            console.log('✅[打包]成功!');
+            this.showFileInExplore(zipFilePath);
+            console.log(`生成压缩包成功，把压缩包上传到cocos store就可以啦\n ${zipFilePath}`);
         })
             .on('error', () => {
-            console.log('❌[打包]失败: ');
+            console.log('生成压缩包失败');
         });
+    }
+    showFileInExplore(showPath) {
+        let platform = OS.platform();
+        let cmd = null;
+        if (platform === 'darwin') {
+            cmd = 'open ' + showPath;
+        }
+        else if (platform === 'win32') {
+            cmd = 'explorer ' + showPath;
+        }
+        if (cmd) {
+            console.log('😂[CMD] ' + cmd);
+            child_process_1.exec(cmd, (error, stdout, stderr) => {
+                if (error) {
+                    console.log(stderr);
+                }
+                else {
+                    // console.log(stdout);
+                }
+            });
+        }
     }
     apply(compiler) {
         compiler.hooks.afterDone.tap('zip', () => {
+            console.log('开始构建压缩包');
             const dir = compiler.options.output.path;
             if (dir) {
-                this.zipDir(dir, this.fileName);
+                this.zipDir(dir, `${this.fileName}-v${this.version}`);
             }
         });
     }

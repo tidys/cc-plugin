@@ -1,6 +1,8 @@
 import webpack from 'webpack';
 import * as Fs from 'fs'
 import * as Path from 'path'
+import { exec } from 'child_process'
+import * as OS from 'os'
 // @ts-ignore
 import JsZip from 'jszip'
 
@@ -41,29 +43,50 @@ export default class Zip {
         })
             .pipe(Fs.createWriteStream(zipFilePath))
             .on('finish', () => {
-                console.log('✅[打包]成功!');
-
+                this.showFileInExplore(zipFilePath)
+                console.log(`生成压缩包成功，把压缩包上传到cocos store就可以啦\n ${zipFilePath}`);
             })
             .on('error', () => {
-                console.log('❌[打包]失败: ');
+                console.log('生成压缩包失败');
             });
     }
 
-    private fileName: string = ''
 
-    constructor(fileName: string) {
-        if (!fileName.endsWith('.zip')) {
-            this.fileName = `${fileName}.zip`
-        } else {
-            this.fileName = fileName;
+    showFileInExplore(showPath: string) {
+        let platform = OS.platform();
+        let cmd = null;
+        if (platform === 'darwin') {
+            cmd = 'open ' + showPath;
+        } else if (platform === 'win32') {
+            cmd = 'explorer ' + showPath;
         }
+        if (cmd) {
+            console.log('😂[CMD] ' + cmd);
+            exec(cmd, (error, stdout, stderr) => {
+                if (error) {
+                    console.log(stderr);
+                } else {
+                    // console.log(stdout);
+                }
+            });
+        }
+    }
+
+
+    private fileName: string = ''
+    private version: string = '';
+
+    constructor(fileName: string, version: string) {
+        this.fileName = fileName;
+        this.version = version;
     }
 
     apply(compiler: webpack.Compiler) {
         compiler.hooks.afterDone.tap('zip', () => {
+            console.log('开始构建压缩包')
             const dir = compiler.options.output.path;
             if (dir) {
-                this.zipDir(dir, this.fileName);
+                this.zipDir(dir, `${this.fileName}-v${this.version}`);
             }
         })
     }
