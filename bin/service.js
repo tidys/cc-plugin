@@ -25,7 +25,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const declare_1 = require("./declare");
 const Path = __importStar(require("path"));
 const serve_1 = __importDefault(require("./commands/serve"));
-const plugin_api_1 = require("./plugin-api");
+const pack_1 = __importDefault(require("./commands/pack"));
+const base_1 = __importDefault(require("./config/base"));
 const lodash_1 = require("lodash");
 const FS = __importStar(require("fs"));
 const interpret_1 = require("interpret");
@@ -33,18 +34,21 @@ const rechoir_1 = require("rechoir");
 const dotenv_1 = __importDefault(require("dotenv"));
 const dotenv_expand_1 = __importDefault(require("dotenv-expand"));
 const log_1 = require("./log");
+const plugin_mgr_1 = require("./plugin-mgr");
 class CocosPluginService {
     constructor(context) {
         this.webpackChainFns = [];
-        this.commands = {};
         this.plugins = [];
         this.projectConfig = this.defaults;
+        this.pluginMgr = new plugin_mgr_1.PluginMgr(this);
         this.context = context || process.cwd();
         this.root = Path.join(__dirname, '..');
         this.resolvePlugins();
     }
     resolvePlugins() {
-        this.plugins.push({ id: 'serve', apply: serve_1.default });
+        this.plugins.push(new base_1.default());
+        this.plugins.push(new pack_1.default());
+        this.plugins.push(new serve_1.default());
     }
     loadEnv() {
         const dirs = [this.context, this.root];
@@ -96,8 +100,8 @@ class CocosPluginService {
         const userOptions = this.loadUserOptions();
         userOptions && this.checkUserOptions(userOptions);
         this.projectConfig = lodash_1.defaultsDeep(userOptions, this.defaults);
-        this.plugins.forEach(({ id, apply }) => {
-            apply(new plugin_api_1.PluginApi(id, this), this.projectConfig);
+        this.plugins.forEach((plugin) => {
+            plugin.apply(this.pluginMgr, this);
         });
     }
     checkIsProjectDir(projDir) {
@@ -163,11 +167,6 @@ class CocosPluginService {
     }
     run() {
         this.init();
-        let name = 'serve';
-        const command = this.commands[name];
-        if (command) {
-            command.fn(this);
-        }
     }
 }
 exports.default = CocosPluginService;

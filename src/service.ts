@@ -7,7 +7,9 @@ import {
 } from './declare';
 
 import * as Path from 'path';
-import serve from './commands/serve'
+import Serve from './commands/serve'
+import Pack from './commands/pack'
+import Base from './config/base'
 import { PluginApi } from './plugin-api';
 import { defaultsDeep } from 'lodash'
 import * as FS from 'fs';
@@ -17,16 +19,9 @@ import dotenv from 'dotenv'
 import dotenvExpand from 'dotenv-expand'
 import chalk from 'chalk';
 import { log } from './log';
-
-export interface ServiceCommands {
-    fn: Function,
-    opts: Object,
-}
-
-interface ServicePlugins {
-    id: string;
-    apply: (api: PluginApi, options: ProjectConfig) => void;
-}
+import { PluginCmdCallback, PluginCmdOptions, PluginMgr } from './plugin-mgr';
+import Config from 'webpack-chain';
+import { program } from 'commander';
 
 export interface ProjectConfig {
     manifest: CocosPluginManifest,
@@ -35,20 +30,23 @@ export interface ProjectConfig {
 
 export default class CocosPluginService {
     public webpackChainFns: Function[] = [];
-    public commands: Record<string, ServiceCommands> = {};
-    public plugins: ServicePlugins[] = [];
+    public plugins: PluginApi[] = [];
     public context: string;
     public root: string;
     public projectConfig: ProjectConfig = this.defaults;
+    public pluginMgr: PluginMgr;
 
     constructor(context: string) {
+        this.pluginMgr = new PluginMgr(this);
         this.context = context || process.cwd();
         this.root = Path.join(__dirname, '..')
         this.resolvePlugins();
     }
 
     private resolvePlugins() {
-        this.plugins.push({ id: 'serve', apply: serve })
+        this.plugins.push(new Base())
+        this.plugins.push(new Pack())
+        this.plugins.push(new Serve())
     }
 
 
@@ -106,8 +104,8 @@ export default class CocosPluginService {
         const userOptions = this.loadUserOptions();
         userOptions && this.checkUserOptions(userOptions);
         this.projectConfig = defaultsDeep(userOptions, this.defaults);
-        this.plugins.forEach(({ id, apply }) => {
-            apply(new PluginApi(id, this), this.projectConfig)
+        this.plugins.forEach((plugin) => {
+            plugin.apply(this.pluginMgr, this);
         })
     }
 
@@ -176,10 +174,5 @@ export default class CocosPluginService {
 
     run() {
         this.init();
-        let name = 'serve';
-        const command = this.commands[name];
-        if (command) {
-            command.fn(this);
-        }
     }
 }

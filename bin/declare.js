@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DefaultCocosPluginOptions = exports.PluginVersion = exports.Panel = void 0;
+exports.Platform = exports.DefaultCocosPluginOptions = exports.PluginVersion = exports.Panel = void 0;
 exports.Panel = {
     Type: {
         Dockable: 'dockable',
@@ -22,4 +22,12 @@ exports.DefaultCocosPluginOptions = {
     },
     watchBuild: false,
     min: false,
+};
+exports.Platform = {
+    WebMobile: 'web-mobile',
+    WebDesktop: 'web-desktop',
+    Android: 'android',
+    Ios: 'ios',
+    Mac: 'mac',
+    Win32: 'win32',
 };
