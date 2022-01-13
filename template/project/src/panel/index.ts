@@ -5,6 +5,7 @@ import App from './index.vue'
 import CCP from 'cc-plugin/src/ccp/entry-render';
 import pluginConfig from '../../cc-plugin.config'
 
+// 使用cc-plugin内置的ui
 // @ts-ignore
 import ccui from 'cc-plugin/src/ui/packages/index'
 import 'cc-plugin/src/ui/iconfont/use.css'

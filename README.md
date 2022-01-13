@@ -2,13 +2,47 @@
 
 专为`Cocos Creator`插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。
 
-大致实现原理就是使用webpack抹平了v2、v3插件版本的底层差异，使开发插件更加工程化。
+使用webpack抹平了v2、v3插件版本的底层差异，使开发插件更加工程化。
 
 推荐使用typescript开发插件，更丝滑流畅。
+## 特点
 
-## 使用
+- 使用 typescript + vue 开发
+- 完美适配所有版本的creator
+- 完善的工作流：一键创建插件、打包插件、发布插件
 
-`cc-plugin.config.ts`配置如下
+## 如何使用
+
+1. 全局安装，命令行关键字cc-plugin、ccp都支持
+
+```shell
+npm install cc-plugin -g
+```
+
+2. 在当前的目录创建项目
+```shell
+cc-plugin create my-first-plugin
+```
+
+3. 安装依赖，推荐yarn，后续版本会将这一步自动化
+```shell
+cd ./my-first-plugin
+npm install
+yarn install
+```
+4. 构建插件
+```shell
+cc-plugin serve
+```
+5. 打包插件
+```shell
+cc-plugin pack
+```
+玩的开心！
+
+## cc-plugin.config.ts 配置
+
+cc-plugin通过`cc-plugin.config.ts`文件来配置管理插件
 
 ```typescript
 import { CocosPluginManifest, CocosPluginOptions, Panel, PluginVersion } from 'cc-plugin/src/declare';
@@ -44,7 +78,7 @@ export default { manifest, options };
 
 ```
 
-为了保证代码的兼容性，插件的主进程代码`manifest.main`需要这样写
+插件的主进程代码
 
 ```typescript
 
@@ -69,21 +103,25 @@ CCP.init(pluginConfig, {
 });
 
 ```
-插件的渲染进程
+插件的渲染进程，主要是针对插件面板
 
 ```typescript
+import { createApp } from 'vue'
+import App from './index.vue'
+import CCP from 'cc-plugin/src/ccp/entry-render';
+import pluginConfig from '../../cc-plugin.config'
 
+// 使用cc-plugin内置的ui
+// @ts-ignore
+import ccui from 'cc-plugin/src/ui/packages/index'
+import 'cc-plugin/src/ui/iconfont/use.css'
+import 'cc-plugin/src/ui/iconfont/iconfont.css'
 
-```
- 
- 
-
-## 创建运行项目
-
-```shell
-npm install cc-plugin -g
-cc-plugin create my-first-plugin
-cd ./my-first-plugin
-npm install
-cc-plugin serve
+export default CCP.init(pluginConfig, {
+    ready: function (rootElement, args: any) {
+        const app = createApp(App)
+        app.use(ccui)
+        app.mount(rootElement)
+    }
+})
 ```
