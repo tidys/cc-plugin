@@ -3,7 +3,7 @@
   "version": "2.0.1",
   "description": "专为Cocos Creator插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。",
   "main": "index.js",
-  "types": "./src/test/a.d.ts",
+  "types": "",
   "bin": {
     "cc-plugin": "./bin/index.js",
     "ccp": "./bin/index.js"
@@ -13,6 +13,10 @@
     "tsc-build": "tsc --watch",
     "demo-test": "vue-cli-service serve",
     "demo-test-debug": "node --inspect-brk=6666 ./node_modules/@vue/cli-service/bin/vue-cli-service.js serve"
+  },
+  "directories": {
+    "doc": "doc",
+    "test": "test"
   },
   "dependencies": {
     "@babel/generator": "^7.16.8",
@@ -74,6 +78,14 @@
     "eslint": "7.32.0",
     "husky": "^3.1.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tidys/cc-plugin.git"
+  },
   "author": "xu_yanfeng",
-  "license": "ISC"
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tidys/cc-plugin/issues"
+  },
+  "homepage": "https://github.com/tidys/cc-plugin#readme"
 }
