@@ -22,6 +22,8 @@ import { log } from './log';
 import { PluginCmdCallback, PluginCmdOptions, PluginMgr } from './plugin-mgr';
 import Config from 'webpack-chain';
 import { program } from 'commander';
+import Create from './commands/create';
+import * as FsExtra from 'fs-extra'
 
 export interface ProjectConfig {
     manifest: CocosPluginManifest,
@@ -45,8 +47,9 @@ export default class CocosPluginService {
 
     private resolvePlugins() {
         this.plugins.push(new Base())
-        this.plugins.push(new Pack())
+        this.plugins.push(new Create())
         this.plugins.push(new Serve())
+        this.plugins.push(new Pack())
     }
 
 
@@ -131,11 +134,20 @@ export default class CocosPluginService {
     }
 
     private catchOutput(projectDir: string, pluginDir: string, pluginName: string) {
+        // 相对目录
+        if (projectDir.startsWith('./')) {
+            log.red(`options.outputProject 暂时不支持相对目录的写法：${projectDir}`)
+            process.exit(0)
+        }
         let output = projectDir;
         if (this.checkIsProjectDir(projectDir)) {
             output = Path.join(projectDir, pluginDir, pluginName);
+            if (!FS.existsSync(output)) {
+                log.yellow(`自动创建输出目录：${output}`)
+                FsExtra.ensureDirSync(output)
+            }
         } else {
-            log.yellow(`options.outputProject推荐配置为Creator生成的项目目录：${projectDir}`);
+            log.yellow(`options.outputProject需要配置为Creator生成的项目目录：${projectDir}`);
             output = projectDir;
         }
         return output;
@@ -168,7 +180,8 @@ export default class CocosPluginService {
             log.red(`无效的output：${options.output}`)
         }
         if (!FS.existsSync(options.output as string)) {
-            log.yellow(`output不存在：${options.output}`)
+            log.red(`options.outputProject目录不存在：${options.output}`)
+            process.exit(0);
         }
     }
 

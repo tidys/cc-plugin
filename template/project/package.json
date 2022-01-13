@@ -1,0 +1,15 @@
+{
+  "name": "cc-plugin-demo",
+  "version": "1.0.0",
+  "description": "cocos creator plugin",
+  "author": "cc-plugin",
+  "scripts": {
+    "ccp-pack": "cc-plugin pack",
+    "ccp-serve": "cc-plugin serve"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.1",
+    "@types/node": "^16.11.12",
+    "cc-plugin": "file:.yalc/cc-plugin"
+  }
+}

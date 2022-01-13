@@ -4,7 +4,7 @@ import Config from 'webpack-chain';
 import { PluginApi } from './plugin-api';
 import { Command, program } from 'commander';
 
-export type PluginCmdOptions = { description?: string, options?: any };
+export type PluginCmdOptions = { description?: string, arguments?: Array<{ name: string, desc?: string }> };
 export type PluginCmdCallback = (param: string[]) => void;
 
 
@@ -18,13 +18,18 @@ export class PluginMgr {
     }
 
     registerCommand(name: string, opts: PluginCmdOptions, callback: PluginCmdCallback) {
-        this.commander
+        let cmd = this.commander
             .command(name)
-            .description(opts.description || '')
-            .action((...args) => {
-                // 把参数传递进去
-                callback(args)
+            .description(opts.description || '');
+        if (opts.arguments) {
+            opts.arguments.forEach(opt => {
+                cmd.argument(opt.name, opt.desc || opt.name)
             })
+        }
+        cmd.action((...args) => {
+            // 把参数传递进去
+            callback(args)
+        })
     }
 
     chainWebpack(fn: (config: Config) => void) {

@@ -43,7 +43,8 @@ targetPanel = new panelInstance();
 
 if (targetPanel.hasOwnProperty('ready') &&
 typeof targetPanel.ready === 'function') {
-targetPanel.ready(this.shadowRoot, args);
+const appDiv = this.shadowRoot.getElementById('app')
+targetPanel.ready(appDiv||this.shadowRoot, args);
 }
 
 

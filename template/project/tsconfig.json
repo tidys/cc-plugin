@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "target": "ES6",
+    "module": "commonjs",
+    "baseUrl": "./src"
+  }
+}

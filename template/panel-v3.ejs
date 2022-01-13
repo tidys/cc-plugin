@@ -70,7 +70,7 @@ targetPanel = new panelInstance();
 
 if (targetPanel.hasOwnProperty('ready') &&
 typeof targetPanel.ready === 'function') {
-targetPanel.ready(this.$.app.parentNode, args);
+targetPanel.ready(this.$.app, args);
 }
 
 }
