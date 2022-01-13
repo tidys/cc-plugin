@@ -1,5 +1,4 @@
-//@ts-ignore
-import * as babylon from 'babylon'
+import { parse } from '@babel/parser'
 //@ts-ignore
 import generator from '@babel/generator'
 
@@ -7,6 +6,8 @@ const ExportDefaultDeclaration = 'ExportDefaultDeclaration'
 const ObjectExpression = 'ObjectExpression';
 const BooleanLiteral = 'BooleanLiteral'
 const StringLiteral = 'StringLiteral'
+const VariableDeclaration = 'VariableDeclaration'
+const VariableDeclarator = 'VariableDeclarator'
 
 class AstFinder {
     cur: any;
@@ -17,17 +18,32 @@ class AstFinder {
 
 
     findType(type: string) {
-        let ret = this.cur.find((el: any) => el.type === type);
+        let ret = this.cur.filter((el: any) => el.type === type);
         if (ret) {
             if (type === ExportDefaultDeclaration) {
                 this.cur = ret.declaration;
+            } else if (type === VariableDeclaration) {
+                this.cur = ret;
             }
         } else {
             this.cur = null;
         }
         return this;
     }
-
+    findVar (key:string) {
+        for (let i = 0; i < this.cur.length; i++) {
+            let item = this.cur[i];
+            let ret = item.declarations.find((el:any) => {
+                return el.type === VariableDeclarator && el.id.name === key
+            })
+            if (ret) {
+                this.cur = ret.init;
+                return this;
+            }
+        }
+        this.cur = null;
+        return this;
+    }
     findProperty(key: string) {
         let ret = this.cur.find((el: any) => el.key.name === key);
         if (ret) {
@@ -61,28 +77,28 @@ class AstFinder {
 }
 
 export default function loader(source: string) {
-    const ast = babylon.parse(source, { sourceType: 'module' });
+    const ast = parse(source, { sourceType: 'module', plugins: ['typescript'] });
 
     new AstFinder(ast)
-        .findType(ExportDefaultDeclaration).isObject()
-        .findProperty('options').isObject()
+        .findType(VariableDeclaration)
+        .findVar('options').isObject()
         .findProperty('server').isObject()
         .findProperty('enabled').setBoolean(false)
 
     new AstFinder(ast)
-        .findType(ExportDefaultDeclaration).isObject()
-        .findProperty('options').isObject()
+        .findType(VariableDeclaration)
+        .findVar('options').isObject()
         .findProperty('watchBuild').setBoolean(false);
 
     new AstFinder(ast)
-        .findType(ExportDefaultDeclaration).isObject()
-        .findProperty('options').isObject()
+        .findType(VariableDeclaration)
+        .findVar('options').isObject()
         .findProperty('outputProject').isObject()
         .findProperty('v2').setString('')
 
     new AstFinder(ast)
-        .findType(ExportDefaultDeclaration).isObject()
-        .findProperty('options').isObject()
+        .findType(VariableDeclaration)
+        .findVar('options').isObject()
         .findProperty('outputProject').isObject()
         .findProperty('v3').setString('')
 
