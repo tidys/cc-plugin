@@ -12,10 +12,15 @@ class PluginMgr {
         this.commander = commander_1.program;
     }
     registerCommand(name, opts, callback) {
-        this.commander
+        let cmd = this.commander
             .command(name)
-            .description(opts.description || '')
-            .action((...args) => {
+            .description(opts.description || '');
+        if (opts.arguments) {
+            opts.arguments.forEach(opt => {
+                cmd.argument(opt.name, opt.desc || opt.name);
+            });
+        }
+        cmd.action((...args) => {
             // 把参数传递进去
             callback(args);
         });

@@ -32,7 +32,6 @@ class Serve extends plugin_api_1.PluginApi {
     apply(api, service) {
         api.registerCommand('serve', {
             description: '开发插件',
-            options: {}
         }, (param) => {
             log_1.log.blue(printf_1.default('%-20s %s', 'service root:    ', service.root));
             log_1.log.blue(printf_1.default('%-20s %s', 'service context: ', service.context));

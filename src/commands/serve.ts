@@ -37,7 +37,6 @@ export default class Serve extends PluginApi {
     apply(api: PluginMgr, service: CocosPluginService): void {
         api.registerCommand('serve', {
             description: '开发插件',
-            options: {}
         }, (param) => {
             log.blue(printf('%-20s %s', 'service root:    ', service.root))
             log.blue(printf('%-20s %s', 'service context: ', service.context))
