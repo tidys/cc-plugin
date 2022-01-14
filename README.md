@@ -125,3 +125,10 @@ export default CCP.init(pluginConfig, {
     }
 })
 ```
+## 对插件开发有用的小工具
+
+```shell
+npm i @xuyanfeng/cc-editor -g 
+```
+插件开发过程中需要在不同的creator版本进行自测，通过 [cc-editor](https://github.com/cocos-creator-plugin/cc-editor) 快速切换配置项，而且cc-editor自身还增加了调试主进程的参数，提高插件开发效率。
+
