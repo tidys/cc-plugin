@@ -58,6 +58,14 @@ class Serve extends plugin_api_1.PluginApi {
                 }
             }));
             let webpackConfig = api.resolveChainWebpackConfig();
+            webpackConfig = Object.assign(webpackConfig, {
+                resolve: {
+                    // https://webpack.docschina.org/configuration/resolve/#resolvefallback
+                    fallback: {
+                        fs: false,
+                    }
+                }
+            });
             const compiler = webpack_1.default(webpackConfig, ((err, stats) => {
                 if (err) {
                     return console.error(err);

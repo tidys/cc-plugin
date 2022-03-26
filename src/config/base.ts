@@ -65,7 +65,15 @@ export default class Base extends PluginApi {
         const { options, manifest } = service.projectConfig;
         api.chainWebpack((webpackChain: Chain) => {
             const pluginName = manifest.name;
-            webpackChain.target('node');
+            // target
+            {
+                if (service.isWeb()) {
+                    webpackChain.target('web');
+                }
+                if (service.isCreatorPlugin()) {
+                    webpackChain.target('node');
+                }
+            }
             const vuePath = Path.resolve(service.root, './node_modules/vue');
             // webpackChain.resolve.alias.set('vue', vuePath).end();
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json');

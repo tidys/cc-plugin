@@ -47,6 +47,7 @@
     "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^2.4.5",
     "parseuri": "0.0.6",
+    "path-browserify": "^1.0.1",
     "portfinder": "^1.0.28",
     "postcss": "^8.4.5",
     "postcss-loader": "^6.2.1",

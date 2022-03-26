@@ -1,9 +1,9 @@
-import { BuilderOptions, CocosPluginConfig, PanelOptions, PluginType, Platform } from '../declare';
-import { versionApi, Versions } from './version-api';
+import {BuilderOptions, CocosPluginConfig, PanelOptions, PluginType, Platform} from '../declare';
+import {versionApi, Versions} from './version-api';
 import * as Fs from 'fs';
 
 const { V246, V247 } = Versions;
-const Path = require('path')
+const Path = require('path-browserify'); // 为了适配浏览器
 const URL = require('url')
 
 let config: CocosPluginConfig, options: PanelOptions;

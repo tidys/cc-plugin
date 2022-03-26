@@ -1,27 +1,27 @@
-import { PluginApi } from '../plugin-api';
+import {PluginApi} from '../plugin-api';
 import Config from 'webpack-chain';
 import Chain from 'webpack-chain';
 import webpack from 'webpack';
-import CocosPluginService, { ProjectConfig } from '../service';
+import CocosPluginService, {ProjectConfig} from '../service';
 import * as Path from 'path';
-import { resolve } from 'path';
-import { VueLoaderPlugin } from 'vue-loader'
-import { CleanWebpackPlugin } from 'clean-webpack-plugin'
+import {resolve} from 'path';
+import {VueLoaderPlugin} from 'vue-loader'
+import {CleanWebpackPlugin} from 'clean-webpack-plugin'
 import Panel from '../panel';
 import * as Fs from 'fs';
-import { existsSync } from 'fs';
+import {existsSync} from 'fs';
 import * as FsExtra from 'fs-extra';
 import CocosPluginPackageJson from './package.json';
 import NpmInstall from '../plugin/npm-install';
 import DevServer from '../plugin/dev-server';
-import { PluginType } from '../declare';
+import {PluginType} from '../declare';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import webpackDevSever from 'webpack-dev-server'
 import PortFinder from 'portfinder'
 import printf from 'printf';
-import { log } from '../log'
+import {log} from '../log'
 import requireV3 from '../plugin/require-v3'
-import { PluginMgr } from '../plugin-mgr';
+import {PluginMgr} from '../plugin-mgr';
 
 
 function buildTargetNode(service: CocosPluginService) {
@@ -64,6 +64,14 @@ export default class Serve extends PluginApi {
                 }
             });
             let webpackConfig = api.resolveChainWebpackConfig();
+            webpackConfig = Object.assign(webpackConfig, {
+                resolve: {
+                    // https://webpack.docschina.org/configuration/resolve/#resolvefallback
+                    fallback: {
+                        fs: false,
+                    }
+                }
+            });
             const compiler = webpack(webpackConfig, ((err, stats) => {
                 if (err) {
                     return console.error(err)
