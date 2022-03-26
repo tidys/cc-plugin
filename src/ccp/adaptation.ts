@@ -3,7 +3,7 @@ import {versionApi, Versions} from './version-api';
 import * as Fs from 'fs';
 
 const { V246, V247 } = Versions;
-const Path = require('path-browserify'); // 为了适配浏览器
+const Path = require('path'); // 为了适配浏览器
 const URL = require('url')
 
 let config: CocosPluginConfig, options: PanelOptions;

@@ -92,8 +92,10 @@ class Base extends plugin_api_1.PluginApi {
             // webpackChain.resolve.alias.set('vue', vuePath).end();
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json');
             // 排除模块
-            let externals = this.getExternal(service.context, ['electron', 'fs-extra', 'express']);
-            webpackChain.externals(externals);
+            if (service.isCreatorPlugin()) {
+                let externals = this.getExternal(service.context, ['electron', 'fs-extra', 'express']);
+                webpackChain.externals(externals);
+            }
             if (service.isCreatorPlugin()) {
                 // i18n
                 const { i18n_zh, i18n_en } = manifest;
@@ -129,14 +131,12 @@ class Base extends plugin_api_1.PluginApi {
                 // 处理相对路径
                 output = resolvePath;
             }
-            let publicPath = './';
             if (service.isCreatorPlugin()) {
-                publicPath = `packages://${pluginName}/`;
+                webpackChain.output.libraryTarget('commonjs');
+                webpackChain.output.publicPath(`packages://${pluginName}/`);
             }
-            webpackChain.output.path(output)
-                .libraryTarget('commonjs')
-                // .libraryExport('default') // 这里暂时不能使用这个
-                .publicPath(publicPath);
+            webpackChain.output.path(output);
+            // .libraryExport('default') // 这里暂时不能使用这个
             // rules
             webpackChain.module
                 .rule('less')

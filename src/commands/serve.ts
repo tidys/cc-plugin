@@ -22,7 +22,7 @@ import printf from 'printf';
 import {log} from '../log'
 import requireV3 from '../plugin/require-v3'
 import {PluginMgr} from '../plugin-mgr';
-
+import {merge} from 'lodash';
 
 function buildTargetNode(service: CocosPluginService) {
     let config = new Chain();
@@ -63,15 +63,27 @@ export default class Serve extends PluginApi {
                         .end();
                 }
             });
+            // https://webpack.docschina.org/configuration/resolve/#resolvefallback
+            let fallback: Record<string, string | boolean> = {
+                fs: false,
+            };
+            if (service.isWeb()) {
+                // web情况下： net模块重定向
+                fallback = Object.assign(fallback, {
+                    'assert': require.resolve('assert'),
+                    'net': require.resolve('net-browserify'),
+                    'path': require.resolve('path-browserify'),
+                    'zlib': require.resolve('browserify-zlib'),
+                    "http": require.resolve("stream-http"),
+                    "stream": require.resolve("stream-browserify"),
+                    "util": require.resolve("util/"),
+                    "crypto": require.resolve("crypto-browserify"),
+                    "express": false,
+                    "electron": false,
+                })
+            }
             let webpackConfig = api.resolveChainWebpackConfig();
-            webpackConfig = Object.assign(webpackConfig, {
-                resolve: {
-                    // https://webpack.docschina.org/configuration/resolve/#resolvefallback
-                    fallback: {
-                        fs: false,
-                    }
-                }
-            });
+            webpackConfig = merge(webpackConfig, { resolve: { fallback } });
             const compiler = webpack(webpackConfig, ((err, stats) => {
                 if (err) {
                     return console.error(err)

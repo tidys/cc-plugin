@@ -37,7 +37,6 @@ export default class Base extends PluginApi {
                 console.log(e);
             }
         }
-
         for (let key in map) {
             map[key] = `commonjs ${key}`;
         }
@@ -79,8 +78,10 @@ export default class Base extends PluginApi {
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json');
 
             // 排除模块
-            let externals = this.getExternal(service.context, ['electron', 'fs-extra', 'express'])
-            webpackChain.externals(externals)
+            if (service.isCreatorPlugin()) {
+                let externals = this.getExternal(service.context, ['electron', 'fs-extra', 'express'])
+                webpackChain.externals(externals)
+            }
             if (service.isCreatorPlugin()) {
                 // i18n
                 const { i18n_zh, i18n_en } = manifest;
@@ -117,15 +118,13 @@ export default class Base extends PluginApi {
                 // 处理相对路径
                 output = resolvePath;
             }
-            let publicPath = './';
             if (service.isCreatorPlugin()) {
-                publicPath = `packages://${pluginName}/`;
+                webpackChain.output.libraryTarget('commonjs');
+                webpackChain.output.publicPath(`packages://${pluginName}/`);
             }
-
             webpackChain.output.path(output)
-                .libraryTarget('commonjs')
-                // .libraryExport('default') // 这里暂时不能使用这个
-                .publicPath(publicPath);
+            // .libraryExport('default') // 这里暂时不能使用这个
+
             // rules
             webpackChain.module
                 .rule('less')

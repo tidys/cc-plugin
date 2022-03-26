@@ -5,9 +5,8 @@ import {
     DefaultCocosPluginOptions,
     PluginType
 } from '../declare';
-import ClientSocket from './client-socket';
 
-import adaptation, { Adaptation } from './adaptation';
+import adaptation, {Adaptation} from './adaptation';
 
 interface PanelOptions {
     ready: (rootElement: any, args: any) => void;
@@ -28,24 +27,31 @@ export class CocosCreatorPluginRender {
         const { enabled, port } = this.options.server!;
         if (enabled) {
             let hot = () => {
-                let client = new ClientSocket();
-                client.setReloadCallback(() => {
-                    // TODO 渲染进程HMR实现
-                    console.log('reload')
-                    if (this.isV2) {
+                if (this.options.type === PluginType.Web) {
+                    console.log('TODO web reload');
+                } else {
+                    const ClientSocket = require('./client-socket');
+                    let client = new ClientSocket();
+                    client.setReloadCallback(() => {
+                        // TODO 渲染进程HMR实现
+                        console.log('reload')
 
-                    } else {
+                        if (this.isV2) {
 
-                    }
-                    // window.location.reload();// 这种方式会导致chrome也打开网页
-                    // @ts-ignore
-                    const electron = require('electron')
-                    // @ts-ignore
-                    electron.remote.getCurrentWindow().reload()
-                })
-                client.connect(port!)
+                        } else {
+
+                        }
+                        // window.location.reload();// 这种方式会导致chrome也打开网页
+                        // @ts-ignore
+                        const electron = require('electron')
+                        // @ts-ignore
+                        electron.remote.getCurrentWindow().reload()
+                    })
+                    client.connect(port!)
+                }
             }
-            const originReady = options.ready || (() => {});
+            const originReady = options.ready || (() => {
+            });
             options.ready = (rootElement, args) => {
                 hot();
                 originReady(rootElement, args);

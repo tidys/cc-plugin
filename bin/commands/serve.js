@@ -21,6 +21,7 @@ const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
 const portfinder_1 = __importDefault(require("portfinder"));
 const printf_1 = __importDefault(require("printf"));
 const log_1 = require("../log");
+const lodash_1 = require("lodash");
 function buildTargetNode(service) {
     let config = new webpack_chain_1.default();
     config.target('node').devtool(false).mode('development').resolve.extensions.add('.ts');
@@ -57,15 +58,27 @@ class Serve extends plugin_api_1.PluginApi {
                         .end();
                 }
             }));
+            // https://webpack.docschina.org/configuration/resolve/#resolvefallback
+            let fallback = {
+                fs: false,
+            };
+            if (service.isWeb()) {
+                // web情况下： net模块重定向
+                fallback = Object.assign(fallback, {
+                    'assert': require.resolve('assert'),
+                    'net': require.resolve('net-browserify'),
+                    'path': require.resolve('path-browserify'),
+                    'zlib': require.resolve('browserify-zlib'),
+                    "http": require.resolve("stream-http"),
+                    "stream": require.resolve("stream-browserify"),
+                    "util": require.resolve("util/"),
+                    "crypto": require.resolve("crypto-browserify"),
+                    "express": false,
+                    "electron": false,
+                });
+            }
             let webpackConfig = api.resolveChainWebpackConfig();
-            webpackConfig = Object.assign(webpackConfig, {
-                resolve: {
-                    // https://webpack.docschina.org/configuration/resolve/#resolvefallback
-                    fallback: {
-                        fs: false,
-                    }
-                }
-            });
+            webpackConfig = lodash_1.merge(webpackConfig, { resolve: { fallback } });
             const compiler = webpack_1.default(webpackConfig, ((err, stats) => {
                 if (err) {
                     return console.error(err);
