@@ -23,6 +23,7 @@ export interface PanelOptions {
 export const Panel = {
     Type: {
         Dockable: 'dockable',
+        Simple: 'simple',
     },
 
 };

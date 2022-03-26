@@ -28,7 +28,7 @@ export class CocosCreatorPluginRender {
         const { enabled, port } = this.options.server!;
         if (enabled) {
             let hot = () => {
-                if (this.options.type === PluginType.Web) {
+                if (this.options?.type === PluginType.Web) {
                     console.log('TODO web reload');
                 } else {
                     const ClientSocket = require('./client-socket');
