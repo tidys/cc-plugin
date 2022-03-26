@@ -39,9 +39,12 @@ export interface CocosPluginManifest {
     i18n_en?: string;
 }
 
-export enum PluginVersion {
-    v2,
-    v3,
+export enum PluginType {
+    PluginV2, // cocos creator 插件v2版本
+    PluginV3, // cocos creator 插件v3版本
+    Web, // web页面
+    Electron,// 桌面应用
+    Vscode, // vscode插件
 }
 
 export interface CocosPluginOptions {
@@ -51,10 +54,10 @@ export interface CocosPluginOptions {
         port?: number, // 监听端口，需要优化判断下端口是否占用的问题
     }
     watchBuild?: boolean; // 监听构建
-    outputProject: string | { v2?: string, v3?: string },// 输出的项目路径
+    outputProject: string | { v2?: string, v3?: string, web?: string, vscode?: string, electron?: string },// 输出的项目路径
     output?: string, // 最终都要变成绝对路径
     cwd?: string;
-    version?: PluginVersion;
+    type?: PluginType;
     min?: boolean;// 压缩
     treeShaking?: boolean;
 }
@@ -63,7 +66,7 @@ export interface CocosPluginOptions {
 export const DefaultCocosPluginOptions: CocosPluginOptions = {
     outputProject: './',
     output: './dist',
-    version: PluginVersion.v2,
+    type: PluginType.PluginV2,
     server: {
         enabled: false,
         port: 2022,

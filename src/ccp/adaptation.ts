@@ -1,4 +1,4 @@
-import { BuilderOptions, CocosPluginConfig, PanelOptions, PluginVersion, Platform } from '../declare';
+import { BuilderOptions, CocosPluginConfig, PanelOptions, PluginType, Platform } from '../declare';
 import { versionApi, Versions } from './version-api';
 import * as Fs from 'fs';
 

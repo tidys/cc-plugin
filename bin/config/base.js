@@ -23,7 +23,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const plugin_api_1 = require("../plugin-api");
-const declare_1 = require("../declare");
 const path_1 = __importStar(require("path"));
 const fs_1 = __importStar(require("fs"));
 const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
@@ -79,10 +78,7 @@ class Base extends plugin_api_1.PluginApi {
     apply(api, service) {
         const { options, manifest } = service.projectConfig;
         api.chainWebpack((webpackChain) => {
-            const { version } = options;
             const pluginName = manifest.name;
-            const isV3 = version === declare_1.PluginVersion.v3;
-            const isV2 = version === declare_1.PluginVersion.v2;
             webpackChain.target('node');
             const vuePath = path_1.default.resolve(service.root, './node_modules/vue');
             // webpackChain.resolve.alias.set('vue', vuePath).end();
@@ -90,32 +86,34 @@ class Base extends plugin_api_1.PluginApi {
             // 排除模块
             let externals = this.getExternal(service.context, ['electron', 'fs-extra', 'express']);
             webpackChain.externals(externals);
-            // i18n
-            const { i18n_zh, i18n_en } = manifest;
-            i18n_zh && this.webpackEntry(service, webpackChain, 'i18n/zh', i18n_zh);
-            i18n_en && this.webpackEntry(service, webpackChain, 'i18n/en', i18n_en);
-            // builder&hooks
-            if (isV3) {
-                const builderEntry = 'builder';
-                const builderFile = path_1.default.resolve(service.root, 'src/ccp/builder/builder.ts');
-                this.webpackEntry(service, webpackChain, builderEntry, builderFile);
-                const hooksEntry = 'hooks';
-                const hooksFile = path_1.default.resolve(service.root, 'src/ccp/builder/hooks.ts');
-                this.webpackEntry(service, webpackChain, hooksEntry, hooksFile);
+            if (service.isCreatorPlugin()) {
+                // i18n
+                const { i18n_zh, i18n_en } = manifest;
+                i18n_zh && this.webpackEntry(service, webpackChain, 'i18n/zh', i18n_zh);
+                i18n_en && this.webpackEntry(service, webpackChain, 'i18n/en', i18n_en);
+                // builder&hooks
+                if (service.isCreatorPluginV3()) {
+                    const builderEntry = 'builder';
+                    const builderFile = path_1.default.resolve(service.root, 'src/ccp/builder/builder.ts');
+                    this.webpackEntry(service, webpackChain, builderEntry, builderFile);
+                    const hooksEntry = 'hooks';
+                    const hooksFile = path_1.default.resolve(service.root, 'src/ccp/builder/hooks.ts');
+                    this.webpackEntry(service, webpackChain, hooksEntry, hooksFile);
+                }
+                // 主进程代码
+                let mainFile = '';
+                if (service.isCreatorPluginV2()) {
+                    mainFile = '/src/ccp/main-v2.ts';
+                }
+                if (service.isCreatorPluginV3()) {
+                    mainFile = '/src/ccp/main-v3.ts';
+                }
+                const mainAdaptation = path_1.default.join(service.root, mainFile);
+                // 注意先后顺序
+                webpackChain.entry('main')
+                    .add(manifest.main)
+                    .add(mainAdaptation);
             }
-            // 主进程代码
-            let mainFile = '';
-            if (isV2) {
-                mainFile = '/src/ccp/main-v2.ts';
-            }
-            else if (isV3) {
-                mainFile = '/src/ccp/main-v3.ts';
-            }
-            const mainAdaptation = path_1.default.join(service.root, mainFile);
-            // 注意先后顺序
-            webpackChain.entry('main')
-                .add(manifest.main)
-                .add(mainAdaptation);
             // out
             let output = options.output;
             let resolvePath = path_1.default.resolve(service.context, output);
@@ -123,11 +121,14 @@ class Base extends plugin_api_1.PluginApi {
                 // 处理相对路径
                 output = resolvePath;
             }
-            // const publicPath = version === PluginVersion.v2 ? `packages://${pluginName}/` : '';
+            let publicPath = './';
+            if (service.isCreatorPlugin()) {
+                publicPath = `packages://${pluginName}/`;
+            }
             webpackChain.output.path(output)
                 .libraryTarget('commonjs')
                 // .libraryExport('default') // 这里暂时不能使用这个
-                .publicPath(`packages://${pluginName}/`);
+                .publicPath(publicPath);
             // rules
             webpackChain.module
                 .rule('less')
@@ -212,10 +213,12 @@ class Base extends plugin_api_1.PluginApi {
             const panel = new panel_1.default(service, webpackChain);
             panel.dealPanels();
             // plugins
-            webpackChain.plugin('npm install')
-                .use(npm_install_1.default, [options.output]);
-            webpackChain.plugin('cc-plugin-package.json')
-                .use(package_json_1.default, [service]);
+            if (service.isCreatorPlugin()) {
+                webpackChain.plugin('npm install')
+                    .use(npm_install_1.default, [options.output]);
+                webpackChain.plugin('cc-plugin-package.json')
+                    .use(package_json_1.default, [service]);
+            }
             webpackChain
                 .plugin('vue')
                 .use(vue_loader_1.VueLoaderPlugin)
@@ -225,7 +228,7 @@ class Base extends plugin_api_1.PluginApi {
                     filename: '[name].css',
                     chunkFilename: '[id].css'
                 }]).end();
-            if (isV3) {
+            if (service.isCreatorPluginV3()) {
                 webpackChain.plugin('require-v3')
                     .use(require_v3_1.default)
                     .end();

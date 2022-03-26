@@ -3,7 +3,7 @@ import {
     CocosPluginManifest,
     CocosPluginOptions,
     DefaultCocosPluginOptions,
-    PluginVersion
+    PluginType
 } from '../declare';
 import ClientSocket from './client-socket';
 
@@ -20,7 +20,7 @@ export class CocosCreatorPluginRender {
     public isV2: boolean = true;
 
     public init(config: CocosPluginConfig, options: PanelOptions) {
-        this.isV2 = config.options.version === PluginVersion.v2;
+        this.isV2 = config.options.type === PluginType.PluginV2;
         this.Adaptation.init(config, this.isV2);
         this.manifest = config.manifest;
         this.options = Object.assign(DefaultCocosPluginOptions, config.options);

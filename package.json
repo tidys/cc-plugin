@@ -9,6 +9,7 @@
     "ccp": "./bin/index.js"
   },
   "scripts": {
+    "yalc-push": "tsc && yalc push",
     "webpack-build": "webpack --config webpack.config.js",
     "tsc-build": "tsc --watch",
     "demo-test": "vue-cli-service serve",

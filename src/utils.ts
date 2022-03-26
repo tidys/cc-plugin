@@ -1,4 +1,4 @@
-import { CocosPluginManifest, CocosPluginOptions, PluginVersion } from './declare';
+import { CocosPluginManifest, CocosPluginOptions, PluginType } from './declare';
 
 class Utils {
     private manifest: CocosPluginManifest | null = null;
@@ -12,10 +12,10 @@ class Utils {
     init(manifest: CocosPluginManifest, options: CocosPluginOptions) {
         this.manifest = manifest;
         this.options = options;
-        const { version } = options;
-        if (version === PluginVersion.v2) {
+        const { type } = options;
+        if (type === PluginType.PluginV2) {
             this.builtinMenu.project = this.toi18n('MAIN_MENU.project.title')
-        } else if (version === PluginVersion.v3) {
+        } else if (type === PluginType.PluginV3) {
             this.builtinMenu.project = this.toi18n('menu.project')
         }
     }

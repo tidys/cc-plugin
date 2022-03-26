@@ -4,7 +4,7 @@ import {
     CocosPluginOptions,
     CocosPluginConfig,
     DefaultCocosPluginOptions,
-    PluginVersion,
+    PluginType,
 } from '../declare';
 import adaptation, { Adaptation } from './adaptation'
 
@@ -16,7 +16,7 @@ export class CocosCreatorPluginMain {
     public isV2: boolean = true;
 
     public init(config: CocosPluginConfig, wrapper: PluginMainWrapper) {
-        this.isV2 = config.options.version === PluginVersion.v2;
+        this.isV2 = config.options.type === PluginType.PluginV2;
         this.manifest = config.manifest;
         this.options = Object.assign(DefaultCocosPluginOptions, config.options);
         this.wrapper = wrapper;

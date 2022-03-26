@@ -13,11 +13,11 @@ class Utils {
     init(manifest, options) {
         this.manifest = manifest;
         this.options = options;
-        const { version } = options;
-        if (version === declare_1.PluginVersion.v2) {
+        const { type } = options;
+        if (type === declare_1.PluginType.PluginV2) {
             this.builtinMenu.project = this.toi18n('MAIN_MENU.project.title');
         }
-        else if (version === declare_1.PluginVersion.v3) {
+        else if (type === declare_1.PluginType.PluginV3) {
             this.builtinMenu.project = this.toi18n('menu.project');
         }
     }

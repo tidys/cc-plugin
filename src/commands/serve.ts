@@ -14,7 +14,7 @@ import * as FsExtra from 'fs-extra';
 import CocosPluginPackageJson from './package.json';
 import NpmInstall from '../plugin/npm-install';
 import DevServer from '../plugin/dev-server';
-import { PluginVersion } from '../declare';
+import { PluginType } from '../declare';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import webpackDevSever from 'webpack-dev-server'
 import PortFinder from 'portfinder'
