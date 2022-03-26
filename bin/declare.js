@@ -4,6 +4,7 @@ exports.Platform = exports.DefaultCocosPluginOptions = exports.PluginType = expo
 exports.Panel = {
     Type: {
         Dockable: 'dockable',
+        Simple: 'simple',
     },
 };
 var PluginType;
