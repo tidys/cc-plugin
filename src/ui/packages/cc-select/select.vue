@@ -17,11 +17,11 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, PropType, watch } from "vue";
+import {defineComponent, ref, PropType, watch} from "vue";
 
 interface Option {
   label: string,
-  value: string,
+  value: string | number,
 }
 
 export default defineComponent({

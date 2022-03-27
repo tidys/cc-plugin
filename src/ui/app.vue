@@ -22,28 +22,33 @@
         </cc-prop>
         <cc-prop name="test2">
           <cc-select
-            @change="onChangeSelect"
-            v-model:data="selectData"
-            v-model:value="selectValue">
+              @change="onChangeSelect"
+              v-model:data="selectData"
+              v-model:value="selectValue">
           </cc-select>
         </cc-prop>
       </div>
     </cc-section>
     <i class="iconfont icon-refresh"></i>
     <div style="width: 100px; height: 100px;background: green;" class="iconfont icon-doc"></div>
+    <CCInputNumber :value=10 :min=1 style="width: 100px;"></CCInputNumber>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+import {defineComponent, ref, onMounted} from 'vue'
 // import CcButton from './packages/cc-button/button.vue';
 // import CcSection from './packages/cc-section/index.vue';
 // import CcInput from './packages/cc-input/index.vue';
 // import CcProp from './packages/cc-prop/index.vue';
 // import CcSelect from './packages/cc-select/index.vue';
+import CCInputNumber from './packages/cc-input-number/index.vue'
 
 export default defineComponent({
   name: 'app',
-  // components: { CcSelect, CcProp, CcInput, CcSection, CcButton },
+  components: {
+    // CcSelect, CcProp, CcInput, CcSection, CcButton,
+    CCInputNumber,
+  },
   setup() {
     const value = ref('123')
     const selectData = ref([

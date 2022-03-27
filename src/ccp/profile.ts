@@ -2,7 +2,7 @@ import {CocosPluginConfig, PluginType} from "../declare";
 
 const Key = 'profile';
 
-class Profile {
+export class Profile {
     data: Record<string, any> = {}
     pluginConfig: CocosPluginConfig | null = null;
 
@@ -10,10 +10,25 @@ class Profile {
         this.pluginConfig = cfg;
     }
 
+    save() {
+        if (this.isWeb) {
+            const str = JSON.stringify(this.data);
+            localStorage.setItem(Key, str);
+        }
+    }
+
+    private get isWeb() {
+        if (this.pluginConfig) {
+
+            const { type } = this.pluginConfig.options;
+            return type === PluginType.Web;
+        }
+        return false;
+    }
+
     load(url: string, cb: Function) {
         if (this.pluginConfig) {
-            const { type } = this.pluginConfig.options;
-            if (type === PluginType.Web) {
+            if (this.isWeb) {
                 // 从localstorage中读取
                 const str = localStorage.getItem(Key);
                 if (str) {

@@ -73,6 +73,8 @@ class Serve extends plugin_api_1.PluginApi {
                     "stream": require.resolve("stream-browserify"),
                     "util": require.resolve("util/"),
                     "crypto": require.resolve("crypto-browserify"),
+                    "os": require.resolve("os-browserify/browser"),
+                    "constants": require.resolve("constants-browserify"),
                     "express": false,
                     "electron": false,
                 });

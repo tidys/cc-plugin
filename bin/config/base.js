@@ -193,14 +193,23 @@ class Base extends plugin_api_1.PluginApi {
                     lib: ['es6', 'dom'],
                 }
             });
-            // webpackChain.module
-            //     .rule('image')
-            //     .test(/\.(png|jpe?g|gif|svg)$/)
-            //     .use('url-loader')
-            //     .loader('url-loader')
-            //     .options({
-            //         name:'images/[name].[ext]'
-            //     })
+            webpackChain.module
+                .rule('image')
+                .test(/\.(png|jpe?g|gif)$/)
+                .use('url-loader')
+                .loader('url-loader')
+                .options({
+                limit: 800 * 1024,
+                name: 'images/[name].[ext]'
+            });
+            webpackChain.module
+                .rule('svg')
+                .test(/\.(svg)$/)
+                .use('svg-url-loader')
+                .loader('svg-url-loader')
+                .options({
+                limit: 800 * 1024, // 800k以内都以base64内联
+            });
             webpackChain.module
                 .rule('font')
                 .test(/\.(ttf|woff2|woff|otf|eot)$/)
