@@ -45,7 +45,7 @@ export default class Serve extends PluginApi {
                 // 当server开启时，一般来说都需要启用watchBuild，不然没有实际意义
                 webpackChain.watch(!!options.watchBuild || options.server?.enabled!)
                 webpackChain.mode('development');
-                webpackChain.devtool(false);
+                webpackChain.devtool('source-map');
 
                 webpackChain
                     .plugin('clean')
@@ -84,7 +84,17 @@ export default class Serve extends PluginApi {
                     "electron": false,
                 })
             }
+
+
             let webpackConfig = api.resolveChainWebpackConfig();
+            // 加载用户自定义的配置
+            const file = Path.join(service.context, 'webpack.config.js');
+            if (Fs.existsSync(file)) {
+                const data = require(file);
+                if (data.plugins && data.plugins.length) {
+                    webpackConfig.plugins = webpackConfig.plugins?.concat(data.plugins);
+                }
+            }
             webpackConfig = merge(webpackConfig, { resolve: { fallback } });
             const compiler = webpack(webpackConfig, ((err, stats) => {
                 if (err) {
