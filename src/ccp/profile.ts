@@ -10,6 +10,10 @@ export class Profile {
         this.pluginConfig = cfg;
     }
 
+    setDefaultData(data: Record<string, any>) {
+        this.data = data;
+    }
+
     save() {
         if (this.isWeb) {
             const str = JSON.stringify(this.data);
@@ -19,7 +23,6 @@ export class Profile {
 
     private get isWeb() {
         if (this.pluginConfig) {
-
             const { type } = this.pluginConfig.options;
             return type === PluginType.Web;
         }

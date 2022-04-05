@@ -7,6 +7,7 @@ import {
 } from '../declare';
 
 import adaptation, {Adaptation} from './adaptation';
+import profile from "./profile";
 
 interface PanelOptions {
     ready: (rootElement: any, args: any) => void;
@@ -21,10 +22,10 @@ export class CocosCreatorPluginRender {
     public init(config: CocosPluginConfig, options: PanelOptions) {
         const { type } = config.options;
         this.isV2 = type === PluginType.PluginV2;
-        this.Adaptation.init(config, this.isV2);
+        this.Adaptation.init(config, type || PluginType.PluginV2);
         this.manifest = config.manifest;
         this.options = Object.assign(DefaultCocosPluginOptions, config.options);
-
+        profile.init(config);
         const { enabled, port } = this.options.server!;
         if (enabled) {
             let hot = () => {

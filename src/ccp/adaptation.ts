@@ -1,6 +1,7 @@
-import {BuilderOptions, CocosPluginConfig, PanelOptions, PluginType, Platform} from '../declare';
+import {BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType} from '../declare';
 import {versionApi, Versions} from './version-api';
 import * as Fs from 'fs';
+import axios from 'axios';
 
 const { V246, V247 } = Versions;
 const Path = require('path'); // 为了适配浏览器
@@ -8,6 +9,7 @@ const URL = require('url')
 
 let config: CocosPluginConfig, options: PanelOptions;
 let v2 = true;
+let web = true;
 let adaptation: Adaptation;
 
 class Project {
@@ -262,6 +264,14 @@ class AssetDB {
             // 暂时不需要实现，编辑器会自动刷新
         }
     }
+
+    async fileData(url: string): Promise<string> {
+        if (web) {
+            return await axios.get(url);
+        } else {
+            return ""
+        }
+    }
 }
 
 interface FileFilter {
@@ -351,9 +361,10 @@ export class Adaptation {
         }
     }
 
-    init(pluginConfig: CocosPluginConfig, isV2: boolean = true) {
+    init(pluginConfig: CocosPluginConfig, type: PluginType) {
         config = pluginConfig;
-        v2 = !!isV2;
+        v2 = type === PluginType.PluginV2;
+        web = type === PluginType.Web;
     }
 }
 
