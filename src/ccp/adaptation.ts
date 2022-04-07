@@ -59,13 +59,24 @@ class Util {
     }
 
     urlToFspath(url: string) {
+        let result = URL.parse(url);
+        let r1 = result.pathname
+            ? Path.join(result.hostname, result.pathname)
+            : Path.join(result.hostname);
         if (v2) {
             throw new Error('没有实现的接口')
+        } else if (web) {
+            if (result.protocol === 'packages:') {
+                const pluginName = config.manifest.name;
+                if (r1.startsWith('/')) {
+                    r1 = r1.substring(1, r1.length)
+                }
+                if (r1.startsWith(pluginName)) {
+                    r1 = r1.substring(pluginName.length, r1.length)
+                }
+            }
+            return r1;
         } else {
-            const result = URL.parse(url)
-            let r1 = result.pathname
-                ? Path.join(result.hostname, result.pathname)
-                : Path.join(result.hostname);
             if (result.protocol === 'packages:') {
                 return Path.join(adaptation.Project.path, 'extensions', r1)
             } else if (result.protocol === 'db:') {
@@ -265,12 +276,22 @@ class AssetDB {
         }
     }
 
+
     async fileData(url: string): Promise<string> {
-        if (web) {
-            return await axios.get(url);
-        } else {
-            return ""
+        let fspath = adaptation.Util.urlToFspath(url);
+        if (fspath) {
+            if (web) {
+                const ext = Path.extname(fspath);
+                if (!ext) {
+                    return ''
+                } else {
+                    const res = await axios.get(fspath);
+                    return res.data;
+                }
+            }
+
         }
+        return ''
     }
 }
 
@@ -287,6 +308,16 @@ export interface SelectDialogOptions {
     multi?: boolean;
     filters?: FileFilter[];
     extensions?: string;
+}
+
+class Log {
+    error(str: string) {
+        if (web) {
+            console.error(str);
+        } else {
+            // todo 待实现
+        }
+    }
 }
 
 class Dialog {
@@ -327,6 +358,7 @@ export class Adaptation {
     public Shell = new Shell();
     public Dialog = new Dialog();
     public Builder = new Builder();
+    public Log = new Log();
 
     public require(name: string): any {
         if (v2) {
