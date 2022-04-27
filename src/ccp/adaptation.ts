@@ -111,6 +111,14 @@ class Shell {
             Electron.remote?.shell?.beep();
         }
     }
+    openUrl(url:string){
+        if (web){
+            window.open(url);
+        }else{
+            // @ts-ignore
+            Electron.shell.openExternal(url);
+        }
+    }
 }
 
 class Panel {
