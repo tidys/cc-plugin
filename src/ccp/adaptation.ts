@@ -318,6 +318,22 @@ class Log {
             // todo 待实现
         }
     }
+
+    log(str: string) {
+        if (web) {
+            console.log(str);
+        } else {
+            // todo 待实现
+        }
+    }
+
+    info(str: string) {
+        if (web) {
+            console.log(str);
+        } else {
+            // todo 待实现
+        }
+    }
 }
 
 class Dialog {
