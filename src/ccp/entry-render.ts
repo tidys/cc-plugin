@@ -17,16 +17,14 @@ export class CocosCreatorPluginRender {
     public manifest: CocosPluginManifest | null = null;
     public options: CocosPluginOptions | null = null;
     public Adaptation: Adaptation = adaptation;
-    public isV2: boolean = true;
 
-    public init(config: CocosPluginConfig, options: PanelOptions) {
-        const { type } = config.options;
-        this.isV2 = type === PluginType.PluginV2;
+    public init (config: CocosPluginConfig, options: PanelOptions) {
+        const {type} = config.options;
         this.Adaptation.init(config, type || PluginType.PluginV2);
         this.manifest = config.manifest;
         this.options = Object.assign(DefaultCocosPluginOptions, config.options);
         profile.init(config);
-        const { enabled, port } = this.options.server!;
+        const {enabled, port} = this.options.server!;
         if (enabled) {
             let hot = () => {
                 if (this.options?.type === PluginType.Web) {
@@ -38,7 +36,7 @@ export class CocosCreatorPluginRender {
                         // TODO 渲染进程HMR实现
                         console.log('reload')
 
-                        if (this.isV2) {
+                        if (this.Adaptation.Env.isPluginV2) {
 
                         } else {
 
@@ -68,7 +66,7 @@ export class CocosCreatorPluginRender {
         return options;
     }
 
-    public builder() {
+    public builder () {
 
     }
 }

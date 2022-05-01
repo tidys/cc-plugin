@@ -2,19 +2,18 @@ import {BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType} f
 import {versionApi, Versions} from './version-api';
 import * as Fs from 'fs';
 import axios from 'axios';
+import {inject} from "vue";
 
-const { V246, V247 } = Versions;
+const {V246, V247} = Versions;
 const Path = require('path'); // 为了适配浏览器
 const URL = require('url')
 
 let config: CocosPluginConfig, options: PanelOptions;
-let v2 = true;
-let web = true;
 let adaptation: Adaptation;
 
 class Project {
     get path(): string {
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             return versionApi(
                 adaptation.CCEditor.version,
                 [
@@ -39,7 +38,7 @@ class Project {
 
 class Util {
     fspathToUrl(fspath: string): string | null {
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             // @ts-ignore
             return Editor.assetdb.remote.fspathToUrl(fspath);
         } else {
@@ -63,9 +62,9 @@ class Util {
         let r1 = result.pathname
             ? Path.join(result.hostname, result.pathname)
             : Path.join(result.hostname);
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             throw new Error('没有实现的接口')
-        } else if (web) {
+        } else if (adaptation.Env.isWeb) {
             if (result.protocol === 'packages:') {
                 const pluginName = config.manifest.name;
                 if (r1.startsWith('/')) {
@@ -93,7 +92,7 @@ const Electron = require('electron');
 
 class Shell {
     showItem(path: string) {
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             // @ts-ignore
             Electron.remote?.shell?.showItemInFolder(path);
         } else {
@@ -103,7 +102,7 @@ class Shell {
     }
 
     beep() {
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             // @ts-ignore
             Electron.remote?.shell?.beep();
         } else {
@@ -111,10 +110,11 @@ class Shell {
             Electron.remote?.shell?.beep();
         }
     }
-    openUrl(url:string){
-        if (web){
+
+    openUrl(url: string) {
+        if (adaptation.Env.isWeb) {
             window.open(url);
-        }else{
+        } else {
             // @ts-ignore
             Electron.shell.openExternal(url);
         }
@@ -129,7 +129,7 @@ class Panel {
             if (!config) {
                 throw new Error(`未设置config`)
             }
-            const { manifest, options } = config!;
+            const {manifest, options} = config!;
             // if (options?.version === PluginVersion.v2) { }
             if (panelName === 'self') {
                 panelName = manifest!.name
@@ -158,7 +158,7 @@ class Builder {
     async getConfig(): Promise<BuilderOptions[]> {
         // 为了配合3.x，统一返回array
         let ret: BuilderOptions[] = [];
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             const buildCfgFile = Path.join(adaptation.Project.path, 'local/builder.json');
             if (Fs.existsSync(buildCfgFile)) {
                 const buildData: { template: string, buildPath: string, platform: string } = JSON.parse(Fs.readFileSync(buildCfgFile, 'utf-8'))
@@ -203,6 +203,24 @@ class Builder {
 }
 
 class Env {
+    private _type: PluginType | null = null;
+
+    init(type: PluginType) {
+        this._type = type;
+    }
+
+    get isWeb() {
+        return this._type === PluginType.Web;
+    }
+
+    get isPluginV2() {
+        return this._type === PluginType.PluginV2;
+    }
+
+    get isPluginV3() {
+        return this._type === PluginType.PluginV3;
+    }
+
     get isWin() {
         return process.platform === 'win32'
     }
@@ -215,7 +233,7 @@ class Env {
 class Simulator {
     // 模拟器的完整路径
     get path(): string {
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             return Path.join(adaptation.CCEditor.path, 'cocos2d-x/simulator/');
         } else {
             if (adaptation.Env.isWin) {
@@ -229,7 +247,7 @@ class Simulator {
 
     get remoteAssetDir() {
         const macFixPath = 'Contents/Resources/remote-asset'
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             if (adaptation.Env.isWin) {
                 return Path.join(this.path, 'win32/remote-asset');
             } else if (adaptation.Env.isMac) {
@@ -248,7 +266,7 @@ class Simulator {
 // 为啥取这个名字，因为被Editor编辑器占用了
 class CCEditor {
     get path(): string {
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             //@ts-ignore
             return Path.dirname(Editor.appPath);
         } else {
@@ -263,7 +281,7 @@ class CCEditor {
         if (this._version) {
             return this._version;
         }
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             // @ts-ignore
             this._version = Editor.remote.App.version;
         } else {
@@ -276,7 +294,7 @@ class CCEditor {
 
 class AssetDB {
     refresh(url: string) {
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             // @ts-ignore
             Editor.assetdb.refresh(url);
         } else {
@@ -288,7 +306,7 @@ class AssetDB {
     async fileData(url: string): Promise<string> {
         let fspath = adaptation.Util.urlToFspath(url);
         if (fspath) {
-            if (web) {
+            if (adaptation.Env.isWeb) {
                 const ext = Path.extname(fspath);
                 if (!ext) {
                     return ''
@@ -320,7 +338,7 @@ export interface SelectDialogOptions {
 
 class Log {
     error(str: string) {
-        if (web) {
+        if (adaptation.Env.isWeb) {
             console.error(str);
         } else {
             // todo 待实现
@@ -328,7 +346,7 @@ class Log {
     }
 
     log(str: string) {
-        if (web) {
+        if (adaptation.Env.isWeb) {
             console.log(str);
         } else {
             // todo 待实现
@@ -336,7 +354,7 @@ class Log {
     }
 
     info(str: string) {
-        if (web) {
+        if (adaptation.Env.isWeb) {
             console.log(str);
         } else {
             // todo 待实现
@@ -345,8 +363,54 @@ class Log {
 }
 
 class Dialog {
+    async readPng(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                resolve(event.target!.result as string);
+            };
+            if (file.type === "image/png") {
+                reader.readAsDataURL(file);
+            } else {
+                return '';
+            }
+        });
+    }
+
     async select(options: SelectDialogOptions): Promise<string[]> {
-        if (v2) {
+        if (adaptation.Env.isWeb) {
+            return new Promise((resolve, reject) => {
+                const inputEl: HTMLInputElement = document.createElement('input');
+                inputEl.type = 'file';// only file
+                // web只支持一个filter
+                if (options.filters!.length) {
+                    const types = ['.png', '.txt',];
+                    let accept: string[] = [];
+
+                    options.filters![0].extensions.forEach(ext => {
+                        ext = ext.startsWith('.') ? ext : `.${ext}`;
+                        const extItem = types.find(el => el === ext);
+                        if (extItem) {
+                            accept.push(extItem);
+                        }
+                    });
+
+                    inputEl.accept = accept.join(',');
+                }
+
+                inputEl.multiple = !!options.multi;
+                inputEl.addEventListener('change', async () => {
+                    let ret = [];
+                    for (let i = 0; i < inputEl.files!.length; i++) {
+                        let file: File = inputEl.files![i];
+                        let data = await this.readPng(file);
+                        ret.push(data);
+                    }
+                    resolve(ret);
+                });
+                inputEl.dispatchEvent(new MouseEvent('click'));
+            });
+        } else if (adaptation.Env.isPluginV2) {
             let properties = '';
             if (options.type === 'directory') {
                 properties = 'openDirectory'
@@ -385,7 +449,7 @@ export class Adaptation {
     public Log = new Log();
 
     public require(name: string): any {
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             // @ts-ignore
             return Editor.require(`packages://${config.manifest!.name}/node_modules/${name}`)
         } else {
@@ -400,7 +464,7 @@ export class Adaptation {
     }
 
     public url(url: string) {
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             // @ts-ignore
             return Editor.url(url)
         } else {
@@ -409,7 +473,7 @@ export class Adaptation {
     }
 
     public log(str: string) {
-        if (v2) {
+        if (adaptation.Env.isPluginV2) {
             // @ts-ignore
             Editor.log(str)
         } else {
@@ -419,8 +483,7 @@ export class Adaptation {
 
     init(pluginConfig: CocosPluginConfig, type: PluginType) {
         config = pluginConfig;
-        v2 = type === PluginType.PluginV2;
-        web = type === PluginType.Web;
+        this.Env.init(type);
     }
 }
 
