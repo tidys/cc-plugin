@@ -2,7 +2,6 @@ import {BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType} f
 import {versionApi, Versions} from './version-api';
 import * as Fs from 'fs';
 import axios from 'axios';
-import {inject} from "vue";
 
 const {V246, V247} = Versions;
 const Path = require('path'); // 为了适配浏览器
@@ -377,7 +376,8 @@ class Dialog {
         });
     }
 
-    async select(options: SelectDialogOptions): Promise<string[]> {
+    // path:content
+    async select(options: SelectDialogOptions): Promise<Record<string, string | null>> {
         if (adaptation.Env.isWeb) {
             return new Promise((resolve, reject) => {
                 const inputEl: HTMLInputElement = document.createElement('input');
@@ -400,11 +400,10 @@ class Dialog {
 
                 inputEl.multiple = !!options.multi;
                 inputEl.addEventListener('change', async () => {
-                    let ret = [];
+                    let ret: Record<string, any> = {};
                     for (let i = 0; i < inputEl.files!.length; i++) {
                         let file: File = inputEl.files![i];
-                        let data = await this.readPng(file);
-                        ret.push(data);
+                        ret[file.name.toString()] = await this.readPng(file);
                     }
                     resolve(ret);
                 });
@@ -418,19 +417,27 @@ class Dialog {
                 properties = 'openFile';
             }
             //@ts-ignore 更多的参数后续慢慢适配
-            const ret = Editor.Dialog.openFile({
+            const result = Editor.Dialog.openFile({
                 title: options.title,
                 defaultPath: options.path,
                 properties: [properties],
             })
-            if (ret === -1) {
-                return []
+            if (result === -1) {
+                return {}
             }
-            return ret || [];
+            const ret: Record<string, any> = {};
+            (result || []).forEach((e: string) => {
+                ret[e] = null;
+            })
+            return ret;
         } else {
+            const ret: Record<string, any> = {};
             // @ts-ignore
-            const ret = await Editor.Dialog.select(options);
-            return ret.filePaths || [];
+            const result = await Editor.Dialog.select(options);
+            (result.filePaths || []).forEach((e: string) => {
+                ret[e] = null;
+            });
+            return ret;
         }
     }
 }
