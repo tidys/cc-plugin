@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, ref} from 'vue';
+import {defineComponent, onMounted, ref, watch} from 'vue';
 
 export default defineComponent({
   name: "cc-input-number",
@@ -34,9 +34,12 @@ export default defineComponent({
       type: Number,
     },
   },
-  setup(props, { emit }) {
+  setup(props, {emit}) {
     const input = ref();
-    const val = ref(props.value);
+    const val = ref(parseFloat(props.value.toFixed(2).toString()));
+    watch(() => props.value, () => {
+      val.value = parseFloat(props.value.toFixed(2).toString());
+    })
     onMounted(() => {
       if (props.min !== undefined) {
         (input.value as Element).setAttribute('min', props.min.toString());
