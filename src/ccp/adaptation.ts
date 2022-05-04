@@ -384,7 +384,7 @@ class Dialog {
                 const inputEl: HTMLInputElement = document.createElement('input');
                 inputEl.type = 'file';// only file
                 // web只支持一个filter
-                if (options.filters!.length) {
+                if (options.filters?.length) {
                     const types = ['.png', '.txt',];
                     let accept: string[] = [];
 
