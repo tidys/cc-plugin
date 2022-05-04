@@ -2,6 +2,7 @@ import {BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType} f
 import {versionApi, Versions} from './version-api';
 import * as Fs from 'fs';
 import axios from 'axios';
+import {IUiMenuItem, showMenuByMouseEvent} from "../ui/packages/cc-menu";
 
 const {V246, V247} = Versions;
 const Path = require('path'); // 为了适配浏览器
@@ -442,6 +443,26 @@ class Dialog {
     }
 }
 
+
+export class Menu {
+    popup(event: MouseEvent, menus: IUiMenuItem[]) {
+        menus = menus.map((menu) => {
+            return new IUiMenuItem(menu.name, menu.callback || null, menu.enabled);
+        })
+        if (adaptation.Env.isWeb) {
+            showMenuByMouseEvent(event, menus);
+        } else {
+            const {Menu, MenuItem, getCurrentWindow} = Electron.remote;
+            let menu = new Menu();
+            for (let i = 0; i < menus.length; i++) {
+                let item = menus[i];
+                menu.append(new MenuItem({label: item.name, click: item.callback}));
+            }
+            menu.popup(getCurrentWindow());
+        }
+    }
+}
+
 export class Adaptation {
     public Util = new Util();
     public Env = new Env();
@@ -454,6 +475,7 @@ export class Adaptation {
     public Dialog = new Dialog();
     public Builder = new Builder();
     public Log = new Log();
+    public Menu = new Menu();
 
     public require(name: string): any {
         if (adaptation.Env.isPluginV2) {

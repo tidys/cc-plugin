@@ -37,7 +37,7 @@ export default defineComponent({
     value: String,
   },
   emits: ["change", 'update:data', 'update:value'],
-  setup(props: any, { emit }) {
+  setup(props: any, {emit}) {
     const curValue = ref(props.value || '')
     watch(() => props.value, (val) => {
       curValue.value = val;
@@ -45,8 +45,9 @@ export default defineComponent({
     return {
       curValue,
       onSelectChange() {
-        emit("update:value", curValue.value.toString());
-        emit("change");
+        const val = curValue.value.toString();
+        emit("update:value", val);
+        emit("change", val);
       },
     };
   },
