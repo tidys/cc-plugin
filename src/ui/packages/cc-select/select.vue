@@ -34,13 +34,13 @@ export default defineComponent({
         return [];
       },
     },
-    value: String,
+    value: [String, Number],
   },
   emits: ["change", 'update:data', 'update:value'],
-  setup(props: any, {emit}) {
-    const curValue = ref(props.value || '')
+  setup(props: any, { emit }) {
+    const curValue = ref(props.value?.toString() || '')
     watch(() => props.value, (val) => {
-      curValue.value = val;
+      curValue.value = val.toString();
     })
     return {
       curValue,
