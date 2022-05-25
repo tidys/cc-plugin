@@ -2,27 +2,19 @@ import {PluginApi} from '../plugin-api';
 import Config from 'webpack-chain';
 import Chain from 'webpack-chain';
 import webpack from 'webpack';
-import CocosPluginService, {ProjectConfig} from '../service';
+import CocosPluginService from '../service';
 import * as Path from 'path';
-import {resolve} from 'path';
-import {VueLoaderPlugin} from 'vue-loader'
 import {CleanWebpackPlugin} from 'clean-webpack-plugin'
-import Panel from '../panel';
 import * as Fs from 'fs';
-import {existsSync} from 'fs';
-import * as FsExtra from 'fs-extra';
-import CocosPluginPackageJson from './package.json';
-import NpmInstall from '../plugin/npm-install';
 import DevServer from '../plugin/dev-server';
-import {PluginType} from '../declare';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import webpackDevSever from 'webpack-dev-server'
 import PortFinder from 'portfinder'
 import printf from 'printf';
 import {log} from '../log'
-import requireV3 from '../plugin/require-v3'
 import {PluginMgr} from '../plugin-mgr';
 import {merge} from 'lodash';
+
+PortFinder.basePort = 9087;
 
 function buildTargetNode(service: CocosPluginService) {
     let config = new Chain();
@@ -37,7 +29,7 @@ export default class Serve extends PluginApi {
     apply(api: PluginMgr, service: CocosPluginService): void {
         api.registerCommand('serve', {
             description: '开发插件',
-        }, (param) => {
+        }, async (param) => {
             log.blue(printf('%-20s %s', 'service root:    ', service.root))
             log.blue(printf('%-20s %s', 'service context: ', service.context))
             const { options, manifest } = service.projectConfig;
@@ -113,31 +105,31 @@ export default class Serve extends PluginApi {
                 })
                 console.log('build complete')
             }));
-
+            if (service.isWeb()) {
+                await this.runWebpackServer(compiler);
+            }
         })
     }
 
-    async webpackServerTest(compiler: webpack.Compiler) {
+    async runWebpackServer(compiler: webpack.Compiler) {
+        const host = await webpackDevSever.internalIP('v4');
+        const port = await PortFinder.getPortPromise();
         const server = new webpackDevSever({
             // inputFileSystem: FsExtra,
             // outputFileSystem: FsExtra,
-            hot: true,
-            allowedHosts: ['all']
+            hot: false,
+            allowedHosts: ['all'],
+            open: true,
+            host,
+            port,
+            static: './dist',
         }, compiler);
-        const host = '0.0.0.0';
-        const port = await this.getPort();
-        server.listen(port, host, (err) => {
-            if (err) {
-                return console.log(err)
+        server.startCallback((error) => {
+            if (error) {
+                console.error(error);
+                return;
             }
-            console.log(`webpack dev server listen ${port}`)
-        })
+            console.log(`webpack dev server listen ${host}:${port}`)
+        });
     }
-
-    async getPort() {
-        PortFinder.basePort = 9087;
-        const port = await PortFinder.getPortPromise();
-        return port;
-    }
-
 }

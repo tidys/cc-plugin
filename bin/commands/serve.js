@@ -43,6 +43,7 @@ const portfinder_1 = __importDefault(require("portfinder"));
 const printf_1 = __importDefault(require("printf"));
 const log_1 = require("../log");
 const lodash_1 = require("lodash");
+portfinder_1.default.basePort = 9087;
 function buildTargetNode(service) {
     let config = new webpack_chain_1.default();
     config.target('node').devtool(false).mode('development').resolve.extensions.add('.ts');
@@ -54,7 +55,7 @@ class Serve extends plugin_api_1.PluginApi {
     apply(api, service) {
         api.registerCommand('serve', {
             description: '开发插件',
-        }, (param) => {
+        }, (param) => __awaiter(this, void 0, void 0, function* () {
             var _a;
             log_1.log.blue(printf_1.default('%-20s %s', 'service root:    ', service.root));
             log_1.log.blue(printf_1.default('%-20s %s', 'service context: ', service.context));
@@ -128,31 +129,32 @@ class Serve extends plugin_api_1.PluginApi {
                 });
                 console.log('build complete');
             }));
-        });
+            if (service.isWeb()) {
+                yield this.runWebpackServer(compiler);
+            }
+        }));
     }
-    webpackServerTest(compiler) {
+    runWebpackServer(compiler) {
         return __awaiter(this, void 0, void 0, function* () {
+            const host = yield webpack_dev_server_1.default.internalIP('v4');
+            const port = yield portfinder_1.default.getPortPromise();
             const server = new webpack_dev_server_1.default({
                 // inputFileSystem: FsExtra,
                 // outputFileSystem: FsExtra,
-                hot: true,
-                allowedHosts: ['all']
+                hot: false,
+                allowedHosts: ['all'],
+                open: true,
+                host,
+                port,
+                static: './dist',
             }, compiler);
-            const host = '0.0.0.0';
-            const port = yield this.getPort();
-            server.listen(port, host, (err) => {
-                if (err) {
-                    return console.log(err);
+            server.startCallback((error) => {
+                if (error) {
+                    console.error(error);
+                    return;
                 }
-                console.log(`webpack dev server listen ${port}`);
+                console.log(`webpack dev server listen ${host}:${port}`);
             });
-        });
-    }
-    getPort() {
-        return __awaiter(this, void 0, void 0, function* () {
-            portfinder_1.default.basePort = 9087;
-            const port = yield portfinder_1.default.getPortPromise();
-            return port;
         });
     }
 }
