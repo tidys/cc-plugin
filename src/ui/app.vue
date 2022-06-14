@@ -32,6 +32,7 @@
     <i class="iconfont icon-refresh"></i>
     <div style="width: 100px; height: 100px;background: green;" class="iconfont icon-doc"></div>
     <CCInputNumber :value=10 :min=1 style="width: 100px;"></CCInputNumber>
+    <CCColor></CCColor>
   </div>
 </template>
 <script lang="ts">
@@ -42,10 +43,12 @@ import {defineComponent, ref, onMounted} from 'vue'
 // import CcProp from './packages/cc-prop/index.vue';
 // import CcSelect from './packages/cc-select/index.vue';
 import CCInputNumber from './packages/cc-input-number/index.vue'
+import CCColor from "./packages/cc-color/color.vue";
 
 export default defineComponent({
   name: 'app',
   components: {
+    CCColor,
     // CcSelect, CcProp, CcInput, CcSection, CcButton,
     CCInputNumber,
   },
