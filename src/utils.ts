@@ -7,6 +7,7 @@ class Utils {
     // 内置的菜单
     public builtinMenu = {
         project: '',
+        package: '',
     }
 
     init(manifest: CocosPluginManifest, options: CocosPluginOptions) {
@@ -15,6 +16,7 @@ class Utils {
         const { type } = options;
         if (type === PluginType.PluginV2) {
             this.builtinMenu.project = this.toi18n('MAIN_MENU.project.title')
+            this.builtinMenu.package = this.toi18n('MAIN_MENU.package.title');
         } else if (type === PluginType.PluginV3) {
             this.builtinMenu.project = this.toi18n('menu.project')
         }

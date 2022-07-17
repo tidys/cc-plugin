@@ -8,6 +8,7 @@ class Utils {
         // 内置的菜单
         this.builtinMenu = {
             project: '',
+            package: '',
         };
     }
     init(manifest, options) {
@@ -16,6 +17,7 @@ class Utils {
         const { type } = options;
         if (type === declare_1.PluginType.PluginV2) {
             this.builtinMenu.project = this.toi18n('MAIN_MENU.project.title');
+            this.builtinMenu.package = this.toi18n('MAIN_MENU.package.title');
         }
         else if (type === declare_1.PluginType.PluginV3) {
             this.builtinMenu.project = this.toi18n('menu.project');
