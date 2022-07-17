@@ -8,10 +8,22 @@ import Zip from '../plugin/zip';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin'
 import * as Path from 'path';
+import { PluginType } from '../declare';
 
 export default class Pack extends PluginApi {
     exit() {
         process.exit(0);
+    }
+
+    private getPluginTypeName(type: PluginType) {
+        switch (type) {
+            case PluginType.PluginV2:
+                return 'plugin-v2';
+            case PluginType.PluginV3:
+                return 'plugin-v3';
+            default:
+                return '';
+        }
     }
 
     apply(api: PluginMgr, service: CocosPluginService) {
@@ -52,8 +64,15 @@ export default class Pack extends PluginApi {
                     //         cleanOnceBeforeBuildPatterns: ['**/*'],
                     //     }])
                     //     .end();
-                    const { name, version } = service.projectConfig.manifest;
-                    webpackChain.plugin('zip').use(Zip, [name, version])
+
+                    let { name, version } = service.projectConfig.manifest;
+                    const { type } = service.projectConfig.options;
+                    const typeName = this.getPluginTypeName(type!);
+                    if (typeName && typeName.length > 0) {
+                        name = `${name}_${typeName}`;
+                    }
+                    const outDir = Path.join(service.context, 'dist');
+                    webpackChain.plugin('zip').use(Zip, [name, version, outDir])
                 })
                 const webpackConfig = api.resolveChainWebpackConfig();
                 webpack(webpackConfig, ((err, stats) => {

@@ -29,11 +29,13 @@ const OS = __importStar(require("os"));
 // @ts-ignore
 const jszip_1 = __importDefault(require("jszip"));
 class Zip {
-    constructor(fileName, version) {
+    constructor(fileName, version, outDir) {
         this.fileName = '';
         this.version = '';
+        this.outDir = '';
         this.fileName = fileName;
         this.version = version;
+        this.outDir = outDir;
     }
     _packageDir(rootPath, zip) {
         let dir = Fs.readdirSync(rootPath);
@@ -49,14 +51,25 @@ class Zip {
             }
         }
     }
-    zipDir(dir, pluginName) {
-        let zip = new jszip_1.default();
-        this._packageDir(dir, zip.folder(pluginName));
-        let dirParent = Path.dirname(dir);
-        if (!Fs.existsSync(dirParent)) {
-            dirParent = dir;
+    getOutDir(dir) {
+        if (this.outDir) {
+            if (!Fs.existsSync(this.outDir)) {
+                Fs.mkdirSync(this.outDir);
+            }
+            return this.outDir;
         }
-        const zipFilePath = Path.join(dirParent, `${pluginName}.zip`);
+        // 输出目录同级
+        let dirParent = Path.dirname(dir);
+        if (Fs.existsSync(dirParent)) {
+            return dirParent;
+        }
+        return dir;
+    }
+    zipDir(dir, pluginName) {
+        const zip = new jszip_1.default();
+        this._packageDir(dir, zip.folder(pluginName));
+        const outDir = this.getOutDir(dir);
+        const zipFilePath = Path.join(outDir, `${pluginName}.zip`);
         if (Fs.existsSync(zipFilePath)) {
             Fs.unlinkSync(zipFilePath);
             console.log('⚠[删除] 旧版本压缩包: ' + zipFilePath);
