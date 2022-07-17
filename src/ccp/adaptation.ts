@@ -1,10 +1,10 @@
-import {BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType} from '../declare';
-import {versionApi, Versions} from './version-api';
+import { BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType } from '../declare';
+import { versionApi, Versions } from './version-api';
 import * as Fs from 'fs';
 import axios from 'axios';
-import {IUiMenuItem, showMenuByMouseEvent} from "../ui/packages/cc-menu";
+import { IUiMenuItem, showMenuByMouseEvent } from '../ui/packages/cc-menu';
 
-const {V246, V247} = Versions;
+const { V246, V247, V248, V249 } = Versions;
 const Path = require('path'); // 为了适配浏览器
 const URL = require('url')
 
@@ -18,7 +18,7 @@ class Project {
                 adaptation.CCEditor.version,
                 [
                     {
-                        version: [V246, V247],
+                        version: [V246, V247, V248, V249],
                         fn: () => {
                             // @ts-ignore
                             return Editor.Project.path;
@@ -129,7 +129,7 @@ class Panel {
             if (!config) {
                 throw new Error(`未设置config`)
             }
-            const {manifest, options} = config!;
+            const { manifest, options } = config!;
             // if (options?.version === PluginVersion.v2) { }
             if (panelName === 'self') {
                 panelName = manifest!.name
@@ -369,7 +369,7 @@ class Dialog {
             reader.onload = (event) => {
                 resolve(event.target!.result as string);
             };
-            if (file.type === "image/png") {
+            if (file.type === 'image/png') {
                 reader.readAsDataURL(file);
             } else {
                 return '';
@@ -378,6 +378,7 @@ class Dialog {
     }
 
     // path:content
+    // 返回值选择是Object的原因是希望获取文件路径的一些其他信息，比如 图片路径：图片base64
     async select(options: SelectDialogOptions): Promise<Record<string, string | null>> {
         if (adaptation.Env.isWeb) {
             return new Promise((resolve, reject) => {
@@ -452,11 +453,11 @@ export class Menu {
         if (adaptation.Env.isWeb) {
             showMenuByMouseEvent(event, menus);
         } else {
-            const {Menu, MenuItem, getCurrentWindow} = Electron.remote;
+            const { Menu, MenuItem, getCurrentWindow } = Electron.remote;
             let menu = new Menu();
             for (let i = 0; i < menus.length; i++) {
                 let item = menus[i];
-                menu.append(new MenuItem({label: item.name, click: item.callback}));
+                menu.append(new MenuItem({ label: item.name, click: item.callback }));
             }
             menu.popup(getCurrentWindow());
         }

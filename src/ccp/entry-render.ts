@@ -30,7 +30,7 @@ export class CocosCreatorPluginRender {
                 if (this.options?.type === PluginType.Web) {
                     console.log('TODO web reload');
                 } else {
-                    const ClientSocket = require('./client-socket');
+                    const ClientSocket = require('./client-socket').default;
                     let client = new ClientSocket();
                     client.setReloadCallback(() => {
                         // TODO 渲染进程HMR实现
