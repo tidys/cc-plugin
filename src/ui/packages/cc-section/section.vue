@@ -53,6 +53,9 @@ export default defineComponent({
       user-select: none;
       font-size: 12px;
       font-weight: bold;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .fold {

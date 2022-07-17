@@ -41,17 +41,20 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
   margin: 2px 0;
+  overflow: hidden;
 
   .name {
     user-select: none;
     margin-left: 15px;
-    display: flex;
+    display: block;
     flex-direction: row;
     justify-content: left;
     align-items: center;
-    width: 35%;
     font-size: 12px;
     color: #bdbdbd;
+    width: 35%;
+    min-width: 35%;
+    overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
@@ -61,6 +64,7 @@ export default defineComponent({
   }
 
   .value {
+    overflow: hidden;
     display: flex;
     flex: 1;
     align-items: center;
