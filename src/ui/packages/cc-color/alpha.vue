@@ -1,8 +1,9 @@
 <template>
   <div class="root">
     <div class="title">{{ curTitle }}</div>
-    <div class="hue" ref="hueEl" @mousedown.self="onHueMouseDown">
-      <div class="bg"></div>
+    <div class="hue" ref="hue" @mousedown.self="onHueMouseDown">
+      <AlphaBoard class="alpha"></AlphaBoard>
+      <div class="bg" :style="style"></div>
       <div class="pointer" ref="pointer">
         <div class="shape"></div>
       </div>
@@ -13,11 +14,13 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, ref, watch} from 'vue';
-import {getColorHue, transformColorWithHSL} from './util';
-// 色相
+import {computed, defineComponent, ref, watch} from 'vue';
+import AlphaBoard from './alpha-board.vue';
+import {getColorHex, transformColorWithAlpha} from '@/rich-text-editor/color/util';
+
 export default defineComponent({
-  name: 'color-hue',
+  name: 'color-alpha',
+  components: { AlphaBoard },
   emits: ['change', 'update:color'],
   props: {
     title: {
@@ -30,35 +33,30 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const hueEl = ref();
+    const hue = ref();
     const pointer = ref();
     const curTitle = ref(props.title);
-    watch(() => props.color, (color:string) => {
-      updatePointer(color);
-    });
-    function updatePointer(color:string) {
-      const PointerEl: HTMLDivElement = pointer.value as HTMLDivElement;
-      const hue = getColorHue(color);
-      PointerEl.style.left = `${ hue / 360 * 100}%`;
-    }
-    onMounted(()=>{
-      updatePointer(props.color);
+
+    const style = computed(()=>{
+      let color =  getColorHex(props.color);
+      return `background: linear-gradient(to right, transparent 0%, #${color} 100%)`;
     });
     return {
-      hueEl, pointer, curTitle,
+      style,
+      hue, pointer, curTitle,
       onHueMouseDown(event: MouseEvent) {
+        const HueEl: HTMLDivElement = hue.value as HTMLDivElement;
         const PointerEl: HTMLDivElement = pointer.value as HTMLDivElement;
-        const rect = (hueEl.value as HTMLDivElement).getBoundingClientRect();
-        const mouseMove = (e: MouseEvent) => {
+        const rect = HueEl.getBoundingClientRect();
+        let mouseMove = (e: MouseEvent) => {
           let x = (e.clientX - rect.left) / rect.width * 100;
           x = x > 100 ? 100 : x;
           x = x < 0 ? 0 : x;
 
           PointerEl.style.left = `${x}%`;
-          const hue = 360 * (x / 100);
-          const trColor = transformColorWithHSL(props.color, hue);
-          emit('update:color', trColor);
-          emit('change', trColor);
+          const color =  transformColorWithAlpha(props.color, x / 100);
+          emit('update:color', color);
+          emit('change', color);
         };
         let mouseUp = (e: MouseEvent) => {
           document.removeEventListener('mousemove', mouseMove);
@@ -93,16 +91,23 @@ div {
     height: 20px;
     flex: 1;
 
-    .bg {
+    .alpha {
+      position: absolute;
       width: 100%;
       height: 100%;
       pointer-events: none;
-      background: linear-gradient(to right, red 0%, #ff0 17%, lime 33%, cyan 50%, blue 66%, #f0f 83%, red 100%)
+    }
+
+    .bg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
     }
 
     .pointer {
       position: absolute;
-      left: 100%;
+      left: 50%;
       top: 0;
       width: 0;
       height: 100%;
