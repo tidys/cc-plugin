@@ -385,7 +385,7 @@ class Dialog {
                 inputEl.type = 'file';// only file
                 // web只支持一个filter
                 if (options.filters?.length) {
-                    const types = ['.png', '.txt',];
+                    const types = ['.png', '.txt', '.jpg', 'jpeg'];
                     let accept: string[] = [];
 
                     options.filters![0].extensions.forEach(ext => {
