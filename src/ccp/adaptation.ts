@@ -4,7 +4,7 @@ import * as Fs from 'fs';
 import axios from 'axios';
 import {IUiMenuItem, showMenuByMouseEvent} from "../ui/packages/cc-menu";
 
-const {V246, V247} = Versions;
+const { V246, V247 } = Versions;
 const Path = require('path'); // 为了适配浏览器
 const URL = require('url')
 
@@ -129,7 +129,7 @@ class Panel {
             if (!config) {
                 throw new Error(`未设置config`)
             }
-            const {manifest, options} = config!;
+            const { manifest, options } = config!;
             // if (options?.version === PluginVersion.v2) { }
             if (panelName === 'self') {
                 panelName = manifest!.name
@@ -369,10 +369,11 @@ class Dialog {
             reader.onload = (event) => {
                 resolve(event.target!.result as string);
             };
-            if (file.type === "image/png") {
+            if (["image/png", "image/jpeg"].find(el => el === file.type)) {
                 reader.readAsDataURL(file);
             } else {
-                return '';
+                console.log('un support file type: ', file.type);
+                resolve('');
             }
         });
     }
@@ -404,7 +405,10 @@ class Dialog {
                     let ret: Record<string, any> = {};
                     for (let i = 0; i < inputEl.files!.length; i++) {
                         let file: File = inputEl.files![i];
-                        ret[file.name.toString()] = await this.readPng(file);
+                        const imageData = await this.readPng(file);
+                        if (imageData) {
+                            ret[file.name.toString()] = imageData;
+                        }
                     }
                     resolve(ret);
                 });
@@ -452,11 +456,11 @@ export class Menu {
         if (adaptation.Env.isWeb) {
             showMenuByMouseEvent(event, menus);
         } else {
-            const {Menu, MenuItem, getCurrentWindow} = Electron.remote;
+            const { Menu, MenuItem, getCurrentWindow } = Electron.remote;
             let menu = new Menu();
             for (let i = 0; i < menus.length; i++) {
                 let item = menus[i];
-                menu.append(new MenuItem({label: item.name, click: item.callback}));
+                menu.append(new MenuItem({ label: item.name, click: item.callback }));
             }
             menu.popup(getCurrentWindow());
         }
