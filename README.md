@@ -1,6 +1,6 @@
 # cc-plugin
 
-专为`Cocos Creator`插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。
+专为`Cocos Creator`插件开发的cli，一次编写，同时发布web网页版本、creator v2版本、creator v3版本，免去多版本同步的问题。
 
 使用webpack抹平了v2、v3插件版本的底层差异，使开发插件更加工程化。
 
