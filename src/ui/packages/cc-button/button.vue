@@ -83,6 +83,11 @@ export default defineComponent({
     user-select: none;
     color: white;
     font: 12px bold;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
   }
 }
 

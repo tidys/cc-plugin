@@ -37,9 +37,20 @@ const log_1 = require("../log");
 const zip_1 = __importDefault(require("../plugin/zip"));
 const terser_webpack_plugin_1 = __importDefault(require("terser-webpack-plugin"));
 const Path = __importStar(require("path"));
+const declare_1 = require("../declare");
 class Pack extends plugin_api_1.PluginApi {
     exit() {
         process.exit(0);
+    }
+    getPluginTypeName(type) {
+        switch (type) {
+            case declare_1.PluginType.PluginV2:
+                return 'plugin-v2';
+            case declare_1.PluginType.PluginV3:
+                return 'plugin-v3';
+            default:
+                return '';
+        }
     }
     apply(api, service) {
         api.registerCommand('pack', { description: '打包插件' }, (param) => {
@@ -74,8 +85,14 @@ class Pack extends plugin_api_1.PluginApi {
                 //         cleanOnceBeforeBuildPatterns: ['**/*'],
                 //     }])
                 //     .end();
-                const { name, version } = service.projectConfig.manifest;
-                webpackChain.plugin('zip').use(zip_1.default, [name, version]);
+                let { name, version } = service.projectConfig.manifest;
+                const { type } = service.projectConfig.options;
+                const typeName = this.getPluginTypeName(type);
+                if (typeName && typeName.length > 0) {
+                    name = `${name}_${typeName}`;
+                }
+                const outDir = Path.join(service.context, 'dist');
+                webpackChain.plugin('zip').use(zip_1.default, [name, version, outDir]);
             }));
             const webpackConfig = api.resolveChainWebpackConfig();
             webpack_1.default(webpackConfig, ((err, stats) => {

@@ -44,12 +44,12 @@ class CocosPluginPackageJson {
             author: this.manifest.author || 'cocos-plugin-cli',
             main: './main.js',
         };
-        const { version } = this.options;
+        const { type } = this.options;
         let packageWorker = null;
-        if (version === declare_1.PluginVersion.v2) {
+        if (type === declare_1.PluginType.PluginV2) {
             packageWorker = new package_worker_1.PackageV2(this.service.projectConfig, packageJson);
         }
-        else if (version === declare_1.PluginVersion.v3) {
+        else if (type === declare_1.PluginType.PluginV3) {
             packageWorker = new package_worker_1.PackageV3(this.service.projectConfig, packageJson);
         }
         // 面板
@@ -74,7 +74,13 @@ class CocosPluginPackageJson {
             if (FsExtra.existsSync(file)) {
                 const data = FsExtra.readJSONSync(file);
                 if (data && data.hasOwnProperty('dependencies')) {
-                    return data['dependencies'];
+                    const dependencies = data['dependencies'];
+                    for (let key in dependencies) {
+                        if (key.endsWith('.js')) {
+                            delete dependencies[key];
+                        }
+                    }
+                    return dependencies;
                 }
             }
         }

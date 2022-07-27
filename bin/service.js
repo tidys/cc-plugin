@@ -47,6 +47,22 @@ class CocosPluginService {
         this.root = Path.join(__dirname, '..');
         this.resolvePlugins();
     }
+    isCreatorPlugin() {
+        const { type } = this.projectConfig.options;
+        return type === declare_1.PluginType.PluginV2 || type === declare_1.PluginType.PluginV3;
+    }
+    isCreatorPluginV2() {
+        const { type } = this.projectConfig.options;
+        return type === declare_1.PluginType.PluginV2;
+    }
+    isCreatorPluginV3() {
+        const { type } = this.projectConfig.options;
+        return type === declare_1.PluginType.PluginV3;
+    }
+    isWeb() {
+        const { type } = this.projectConfig.options;
+        return type === declare_1.PluginType.Web;
+    }
     resolvePlugins() {
         this.plugins.push(new base_1.default());
         this.plugins.push(new create_1.default());
@@ -128,7 +144,7 @@ class CocosPluginService {
     catchOutput(projectDir, pluginDir, pluginName) {
         // 相对目录
         if (projectDir.startsWith('./')) {
-            log_1.log.red(`options.outputProject 暂时不支持相对目录的写法：${projectDir}`);
+            log_1.log.red(`当type为creator插件时，options.outputProject 暂时不支持相对目录的写法：${projectDir}`);
             process.exit(0);
         }
         let output = projectDir;
@@ -146,25 +162,33 @@ class CocosPluginService {
         return output;
     }
     getPluginDir(version) {
-        if (version === declare_1.PluginVersion.v2) {
+        if (version === declare_1.PluginType.PluginV2) {
             return 'packages';
         }
-        else if (version === declare_1.PluginVersion.v3) {
+        else if (version === declare_1.PluginType.PluginV3) {
             return 'extensions';
         }
     }
     checkUserOptions(userOptions) {
         // 根据配置，将output目录统一变为绝对路径
         const { options, manifest } = userOptions;
-        let { version, outputProject } = options;
-        const pluginDir = this.getPluginDir(version);
+        let { type, outputProject } = options;
+        const pluginDir = this.getPluginDir(type);
         if (typeof outputProject === 'object') {
-            const { v2, v3 } = outputProject;
-            if (v2 && version === declare_1.PluginVersion.v2) {
+            const { v2, v3, web } = outputProject;
+            if (v2 && type === declare_1.PluginType.PluginV2) {
                 options.output = this.catchOutput(v2, pluginDir, manifest.name);
             }
-            else if (v3 && version === declare_1.PluginVersion.v3) {
+            else if (v3 && type === declare_1.PluginType.PluginV3) {
                 options.output = this.catchOutput(v3, pluginDir, manifest.name);
+            }
+            else if (web && type === declare_1.PluginType.Web) {
+                let fullPath = Path.join(this.context, web);
+                if (!FS.existsSync(fullPath)) {
+                    log_1.log.yellow(`auto create directory: ${fullPath}`);
+                    FsExtra.ensureDirSync(fullPath);
+                }
+                options.output = fullPath;
             }
         }
         else {

@@ -3,7 +3,7 @@ import CocosPluginService from '../service';
 import Chain from 'webpack-chain';
 import Config from 'webpack-chain';
 import { PluginMgr } from '../plugin-mgr';
-import { PluginVersion } from '../declare';
+import { PluginType } from '../declare';
 import Path, { resolve } from 'path';
 import Fs, { existsSync } from 'fs';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
@@ -12,7 +12,6 @@ import NpmInstall from '../plugin/npm-install';
 import CocosPluginPackageJson from '../commands/package.json';
 import { VueLoaderPlugin } from 'vue-loader';
 import requireV3 from '../plugin/require-v3';
-import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import webpack from 'webpack';
 import { log } from '../log';
 import * as FsExtra from 'fs-extra';
@@ -32,13 +31,14 @@ export default class Base extends PluginApi {
             try {
                 const { dependencies } = FsExtra.readJSONSync(packageFile);
                 for (let key in dependencies) {
-                    map[key] = '';
+                    if (!key.endsWith('.js')) {
+                        map[key] = '';
+                    }
                 }
             } catch (e) {
                 console.log(e);
             }
         }
-
         for (let key in map) {
             map[key] = `commonjs ${key}`;
         }
@@ -65,45 +65,53 @@ export default class Base extends PluginApi {
     apply(api: PluginMgr, service: CocosPluginService) {
         const { options, manifest } = service.projectConfig;
         api.chainWebpack((webpackChain: Chain) => {
-            const { version } = options;
             const pluginName = manifest.name;
-
-            const isV3 = version === PluginVersion.v3;
-            const isV2 = version === PluginVersion.v2;
-
-            webpackChain.target('node');
+            // target
+            {
+                if (service.isWeb()) {
+                    webpackChain.target('web');
+                }
+                if (service.isCreatorPlugin()) {
+                    webpackChain.target('node');
+                }
+            }
             const vuePath = Path.resolve(service.root, './node_modules/vue');
             // webpackChain.resolve.alias.set('vue', vuePath).end();
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json');
 
             // 排除模块
-            let externals = this.getExternal(service.context, ['electron', 'fs-extra', 'express'])
-            webpackChain.externals(externals)
-            // i18n
-            const { i18n_zh, i18n_en } = manifest;
-            i18n_zh && this.webpackEntry(service, webpackChain, 'i18n/zh', i18n_zh);
-            i18n_en && this.webpackEntry(service, webpackChain, 'i18n/en', i18n_en);
-            // builder&hooks
-            if (isV3) {
-                const builderEntry = 'builder';
-                const builderFile = Path.resolve(service.root, 'src/ccp/builder/builder.ts')
-                this.webpackEntry(service, webpackChain, builderEntry, builderFile);
-                const hooksEntry = 'hooks';
-                const hooksFile = Path.resolve(service.root, 'src/ccp/builder/hooks.ts');
-                this.webpackEntry(service, webpackChain, hooksEntry, hooksFile);
+            if (service.isCreatorPlugin()) {
+                let externals = this.getExternal(service.context, ['electron', 'fs-extra', 'express'])
+                webpackChain.externals(externals)
             }
-            // 主进程代码
-            let mainFile = ''
-            if (isV2) {
-                mainFile = '/src/ccp/main-v2.ts';
-            } else if (isV3) {
-                mainFile = '/src/ccp/main-v3.ts';
+            if (service.isCreatorPlugin()) {
+                // i18n
+                const { i18n_zh, i18n_en } = manifest;
+                i18n_zh && this.webpackEntry(service, webpackChain, 'i18n/zh', i18n_zh);
+                i18n_en && this.webpackEntry(service, webpackChain, 'i18n/en', i18n_en);
+                // builder&hooks
+                if (service.isCreatorPluginV3()) {
+                    const builderEntry = 'builder';
+                    const builderFile = Path.resolve(service.root, 'src/ccp/builder/builder.ts')
+                    this.webpackEntry(service, webpackChain, builderEntry, builderFile);
+                    const hooksEntry = 'hooks';
+                    const hooksFile = Path.resolve(service.root, 'src/ccp/builder/hooks.ts');
+                    this.webpackEntry(service, webpackChain, hooksEntry, hooksFile);
+                }
+                // 主进程代码
+                let mainFile = ''
+                if (service.isCreatorPluginV2()) {
+                    mainFile = '/src/ccp/main-v2.ts';
+                }
+                if (service.isCreatorPluginV3()) {
+                    mainFile = '/src/ccp/main-v3.ts';
+                }
+                const mainAdaptation = Path.join(service.root, mainFile)
+                // 注意先后顺序
+                webpackChain.entry('main')
+                    .add(manifest.main)
+                    .add(mainAdaptation);
             }
-            const mainAdaptation = Path.join(service.root, mainFile)
-            // 注意先后顺序
-            webpackChain.entry('main')
-                .add(manifest.main)
-                .add(mainAdaptation);
 
             // out
             let output: string = options.output! as string;
@@ -112,11 +120,13 @@ export default class Base extends PluginApi {
                 // 处理相对路径
                 output = resolvePath;
             }
-            // const publicPath = version === PluginVersion.v2 ? `packages://${pluginName}/` : '';
+            if (service.isCreatorPlugin()) {
+                webpackChain.output.libraryTarget('commonjs');
+                webpackChain.output.publicPath(`packages://${pluginName}/`);
+            }
             webpackChain.output.path(output)
-                .libraryTarget('commonjs')
-                // .libraryExport('default') // 这里暂时不能使用这个
-                .publicPath(`packages://${pluginName}/`);
+            // .libraryExport('default') // 这里暂时不能使用这个
+
             // rules
             webpackChain.module
                 .rule('less')
@@ -162,12 +172,12 @@ export default class Base extends PluginApi {
                     allowTsInNodeModules: true,
                     // happyPackMode: true,
                     compilerOptions: {
-                        target: "es6",
-                        module: "es6",
+                        target: 'es6',
+                        module: 'es6',
                         strict: false,
                         // jsx: "preserve",
                         // importHelpers: true,
-                        moduleResolution: "node",
+                        moduleResolution: 'node',
                         skipLibCheck: true,
                         esModuleInterop: true,
                         allowSyntheticDefaultImports: true,
@@ -177,14 +187,23 @@ export default class Base extends PluginApi {
                     }
                 });
 
-            // webpackChain.module
-            //     .rule('image')
-            //     .test(/\.(png|jpe?g|gif|svg)$/)
-            //     .use('url-loader')
-            //     .loader('url-loader')
-            //     .options({
-            //         name:'images/[name].[ext]'
-            //     })
+            webpackChain.module
+                .rule('image')
+                .test(/\.(png|jpe?g|gif)$/)
+                .use('url-loader')
+                .loader('url-loader')
+                .options({
+                    limit: 800 * 1024,// 800k以内都以base64内联
+                    name: 'images/[name].[ext]'
+                });
+            webpackChain.module
+                .rule('svg')
+                .test(/\.(svg)$/)
+                .use('svg-url-loader')
+                .loader('svg-url-loader')
+                .options({
+                    limit: 800 * 1024,// 800k以内都以base64内联
+                })
             webpackChain.module
                 .rule('font')
                 .test(/\.(ttf|woff2|woff|otf|eot)$/)
@@ -206,10 +225,12 @@ export default class Base extends PluginApi {
             panel.dealPanels();
 
             // plugins
-            webpackChain.plugin('npm install')
-                .use(NpmInstall, [options.output! as string])
-            webpackChain.plugin('cc-plugin-package.json')
-                .use(CocosPluginPackageJson, [service])
+            if (service.isCreatorPlugin()) {
+                webpackChain.plugin('npm install')
+                    .use(NpmInstall, [options.output! as string])
+                webpackChain.plugin('cc-plugin-package.json')
+                    .use(CocosPluginPackageJson, [service])
+            }
             webpackChain
                 .plugin('vue')
                 .use(VueLoaderPlugin)
@@ -219,7 +240,7 @@ export default class Base extends PluginApi {
                     filename: '[name].css',
                     chunkFilename: '[id].css'
                 }]).end();
-            if (isV3) {
+            if (service.isCreatorPluginV3()) {
                 webpackChain.plugin('require-v3')
                     .use(requireV3)
                     .end();

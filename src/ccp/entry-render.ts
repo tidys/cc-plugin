@@ -3,11 +3,11 @@ import {
     CocosPluginManifest,
     CocosPluginOptions,
     DefaultCocosPluginOptions,
-    PluginVersion
+    PluginType
 } from '../declare';
-import ClientSocket from './client-socket';
 
-import adaptation, { Adaptation } from './adaptation';
+import adaptation, {Adaptation} from './adaptation';
+import profile from "./profile";
 
 interface PanelOptions {
     ready: (rootElement: any, args: any) => void;
@@ -17,44 +17,56 @@ export class CocosCreatorPluginRender {
     public manifest: CocosPluginManifest | null = null;
     public options: CocosPluginOptions | null = null;
     public Adaptation: Adaptation = adaptation;
-    public isV2: boolean = true;
 
-    public init(config: CocosPluginConfig, options: PanelOptions) {
-        this.isV2 = config.options.version === PluginVersion.v2;
-        this.Adaptation.init(config, this.isV2);
+    public init (config: CocosPluginConfig, options: PanelOptions) {
+        const {type} = config.options;
+        this.Adaptation.init(config, type || PluginType.PluginV2);
         this.manifest = config.manifest;
         this.options = Object.assign(DefaultCocosPluginOptions, config.options);
-
-        const { enabled, port } = this.options.server!;
+        profile.init(config);
+        const {enabled, port} = this.options.server!;
         if (enabled) {
             let hot = () => {
-                let client = new ClientSocket();
-                client.setReloadCallback(() => {
-                    // TODO 渲染进程HMR实现
-                    console.log('reload')
-                    if (this.isV2) {
+                if (this.options?.type === PluginType.Web) {
+                    console.log('TODO web reload');
+                } else {
+                    const ClientSocket = require('./client-socket').default;
+                    let client = new ClientSocket();
+                    client.setReloadCallback(() => {
+                        // TODO 渲染进程HMR实现
+                        console.log('reload')
 
-                    } else {
+                        if (this.Adaptation.Env.isPluginV2) {
 
-                    }
-                    // window.location.reload();// 这种方式会导致chrome也打开网页
-                    // @ts-ignore
-                    const electron = require('electron')
-                    // @ts-ignore
-                    electron.remote.getCurrentWindow().reload()
-                })
-                client.connect(port!)
+                        } else {
+
+                        }
+                        // window.location.reload();// 这种方式会导致chrome也打开网页
+                        // @ts-ignore
+                        const electron = require('electron')
+                        // @ts-ignore
+                        electron.remote.getCurrentWindow().reload()
+                    })
+                    client.connect(port!)
+                }
             }
-            const originReady = options.ready || (() => {});
+            const originReady = options.ready || (() => {
+            });
             options.ready = (rootElement, args) => {
                 hot();
                 originReady(rootElement, args);
             }
         }
+        if (type === PluginType.Web) {
+            let el = document.body.querySelector('#app');
+            if (el && options.ready) {
+                options.ready(el, null);
+            }
+        }
         return options;
     }
 
-    public builder() {
+    public builder () {
 
     }
 }

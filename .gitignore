@@ -2,3 +2,4 @@
 /.idea/
 /test/
 /yarn-error.log
+/node_modules/

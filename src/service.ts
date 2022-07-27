@@ -3,25 +3,22 @@ import {
     CocosPluginManifest,
     CocosPluginOptions,
     DefaultCocosPluginOptions,
-    PluginVersion
+    PluginType
 } from './declare';
 
 import * as Path from 'path';
 import Serve from './commands/serve'
 import Pack from './commands/pack'
 import Base from './config/base'
-import { PluginApi } from './plugin-api';
-import { defaultsDeep } from 'lodash'
+import {PluginApi} from './plugin-api';
+import {defaultsDeep} from 'lodash'
 import * as FS from 'fs';
-import { extensions } from 'interpret'
-import { prepare } from 'rechoir'
+import {extensions} from 'interpret'
+import {prepare} from 'rechoir'
 import dotenv from 'dotenv'
 import dotenvExpand from 'dotenv-expand'
-import chalk from 'chalk';
-import { log } from './log';
-import { PluginCmdCallback, PluginCmdOptions, PluginMgr } from './plugin-mgr';
-import Config from 'webpack-chain';
-import { program } from 'commander';
+import {log} from './log';
+import {PluginMgr} from './plugin-mgr';
 import Create from './commands/create';
 import * as FsExtra from 'fs-extra'
 
@@ -43,6 +40,26 @@ export default class CocosPluginService {
         this.context = context || process.cwd();
         this.root = Path.join(__dirname, '..')
         this.resolvePlugins();
+    }
+
+    public isCreatorPlugin() {
+        const { type } = this.projectConfig.options;
+        return type === PluginType.PluginV2 || type === PluginType.PluginV3;
+    }
+
+    public isCreatorPluginV2() {
+        const { type } = this.projectConfig.options;
+        return type === PluginType.PluginV2;
+    }
+
+    public isCreatorPluginV3() {
+        const { type } = this.projectConfig.options;
+        return type === PluginType.PluginV3;
+    }
+
+    public isWeb() {
+        const { type } = this.projectConfig.options;
+        return type === PluginType.Web;
     }
 
     private resolvePlugins() {
@@ -136,7 +153,7 @@ export default class CocosPluginService {
     private catchOutput(projectDir: string, pluginDir: string, pluginName: string) {
         // 相对目录
         if (projectDir.startsWith('./')) {
-            log.red(`options.outputProject 暂时不支持相对目录的写法：${projectDir}`)
+            log.red(`当type为creator插件时，options.outputProject 暂时不支持相对目录的写法：${projectDir}`)
             process.exit(0)
         }
         let output = projectDir;
@@ -153,10 +170,10 @@ export default class CocosPluginService {
         return output;
     }
 
-    getPluginDir(version: PluginVersion) {
-        if (version === PluginVersion.v2) {
+    getPluginDir(version: PluginType) {
+        if (version === PluginType.PluginV2) {
             return 'packages';
-        } else if (version === PluginVersion.v3) {
+        } else if (version === PluginType.PluginV3) {
             return 'extensions';
         }
     }
@@ -164,14 +181,21 @@ export default class CocosPluginService {
     private checkUserOptions(userOptions: CocosPluginConfig) {
         // 根据配置，将output目录统一变为绝对路径
         const { options, manifest } = userOptions;
-        let { version, outputProject } = options;
-        const pluginDir = this.getPluginDir(version!);
+        let { type, outputProject } = options;
+        const pluginDir = this.getPluginDir(type!);
         if (typeof outputProject === 'object') {
-            const { v2, v3 } = outputProject!;
-            if (v2 && version === PluginVersion.v2) {
+            const { v2, v3, web } = outputProject!;
+            if (v2 && type === PluginType.PluginV2) {
                 options.output = this.catchOutput(v2, pluginDir!, manifest.name);
-            } else if (v3 && version === PluginVersion.v3) {
+            } else if (v3 && type === PluginType.PluginV3) {
                 options.output = this.catchOutput(v3, pluginDir!, manifest.name);
+            } else if (web && type === PluginType.Web) {
+                let fullPath = Path.join(this.context, web);
+                if (!FS.existsSync(fullPath)) {
+                    log.yellow(`auto create directory: ${fullPath}`);
+                    FsExtra.ensureDirSync(fullPath);
+                }
+                options.output = fullPath;
             }
         } else {
             options.output = this.catchOutput(outputProject, pluginDir!, manifest.name);

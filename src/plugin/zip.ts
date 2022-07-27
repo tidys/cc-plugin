@@ -21,14 +21,26 @@ export default class Zip {
         }
     }
 
-    private zipDir(dir: string, pluginName: string) {
-        let zip = new JsZip();
-        this._packageDir(dir, zip.folder(pluginName))
-        let dirParent = Path.dirname(dir);
-        if (!Fs.existsSync(dirParent)) {
-            dirParent = dir;
+    private getOutDir(dir: string): string {
+        if (this.outDir) {
+            if (!Fs.existsSync(this.outDir)) {
+                Fs.mkdirSync(this.outDir);
+            }
+            return this.outDir;
         }
-        const zipFilePath = Path.join(dirParent, `${pluginName}.zip`)
+        // 输出目录同级
+        let dirParent = Path.dirname(dir);
+        if (Fs.existsSync(dirParent)) {
+            return dirParent;
+        }
+        return dir;
+    }
+
+    private zipDir(dir: string, pluginName: string) {
+        const zip = new JsZip();
+        this._packageDir(dir, zip.folder(pluginName))
+        const outDir = this.getOutDir(dir);
+        const zipFilePath = Path.join(outDir, `${pluginName}.zip`)
         if (Fs.existsSync(zipFilePath)) {
             Fs.unlinkSync(zipFilePath);
             console.log('⚠[删除] 旧版本压缩包: ' + zipFilePath);
@@ -75,10 +87,12 @@ export default class Zip {
 
     private fileName: string = ''
     private version: string = '';
+    private outDir: string = '';
 
-    constructor(fileName: string, version: string) {
+    constructor(fileName: string, version: string, outDir: string) {
         this.fileName = fileName;
         this.version = version;
+        this.outDir = outDir;
     }
 
     apply(compiler: webpack.Compiler) {

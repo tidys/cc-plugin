@@ -1,12 +1,12 @@
 import {
-    PluginMainWrapper,
+    CocosPluginConfig,
     CocosPluginManifest,
     CocosPluginOptions,
-    CocosPluginConfig,
     DefaultCocosPluginOptions,
-    PluginVersion,
+    PluginMainWrapper,
+    PluginType,
 } from '../declare';
-import adaptation, { Adaptation } from './adaptation'
+import adaptation, {Adaptation} from './adaptation'
 
 export class CocosCreatorPluginMain {
     public manifest: CocosPluginManifest | null = null;
@@ -16,11 +16,12 @@ export class CocosCreatorPluginMain {
     public isV2: boolean = true;
 
     public init(config: CocosPluginConfig, wrapper: PluginMainWrapper) {
-        this.isV2 = config.options.version === PluginVersion.v2;
+        const { type } = config.options;
+        this.isV2 = type === PluginType.PluginV2;
         this.manifest = config.manifest;
         this.options = Object.assign(DefaultCocosPluginOptions, config.options);
         this.wrapper = wrapper;
-        this.Adaptation.init(config, this.isV2)
+        this.Adaptation.init(config, type || PluginType.PluginV2)
     }
 }
 

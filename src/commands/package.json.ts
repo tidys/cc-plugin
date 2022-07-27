@@ -1,5 +1,5 @@
 import webpack from 'webpack';
-import { CocosPluginV2, CocosPluginV3, PluginVersion } from '../declare';
+import { CocosPluginV2, CocosPluginV3, PluginType } from '../declare';
 import Path from 'path';
 import * as FsExtra from 'fs-extra';
 import CocosPluginService from '../service';
@@ -29,12 +29,12 @@ export default class CocosPluginPackageJson {
             author: this.manifest.author || 'cocos-plugin-cli',
             main: './main.js',
         };
-        const { version } = this.options;
+        const { type } = this.options;
 
         let packageWorker: PackageInterface | null = null;
-        if (version === PluginVersion.v2) {
+        if (type === PluginType.PluginV2) {
             packageWorker = new PackageV2(this.service.projectConfig, packageJson);
-        } else if (version === PluginVersion.v3) {
+        } else if (type === PluginType.PluginV3) {
             packageWorker = new PackageV3(this.service.projectConfig, packageJson);
         }
         // 面板
@@ -60,7 +60,13 @@ export default class CocosPluginPackageJson {
             if (FsExtra.existsSync(file)) {
                 const data = FsExtra.readJSONSync(file);
                 if (data && data.hasOwnProperty('dependencies')) {
-                    return data['dependencies']
+                    const dependencies = data['dependencies']
+                    for (let key in dependencies) {
+                        if (key.endsWith('.js')) {
+                            delete dependencies[key]
+                        }
+                    }
+                    return dependencies;
                 }
             }
         } catch (e) {

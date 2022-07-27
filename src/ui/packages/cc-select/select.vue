@@ -17,11 +17,11 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, PropType, watch } from "vue";
+import {defineComponent, ref, PropType, watch} from "vue";
 
 interface Option {
   label: string,
-  value: string,
+  value: string | number,
 }
 
 export default defineComponent({
@@ -34,19 +34,20 @@ export default defineComponent({
         return [];
       },
     },
-    value: String,
+    value: [String, Number],
   },
   emits: ["change", 'update:data', 'update:value'],
   setup(props: any, { emit }) {
-    const curValue = ref(props.value || '')
+    const curValue = ref(props.value?.toString() || '')
     watch(() => props.value, (val) => {
-      curValue.value = val;
+      curValue.value = val.toString();
     })
     return {
       curValue,
       onSelectChange() {
-        emit("update:value", curValue.value.toString());
-        emit("change");
+        const val = curValue.value.toString();
+        emit("update:value", val);
+        emit("change", val);
       },
     };
   },

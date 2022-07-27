@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,12 +34,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const plugin_api_1 = require("../plugin-api");
 const webpack_chain_1 = __importDefault(require("webpack-chain"));
 const webpack_1 = __importDefault(require("webpack"));
+const Path = __importStar(require("path"));
 const clean_webpack_plugin_1 = require("clean-webpack-plugin");
+const Fs = __importStar(require("fs"));
 const dev_server_1 = __importDefault(require("../plugin/dev-server"));
 const webpack_dev_server_1 = __importDefault(require("webpack-dev-server"));
 const portfinder_1 = __importDefault(require("portfinder"));
 const printf_1 = __importDefault(require("printf"));
 const log_1 = require("../log");
+const lodash_1 = require("lodash");
+portfinder_1.default.basePort = 9087;
 function buildTargetNode(service) {
     let config = new webpack_chain_1.default();
     config.target('node').devtool(false).mode('development').resolve.extensions.add('.ts');
@@ -32,16 +55,17 @@ class Serve extends plugin_api_1.PluginApi {
     apply(api, service) {
         api.registerCommand('serve', {
             description: '开发插件',
-        }, (param) => {
+        }, (param) => __awaiter(this, void 0, void 0, function* () {
+            var _a;
             log_1.log.blue(printf_1.default('%-20s %s', 'service root:    ', service.root));
             log_1.log.blue(printf_1.default('%-20s %s', 'service context: ', service.context));
             const { options, manifest } = service.projectConfig;
             api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
-                var _a;
+                var _b;
                 // 当server开启时，一般来说都需要启用watchBuild，不然没有实际意义
-                webpackChain.watch(!!options.watchBuild || ((_a = options.server) === null || _a === void 0 ? void 0 : _a.enabled));
+                webpackChain.watch(!!options.watchBuild || ((_b = options.server) === null || _b === void 0 ? void 0 : _b.enabled));
                 webpackChain.mode('development');
-                webpackChain.devtool(false);
+                webpackChain.devtool('source-map');
                 webpackChain
                     .plugin('clean')
                     .use(clean_webpack_plugin_1.CleanWebpackPlugin, [{
@@ -57,7 +81,37 @@ class Serve extends plugin_api_1.PluginApi {
                         .end();
                 }
             }));
+            // https://webpack.docschina.org/configuration/resolve/#resolvefallback
+            let fallback = {
+                fs: false,
+            };
+            if (service.isWeb()) {
+                // web情况下： net模块重定向
+                fallback = Object.assign(fallback, {
+                    'assert': require.resolve('assert'),
+                    'net': require.resolve('net-browserify'),
+                    'path': require.resolve('path-browserify'),
+                    'zlib': require.resolve('browserify-zlib'),
+                    "http": require.resolve("stream-http"),
+                    "stream": require.resolve("stream-browserify"),
+                    "util": require.resolve("util/"),
+                    "crypto": require.resolve("crypto-browserify"),
+                    "os": require.resolve("os-browserify/browser"),
+                    "constants": require.resolve("constants-browserify"),
+                    "express": false,
+                    "electron": false,
+                });
+            }
             let webpackConfig = api.resolveChainWebpackConfig();
+            // 加载用户自定义的配置
+            const file = Path.join(service.context, 'webpack.config.js');
+            if (Fs.existsSync(file)) {
+                const data = require(file);
+                if (data.plugins && data.plugins.length) {
+                    webpackConfig.plugins = (_a = webpackConfig.plugins) === null || _a === void 0 ? void 0 : _a.concat(data.plugins);
+                }
+            }
+            webpackConfig = lodash_1.merge(webpackConfig, { resolve: { fallback } });
             const compiler = webpack_1.default(webpackConfig, ((err, stats) => {
                 if (err) {
                     return console.error(err);
@@ -75,31 +129,32 @@ class Serve extends plugin_api_1.PluginApi {
                 });
                 console.log('build complete');
             }));
-        });
+            if (service.isWeb()) {
+                yield this.runWebpackServer(compiler);
+            }
+        }));
     }
-    webpackServerTest(compiler) {
+    runWebpackServer(compiler) {
         return __awaiter(this, void 0, void 0, function* () {
+            const host = yield webpack_dev_server_1.default.internalIP('v4');
+            const port = yield portfinder_1.default.getPortPromise();
             const server = new webpack_dev_server_1.default({
                 // inputFileSystem: FsExtra,
                 // outputFileSystem: FsExtra,
-                hot: true,
-                allowedHosts: ['all']
+                hot: false,
+                allowedHosts: ['all'],
+                open: true,
+                host,
+                port,
+                static: './dist',
             }, compiler);
-            const host = '0.0.0.0';
-            const port = yield this.getPort();
-            server.listen(port, host, (err) => {
-                if (err) {
-                    return console.log(err);
+            server.startCallback((error) => {
+                if (error) {
+                    console.error(error);
+                    return;
                 }
-                console.log(`webpack dev server listen ${port}`);
+                console.log(`webpack dev server listen ${host}:${port}`);
             });
-        });
-    }
-    getPort() {
-        return __awaiter(this, void 0, void 0, function* () {
-            portfinder_1.default.basePort = 9087;
-            const port = yield portfinder_1.default.getPortPromise();
-            return port;
         });
     }
 }
