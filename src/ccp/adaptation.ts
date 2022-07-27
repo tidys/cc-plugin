@@ -453,7 +453,18 @@ class Dialog {
             // @ts-ignore
             const result = await Editor.Dialog.select(options);
             (result.filePaths || []).forEach((e: string) => {
-                ret[e] = null;
+                let head = '';
+                switch (Path.extname(e)) {
+                    case '.png': {
+                        head = `data:image/png;base64,`;
+                        break;
+                    }
+                    case '.jpg': {
+                        head = `data:image/jpg;base64,`;
+                        break;
+                    }
+                }
+                ret[e] = head + Fs.readFileSync(e, { encoding: 'base64' });
             });
             return ret;
         }
