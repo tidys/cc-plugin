@@ -2,14 +2,15 @@
   <div class="checkbox">
     <input type="checkbox" v-model="val" @change="onChange">
     <span class="text" v-if="label.length">{{ label }}</span>
+    <slot name="label"></slot>
   </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, ref, watch} from 'vue'
+import { defineComponent, ref, watch } from 'vue'
 
 export default defineComponent({
-  name: "cc-checkbox",
+  name: 'cc-checkbox',
   emits: ['update:value', 'change'],
   props: {
     value: {
@@ -42,8 +43,14 @@ export default defineComponent({
 
 <style scoped lang="less">
 .checkbox {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
   .text {
     white-space: nowrap;
+    font-size: 13px;
   }
 }
 </style>
