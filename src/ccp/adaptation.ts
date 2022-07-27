@@ -369,7 +369,7 @@ class Dialog {
             reader.onload = (event) => {
                 resolve(event.target!.result as string);
             };
-            if (["image/png", "image/jpeg"].find(el => el === file.type)) {
+            if (['image/png', 'image/jpeg'].find(el => el === file.type)) {
                 reader.readAsDataURL(file);
             } else {
                 console.log('un support file type: ', file.type);
@@ -433,7 +433,19 @@ class Dialog {
             }
             const ret: Record<string, any> = {};
             (result || []).forEach((e: string) => {
-                ret[e] = null;
+                let head = '';
+                switch (Path.extname(e)) {
+                    case '.png': {
+                        head = `data:image/png;base64,`;
+                        break;
+                    }
+                    case '.jpg': {
+                        head = `data:image/jpg;base64,`;
+                        break;
+                    }
+                }
+
+                ret[e] = head + Fs.readFileSync(e, { encoding: 'base64' });
             })
             return ret;
         } else {
