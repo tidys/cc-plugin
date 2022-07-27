@@ -74,7 +74,13 @@ class CocosPluginPackageJson {
             if (FsExtra.existsSync(file)) {
                 const data = FsExtra.readJSONSync(file);
                 if (data && data.hasOwnProperty('dependencies')) {
-                    return data['dependencies'];
+                    const dependencies = data['dependencies'];
+                    for (let key in dependencies) {
+                        if (key.endsWith('.js')) {
+                            delete dependencies[key];
+                        }
+                    }
+                    return dependencies;
                 }
             }
         }

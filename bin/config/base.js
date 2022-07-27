@@ -49,7 +49,9 @@ class Base extends plugin_api_1.PluginApi {
             try {
                 const { dependencies } = FsExtra.readJSONSync(packageFile);
                 for (let key in dependencies) {
-                    map[key] = '';
+                    if (!key.endsWith('.js')) {
+                        map[key] = '';
+                    }
                 }
             }
             catch (e) {
@@ -179,12 +181,12 @@ class Base extends plugin_api_1.PluginApi {
                 allowTsInNodeModules: true,
                 // happyPackMode: true,
                 compilerOptions: {
-                    target: "es6",
-                    module: "es6",
+                    target: 'es6',
+                    module: 'es6',
                     strict: false,
                     // jsx: "preserve",
                     // importHelpers: true,
-                    moduleResolution: "node",
+                    moduleResolution: 'node',
                     skipLibCheck: true,
                     esModuleInterop: true,
                     allowSyntheticDefaultImports: true,

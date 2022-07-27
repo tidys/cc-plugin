@@ -1,19 +1,19 @@
-import {PluginApi} from '../plugin-api';
+import { PluginApi } from '../plugin-api';
 import CocosPluginService from '../service';
 import Chain from 'webpack-chain';
 import Config from 'webpack-chain';
-import {PluginMgr} from '../plugin-mgr';
-import {PluginType} from '../declare';
-import Path, {resolve} from 'path';
-import Fs, {existsSync} from 'fs';
+import { PluginMgr } from '../plugin-mgr';
+import { PluginType } from '../declare';
+import Path, { resolve } from 'path';
+import Fs, { existsSync } from 'fs';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import Panel from '../panel';
 import NpmInstall from '../plugin/npm-install';
 import CocosPluginPackageJson from '../commands/package.json';
-import {VueLoaderPlugin} from 'vue-loader';
+import { VueLoaderPlugin } from 'vue-loader';
 import requireV3 from '../plugin/require-v3';
 import webpack from 'webpack';
-import {log} from '../log';
+import { log } from '../log';
 import * as FsExtra from 'fs-extra';
 
 export default class Base extends PluginApi {
@@ -31,7 +31,9 @@ export default class Base extends PluginApi {
             try {
                 const { dependencies } = FsExtra.readJSONSync(packageFile);
                 for (let key in dependencies) {
-                    map[key] = '';
+                    if (!key.endsWith('.js')) {
+                        map[key] = '';
+                    }
                 }
             } catch (e) {
                 console.log(e);
@@ -170,12 +172,12 @@ export default class Base extends PluginApi {
                     allowTsInNodeModules: true,
                     // happyPackMode: true,
                     compilerOptions: {
-                        target: "es6",
-                        module: "es6",
+                        target: 'es6',
+                        module: 'es6',
                         strict: false,
                         // jsx: "preserve",
                         // importHelpers: true,
-                        moduleResolution: "node",
+                        moduleResolution: 'node',
                         skipLibCheck: true,
                         esModuleInterop: true,
                         allowSyntheticDefaultImports: true,
