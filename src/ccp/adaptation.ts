@@ -369,10 +369,11 @@ class Dialog {
             reader.onload = (event) => {
                 resolve(event.target!.result as string);
             };
-            if (file.type === 'image/png') {
+            if (["image/png", "image/jpeg"].find(el => el === file.type)) {
                 reader.readAsDataURL(file);
             } else {
-                return '';
+                console.log('un support file type: ', file.type);
+                resolve('');
             }
         });
     }
@@ -386,7 +387,7 @@ class Dialog {
                 inputEl.type = 'file';// only file
                 // web只支持一个filter
                 if (options.filters?.length) {
-                    const types = ['.png', '.txt',];
+                    const types = ['.png', '.txt', '.jpg', 'jpeg'];
                     let accept: string[] = [];
 
                     options.filters![0].extensions.forEach(ext => {
@@ -405,7 +406,10 @@ class Dialog {
                     let ret: Record<string, any> = {};
                     for (let i = 0; i < inputEl.files!.length; i++) {
                         let file: File = inputEl.files![i];
-                        ret[file.name.toString()] = await this.readPng(file);
+                        const imageData = await this.readPng(file);
+                        if (imageData) {
+                            ret[file.name.toString()] = imageData;
+                        }
                     }
                     resolve(ret);
                 });
