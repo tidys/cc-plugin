@@ -1,18 +1,19 @@
-import {PluginApi} from '../plugin-api';
+import { PluginApi } from '../plugin-api';
 import Config from 'webpack-chain';
 import Chain from 'webpack-chain';
 import webpack from 'webpack';
 import CocosPluginService from '../service';
 import * as Path from 'path';
-import {CleanWebpackPlugin} from 'clean-webpack-plugin'
+import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import * as Fs from 'fs';
 import DevServer from '../plugin/dev-server';
 import webpackDevSever from 'webpack-dev-server'
 import PortFinder from 'portfinder'
 import printf from 'printf';
-import {log} from '../log'
-import {PluginMgr} from '../plugin-mgr';
-import {merge} from 'lodash';
+import { log } from '../log'
+import { PluginMgr } from '../plugin-mgr';
+import { merge } from 'lodash';
+import { getFallback } from './fallback';
 
 PortFinder.basePort = 9087;
 
@@ -55,27 +56,7 @@ export default class Serve extends PluginApi {
                         .end();
                 }
             });
-            // https://webpack.docschina.org/configuration/resolve/#resolvefallback
-            let fallback: Record<string, string | boolean> = {
-                fs: false,
-            };
-            if (service.isWeb()) {
-                // web情况下： net模块重定向
-                fallback = Object.assign(fallback, {
-                    'assert': require.resolve('assert'),
-                    'net': require.resolve('net-browserify'),
-                    'path': require.resolve('path-browserify'),
-                    'zlib': require.resolve('browserify-zlib'),
-                    "http": require.resolve("stream-http"),
-                    "stream": require.resolve("stream-browserify"),
-                    "util": require.resolve("util/"),
-                    "crypto": require.resolve("crypto-browserify"),
-                    "os": require.resolve("os-browserify/browser"),
-                    "constants": require.resolve("constants-browserify"),
-                    "express": false,
-                    "electron": false,
-                })
-            }
+            let fallback = getFallback(service);
 
 
             let webpackConfig = api.resolveChainWebpackConfig();

@@ -38,6 +38,8 @@ const zip_1 = __importDefault(require("../plugin/zip"));
 const terser_webpack_plugin_1 = __importDefault(require("terser-webpack-plugin"));
 const Path = __importStar(require("path"));
 const declare_1 = require("../declare");
+const lodash_1 = require("lodash");
+const fallback_1 = require("./fallback");
 class Pack extends plugin_api_1.PluginApi {
     exit() {
         process.exit(0);
@@ -94,7 +96,9 @@ class Pack extends plugin_api_1.PluginApi {
                 const outDir = Path.join(service.context, 'dist');
                 webpackChain.plugin('zip').use(zip_1.default, [name, version, outDir]);
             }));
-            const webpackConfig = api.resolveChainWebpackConfig();
+            let webpackConfig = api.resolveChainWebpackConfig();
+            let fallback = fallback_1.getFallback(service);
+            webpackConfig = lodash_1.merge(webpackConfig, { resolve: { fallback } });
             webpack_1.default(webpackConfig, ((err, stats) => {
                 if (err) {
                     return this.exit();

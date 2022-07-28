@@ -9,6 +9,8 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin'
 import * as Path from 'path';
 import { PluginType } from '../declare';
+import { merge } from 'lodash';
+import { getFallback } from './fallback';
 
 export default class Pack extends PluginApi {
     exit() {
@@ -74,7 +76,10 @@ export default class Pack extends PluginApi {
                     const outDir = Path.join(service.context, 'dist');
                     webpackChain.plugin('zip').use(Zip, [name, version, outDir])
                 })
-                const webpackConfig = api.resolveChainWebpackConfig();
+                let webpackConfig = api.resolveChainWebpackConfig();
+                let fallback = getFallback(service);
+                webpackConfig = merge(webpackConfig, { resolve: { fallback } });
+
                 webpack(webpackConfig, ((err, stats) => {
                     if (err) {
                         return this.exit();

@@ -43,6 +43,7 @@ const portfinder_1 = __importDefault(require("portfinder"));
 const printf_1 = __importDefault(require("printf"));
 const log_1 = require("../log");
 const lodash_1 = require("lodash");
+const fallback_1 = require("./fallback");
 portfinder_1.default.basePort = 9087;
 function buildTargetNode(service) {
     let config = new webpack_chain_1.default();
@@ -81,27 +82,7 @@ class Serve extends plugin_api_1.PluginApi {
                         .end();
                 }
             }));
-            // https://webpack.docschina.org/configuration/resolve/#resolvefallback
-            let fallback = {
-                fs: false,
-            };
-            if (service.isWeb()) {
-                // web情况下： net模块重定向
-                fallback = Object.assign(fallback, {
-                    'assert': require.resolve('assert'),
-                    'net': require.resolve('net-browserify'),
-                    'path': require.resolve('path-browserify'),
-                    'zlib': require.resolve('browserify-zlib'),
-                    "http": require.resolve("stream-http"),
-                    "stream": require.resolve("stream-browserify"),
-                    "util": require.resolve("util/"),
-                    "crypto": require.resolve("crypto-browserify"),
-                    "os": require.resolve("os-browserify/browser"),
-                    "constants": require.resolve("constants-browserify"),
-                    "express": false,
-                    "electron": false,
-                });
-            }
+            let fallback = fallback_1.getFallback(service);
             let webpackConfig = api.resolveChainWebpackConfig();
             // 加载用户自定义的配置
             const file = Path.join(service.context, 'webpack.config.js');
