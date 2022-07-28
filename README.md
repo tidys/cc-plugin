@@ -5,6 +5,10 @@
 使用webpack抹平了v2、v3插件版本的底层差异，使开发插件更加工程化。
 
 推荐使用typescript开发插件，更丝滑流畅。
+
+## 开源案例
+- [icon-tools](https://github.com/son-king/icon-tool)
+
 ## 特点
 
 - 使用 typescript + vue 开发
