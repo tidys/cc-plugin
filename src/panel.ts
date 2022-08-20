@@ -70,7 +70,7 @@ export default class Panel {
 
                 const hotFile = join(this.service.root, './src/ccp/client-socket.ts')
                 webpackChain.entry(entryName).add(mainFile);
-                webpackChain.plugin('panel').use(HtmlWebpackPlugin, [options]);
+                webpackChain.plugin(entryName).use(HtmlWebpackPlugin, [options]);
                 return `${filename}`;
             }
         }

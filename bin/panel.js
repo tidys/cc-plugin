@@ -64,7 +64,7 @@ class Panel {
                 }
                 const hotFile = path_1.join(this.service.root, './src/ccp/client-socket.ts');
                 webpackChain.entry(entryName).add(mainFile);
-                webpackChain.plugin('panel').use(html_webpack_plugin_1.default, [options]);
+                webpackChain.plugin(entryName).use(html_webpack_plugin_1.default, [options]);
                 return `${filename}`;
             }
         }
