@@ -122,7 +122,7 @@ class Serve extends plugin_api_1.PluginApi {
             const server = new webpack_dev_server_1.default({
                 // inputFileSystem: FsExtra,
                 // outputFileSystem: FsExtra,
-                hot: false,
+                hot: true,
                 allowedHosts: ['all'],
                 open: true,
                 host,

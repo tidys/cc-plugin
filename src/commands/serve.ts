@@ -98,7 +98,7 @@ export default class Serve extends PluginApi {
         const server = new webpackDevSever({
             // inputFileSystem: FsExtra,
             // outputFileSystem: FsExtra,
-            hot: false,
+            hot: true,
             allowedHosts: ['all'],
             open: true,
             host,
