@@ -34,6 +34,8 @@ const require_v3_1 = __importDefault(require("../plugin/require-v3"));
 const webpack_1 = __importDefault(require("webpack"));
 const log_1 = require("../log");
 const FsExtra = __importStar(require("fs-extra"));
+// @ts-ignore
+const webpack_filter_warnings_plugin_1 = __importDefault(require("webpack-filter-warnings-plugin"));
 class Base extends plugin_api_1.PluginApi {
     getExternal(dir, defaultModules = []) {
         let map = {};
@@ -258,6 +260,9 @@ class Base extends plugin_api_1.PluginApi {
                     __VUE_OPTIONS_API__: true,
                     __VUE_PROD_DEVTOOLS__: false
                 }]);
+            webpackChain
+                .plugin('CriticalDependency')
+                .use(webpack_filter_warnings_plugin_1.default, [{ exclude: [/Critical dependency/] }]);
         });
     }
 }

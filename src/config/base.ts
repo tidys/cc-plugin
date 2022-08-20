@@ -15,6 +15,8 @@ import requireV3 from '../plugin/require-v3';
 import webpack from 'webpack';
 import { log } from '../log';
 import * as FsExtra from 'fs-extra';
+// @ts-ignore
+import filter from 'webpack-filter-warnings-plugin'
 
 export default class Base extends PluginApi {
     getExternal(dir: string, defaultModules: string[] = []) {
@@ -252,6 +254,9 @@ export default class Base extends PluginApi {
                     __VUE_OPTIONS_API__: true,
                     __VUE_PROD_DEVTOOLS__: false
                 }]);
+            webpackChain
+                .plugin('CriticalDependency')
+                .use(filter, [{ exclude: [/Critical dependency/] }])
         })
     }
 }
