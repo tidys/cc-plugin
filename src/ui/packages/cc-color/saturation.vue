@@ -12,8 +12,7 @@
 </template>
 <script lang="ts">
 import {computed, defineComponent, onMounted, ref, toRaw, watch} from 'vue';
-import {createColorByHue, getColorHex, getColorHSV, getColorHue, transformColorWithHSV} from './util';
-import {EmitterMsg, Emitter} from './util';
+import {createColorByHue, getColorHex, getColorHSV, getColorHue, transformColorBySaturation} from './util';
 
 export default defineComponent({
   name: 'color-saturation',
@@ -28,27 +27,31 @@ export default defineComponent({
     const picker = ref();
     const pointer = ref();
     const bgColor = ref('red');
-    let colorProp = toRaw(props.color);
-    Emitter.on(EmitterMsg.UpdateColor, (color:string)=>{
-      console.log(color);
-      colorProp = color;
-      const hue = getColorHue(color);
-      bgColor.value = `#${createColorByHue(hue)}`;
-    });
-    function updatePointer(str:string) {
+    let baseColor = toRaw(props.color);// 基准色，因为在调整pointer的时候，仅仅是在修改基准色的饱和度
+
+    function updateBaseColor(color: string) {
+      baseColor = color;
+      updateView(color);
+    }
+
+    function updateView(str: string) {
       const pointerEl: HTMLDivElement = pointer.value as HTMLDivElement;
-      const {s, v} = getColorHSV(str);
+      const { s, v } = getColorHSV(str);
       pointerEl.style.left = `${s * 100}%`;
       pointerEl.style.top = `${(1 - v) * 100}%`;
+
+      const hue = getColorHue(str);
+      bgColor.value = `#${createColorByHue(hue)}`;
     }
-    watch(()=>props.color, (v)=>{
-      updatePointer(v);
+
+    watch(() => props.color, (v) => {
+      updateView(v);
     });
-    onMounted(()=>{
-      updatePointer(props.color);
+    onMounted(() => {
+      updateView(props.color);
     });
     return {
-      bgColor, pointer, picker,
+      bgColor, pointer, picker, updateBaseColor,
       onPickerPointerMouseDown(event: MouseEvent) {
         let updatePointer = (e: MouseEvent) => {
           const pointerEl: HTMLDivElement = pointer.value as HTMLDivElement;
@@ -64,7 +67,7 @@ export default defineComponent({
           pointerEl.style.top = `${top}%`;
           let saturation = left / 100;
           let bright = 1 - top / 100;
-          let color = transformColorWithHSV(colorProp, saturation, bright );
+          let color = transformColorBySaturation(baseColor, saturation, bright);
           emit('update:color', color);
           emit('change', color);
         };

@@ -39,7 +39,7 @@ export default defineComponent({
 
     const style = computed(()=>{
       let color =  getColorHex(props.color);
-      return `background: linear-gradient(to right, transparent 0%, #${color} 100%)`;
+      return `background: linear-gradient(to right, transparent 0%, ${color} 100%)`;
     });
     return {
       style,

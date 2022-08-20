@@ -1,8 +1,9 @@
 <template>
   <div class="root">
     <div class="title">{{ curTitle }}</div>
-    <input class="input"
-           @keydown.enter="onChange"
+    <input class="input" draggable="false"
+           @keydown.enter="onKeyDown"
+           @paste="onChange"
            v-model="curColor" @change="onChange"/>
   </div>
 </template>
@@ -32,13 +33,15 @@ export default defineComponent({
     watch(() => props.color, (v) => {
       updateAndFormatColor(v);
     });
-    function fillColorHead(color:string) {
+
+    function fillColorHead(color: string) {
       if (!color.startsWith('#')) {
         color = `#${color}`;
       }
       return color;
     }
-    function updateAndFormatColor(str:string) {
+
+    function updateAndFormatColor(str: string) {
       const color = checkColor(str);
       if (color) {
         curColor.value = preColor = fillColorHead(color);
@@ -48,8 +51,12 @@ export default defineComponent({
         return false;
       }
     }
+
     return {
       curColor, curTitle,
+      onKeyDown(event: KeyboardEvent) {
+        (event.target as HTMLInputElement).blur();
+      },
       onChange() {
         if (updateAndFormatColor(curColor.value)) {
           const color = curColor.value;
@@ -85,7 +92,7 @@ export default defineComponent({
     border: 1px solid #363636;
     box-sizing: border-box;
     padding: 0 2px;
-
+    -webkit-user-drag: none;
   }
 }
 </style>

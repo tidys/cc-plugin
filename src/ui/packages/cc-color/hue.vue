@@ -1,6 +1,5 @@
 <template>
   <div class="root">
-    <div class="title">{{ curTitle }}</div>
     <div class="hue" ref="hueEl" @mousedown.self="onHueMouseDown">
       <div class="bg"></div>
       <div class="pointer" ref="pointer">
@@ -8,44 +7,42 @@
       </div>
     </div>
   </div>
-
-
 </template>
 
 <script lang="ts">
 import {defineComponent, onMounted, ref, watch} from 'vue';
-import {getColorHue, transformColorWithHSL} from './util';
+import {getColorHue, transformColorByHue} from './util';
 // 色相
 export default defineComponent({
   name: 'color-hue',
-  emits: ['change', 'update:color'],
+  emits: ['change', 'update:hue'],
   props: {
     title: {
       type: String,
       default: '颜色',
     },
-    color: {
-      type: String,
-      default: 'red',
+    hue: {
+      type: Number,
+      default: 0,
     },
   },
   setup(props, { emit }) {
     const hueEl = ref();
     const pointer = ref();
-    const curTitle = ref(props.title);
-    watch(() => props.color, (color:string) => {
-      updatePointer(color);
+    watch(() => props.hue, (hue: number) => {
+      updatePointer(hue);
     });
-    function updatePointer(color:string) {
+
+    function updatePointer(hue: number) {
       const PointerEl: HTMLDivElement = pointer.value as HTMLDivElement;
-      const hue = getColorHue(color);
-      PointerEl.style.left = `${ hue / 360 * 100}%`;
+      PointerEl.style.left = `${hue / 360 * 100}%`;
     }
-    onMounted(()=>{
-      updatePointer(props.color);
+
+    onMounted(() => {
+      updatePointer(props.hue);
     });
     return {
-      hueEl, pointer, curTitle,
+      hueEl, pointer,
       onHueMouseDown(event: MouseEvent) {
         const PointerEl: HTMLDivElement = pointer.value as HTMLDivElement;
         const rect = (hueEl.value as HTMLDivElement).getBoundingClientRect();
@@ -56,9 +53,8 @@ export default defineComponent({
 
           PointerEl.style.left = `${x}%`;
           const hue = 360 * (x / 100);
-          const trColor = transformColorWithHSL(props.color, hue);
-          emit('update:color', trColor);
-          emit('change', trColor);
+          emit('update:hue', hue);
+          emit('change', hue);
         };
         let mouseUp = (e: MouseEvent) => {
           document.removeEventListener('mousemove', mouseMove);
