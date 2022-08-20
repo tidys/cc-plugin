@@ -1,10 +1,9 @@
 import webpack from 'webpack';
-import { CocosPluginV2, CocosPluginV3, PluginType } from '../declare';
+import {CocosPluginV2, CocosPluginV3, PluginType} from '../declare';
 import Path from 'path';
 import * as FsExtra from 'fs-extra';
 import CocosPluginService from '../service';
-import { PackageInterface, PackageV2, PackageV3 } from './package-worker';
-
+import {PackageInterface, PackageV2, PackageV3} from './package-worker';
 
 export default class CocosPluginPackageJson {
     private service;
@@ -56,6 +55,7 @@ export default class CocosPluginPackageJson {
 
     private getDependencies() {
         try {
+            const filterDep = ['cc-plugin'];
             const file = Path.join(this.service.context, 'package.json');
             if (FsExtra.existsSync(file)) {
                 const data = FsExtra.readJSONSync(file);
@@ -64,6 +64,11 @@ export default class CocosPluginPackageJson {
                     for (let key in dependencies) {
                         if (key.endsWith('.js')) {
                             delete dependencies[key]
+                            continue
+                        }
+                        if (filterDep.find(el => el.indexOf(key) !== -1)) {
+                            delete dependencies[key]
+                            continue;
                         }
                     }
                     return dependencies;

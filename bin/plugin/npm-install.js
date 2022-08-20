@@ -46,6 +46,7 @@ const npmInstall = function (rootDir) {
         // 判断下目录是否存在依赖，再决定是否npm i
         console.log('npm install ...');
         child_process.execSync('npm install', { cwd: rootDir });
+        console.log('npm install succeed');
     }
     else {
         console.log('npm has installed.');

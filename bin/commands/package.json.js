@@ -70,6 +70,7 @@ class CocosPluginPackageJson {
     }
     getDependencies() {
         try {
+            const filterDep = ['cc-plugin'];
             const file = path_1.default.join(this.service.context, 'package.json');
             if (FsExtra.existsSync(file)) {
                 const data = FsExtra.readJSONSync(file);
@@ -78,6 +79,11 @@ class CocosPluginPackageJson {
                     for (let key in dependencies) {
                         if (key.endsWith('.js')) {
                             delete dependencies[key];
+                            continue;
+                        }
+                        if (filterDep.find(el => el.indexOf(key) !== -1)) {
+                            delete dependencies[key];
+                            continue;
                         }
                     }
                     return dependencies;

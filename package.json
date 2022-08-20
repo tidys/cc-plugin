@@ -9,7 +9,8 @@
     "ccp": "./bin/index.js"
   },
   "scripts": {
-    "yalc-push": "tsc && yalc push",
+    "clean-bin-dir": "node ./clean-bin-dir.js",
+    "yalc-push": "npm run clean-bin-dir && tsc && yalc push",
     "webpack-build": "webpack --config webpack.config.js",
     "tsc-build": "tsc --watch",
     "demo-test": "vue-cli-service serve",
@@ -85,7 +86,7 @@
     "webpack-sources": "3.2.2"
   },
   "devDependencies": {
-    "@types/fs-extra": "^9.0.1",
+    "@types/fs-extra": "^9.0.13",
     "@types/interpret": "^1.1.1",
     "@types/lodash": "^4.14.178",
     "@types/mini-css-extract-plugin": "^2.4.0",
