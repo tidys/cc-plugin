@@ -21,6 +21,7 @@ function getFallback(service) {
             "constants": require.resolve("constants-browserify"),
             "express": false,
             "electron": false,
+            'async_hooks': false,
         });
     }
     return fallback;

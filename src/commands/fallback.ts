@@ -1,6 +1,6 @@
 import CocosPluginService from '../service';
 
-export function getFallback(service:CocosPluginService){
+export function getFallback(service: CocosPluginService) {
     // https://webpack.docschina.org/configuration/resolve/#resolvefallback
     let fallback: Record<string, string | boolean> = {
         fs: false,
@@ -20,6 +20,7 @@ export function getFallback(service:CocosPluginService){
             "constants": require.resolve("constants-browserify"),
             "express": false,
             "electron": false,
+            'async_hooks': false,
         })
     }
     return fallback;
