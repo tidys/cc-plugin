@@ -1,24 +1,28 @@
-import {CocosPluginConfig, PluginType} from "../declare";
+import { CocosPluginConfig, PluginType } from "../declare";
+import CCP from "./entry-render";
+import * as Path from "path";
+import * as Fs from "fs";
 
-const Key = 'profile';
 
 export class Profile {
-    data: Record<string, any> = {}
+    private Key = 'profile';
+    private data: Record<string, any> = {}
+    private nativeFile: string = '';// electron环境使用的
     pluginConfig: CocosPluginConfig | null = null;
+    public format: boolean = false;
 
-    init(cfg: CocosPluginConfig) {
+    init(data: Record<string, any>, cfg: CocosPluginConfig) {
+        this.defaultData = data;
         this.pluginConfig = cfg;
     }
 
-    setDefaultData(data: Record<string, any>) {
-        this.data = data;
-    }
+    private defaultData: Record<string, any> = {};
 
-    save() {
-        if (this.isWeb) {
-            const str = JSON.stringify(this.data);
-            localStorage.setItem(Key, str);
+    save(data: Record<string, any>) {
+        if (data) {
+            this.data = Object.assign(this.data, data);
         }
+        this._write();
     }
 
     private get isWeb() {
@@ -29,24 +33,53 @@ export class Profile {
         return false;
     }
 
-    load(url: string, cb: Function) {
+    load(fileName: string): Record<string, any> {
         if (this.pluginConfig) {
-            if (this.isWeb) {
-                // 从localstorage中读取
-                const str = localStorage.getItem(Key);
-                if (str) {
-                    try {
-                        this.data = JSON.parse(str);
-                    } catch (e) {
-                        return cb('parse data failed', this);
-                    }
+            const data = this._read(fileName);
+            this.data = Object.assign(this.defaultData, data);// merge default data
+        }
+        return this.data;
+    }
+
+    public _read(fileName: string) {
+        this.Key = fileName;
+        let retData: Record<string, any> = {}
+        if (this.isWeb) {
+            // 从localstorage中读取
+            const str = localStorage.getItem(this.Key);
+            if (str) {
+                try {
+                    retData = JSON.parse(str);
+                } catch (e) {
+                    retData = this.defaultData;
                 }
-                return cb(null, this);
+            }
+        } else {
+            // 不再调用编辑器接口,设置统一放在项目目录下
+            const filePath = Path.join(CCP.Adaptation.Project.path, 'settings', fileName);
+            this.nativeFile = filePath;
+            if (!Fs.existsSync(filePath)) {
+                Fs.writeFileSync(filePath, JSON.stringify(this.defaultData), 'utf-8');
+                retData = this.defaultData;
             } else {
-                // todo 调用编辑器接口
+                const data = Fs.readFileSync(filePath, 'utf-8');
+                try {
+                    retData = JSON.parse(data);
+                } catch (e) {
+                    retData = this.defaultData;
+                }
             }
         }
-        return cb('profile not init!', this);
+        return retData;
+    }
+
+    private _write() {
+        const str = JSON.stringify(this.data, null, this.format ? 4 : 0);
+        if (this.isWeb) {
+            localStorage.setItem(this.Key, str);
+        } else {
+            Fs.writeFileSync(this.nativeFile, str, 'utf-8')
+        }
     }
 }
 
