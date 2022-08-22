@@ -52,7 +52,7 @@ export default defineComponent({
       },
       onBlur() {
         emit('update:value', text.value)
-        emit('change')
+        emit('change', text.value)
       },
     }
   }
