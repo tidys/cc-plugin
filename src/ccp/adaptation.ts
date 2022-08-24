@@ -362,11 +362,41 @@ class Log {
     }
 }
 
+interface DialogMessageOptions {
+    message: string,
+    title?: string,
+    type?: 'question',
+    buttons?: Array<string>,
+    defaultId?: number,
+    noLink?: boolean,
+    cancelId?: number,
+}
+
+const DefaultDialogMessageOptions: DialogMessageOptions = {
+    type: 'question',
+    title: '提示',
+    message: '提示消息',
+    buttons: ['确定', '取消'],
+    defaultId: 0,
+    cancelId: 1,
+    noLink: true,
+}
+
 class Dialog {
-    message(options:any):number{
-        // todo
-        return 0;
+    message(options: DialogMessageOptions | string): boolean {
+        if (typeof options === 'string') {
+            options = { message: options };
+        }
+        options = Object.assign(DefaultDialogMessageOptions, options);
+        if (adaptation.Env.isWeb) {
+            return confirm(options.message || '')
+        } else {
+            // todo
+            console.log('有待实现')
+        }
+        return false;
     }
+
     async readPng(file: File): Promise<string> {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
