@@ -18,6 +18,7 @@ export function getFallback(service: CocosPluginService) {
             "crypto": require.resolve("crypto-browserify"),
             "os": require.resolve("os-browserify/browser"),
             "constants": require.resolve("constants-browserify"),
+            'process': require.resolve('process/browser'),
             "express": false,
             "electron": false,
             'async_hooks': false,
