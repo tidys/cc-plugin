@@ -16,7 +16,7 @@
 <script lang="ts">
 import {computed, defineComponent, ref, watch} from 'vue';
 import AlphaBoard from './alpha-board.vue';
-import {getColorHex, transformColorWithAlpha} from '@/rich-text-editor/color/util';
+import {getColorHex, transformColorWithAlpha} from './util';
 
 export default defineComponent({
   name: 'color-alpha',

@@ -20,9 +20,9 @@ import {computed, defineComponent, onMounted, ref, watch} from 'vue';
 import Hue from './hue.vue';
 import ColorInput from './color-input.vue';
 import Alpha from './alpha.vue';
-import ColorSaturation from '@/rich-text-editor/color/saturation.vue';
+import ColorSaturation from './saturation.vue';
 import {getColorHex, getColorHex8, getColorHue, transformColorByHue} from './util';
-import ColorCase from '@/rich-text-editor/color/color-case.vue';
+import ColorCase from './color-case.vue';
 
 export default defineComponent({
   name: 't-color',

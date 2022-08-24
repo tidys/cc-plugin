@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import {defineComponent, ref, toRaw, watch} from 'vue';
-import {checkColor} from '@/rich-text-editor/color/util';
+import {checkColor} from './util';
 
 export default defineComponent({
   name: 'color-input',
