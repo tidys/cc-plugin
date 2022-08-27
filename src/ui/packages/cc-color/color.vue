@@ -118,7 +118,6 @@ export default defineComponent({
   flex: 1;
   height: 20px;
   width: 120px;
-  position: relative;
 
   .color {
     width: 100%;
@@ -133,7 +132,7 @@ export default defineComponent({
     flex-direction: column;
     background-color: white;
     position: absolute;
-    width: 100%;
+    width: 150px;
     height: 226px;
     border: 1px solid #575757;
     border-top: transparent;
