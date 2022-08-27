@@ -8,10 +8,10 @@
         </div>
       </template>
       <div>
-        <CCProp name="input">
+        <CCProp name="input" tooltip="测试tooltip">
           <CCInput @change="onChangeText" v-model:value="value"></CCInput>
         </CCProp>
-        <CCProp name="disabled">
+        <CCProp name="disabled" tooltip="测试禁用">
           <CCInput :disabled="true" value="disabled"></CCInput>
         </CCProp>
         <CCProp name="readonly">
