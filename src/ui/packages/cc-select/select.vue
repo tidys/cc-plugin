@@ -17,7 +17,7 @@
   </div>
 </template>
 <script lang="ts">
-import {defineComponent, ref, PropType, watch} from "vue";
+import { defineComponent, ref, PropType, watch } from "vue";
 
 interface Option {
   label: string,
@@ -56,7 +56,6 @@ export default defineComponent({
 
 <style scoped lang="less">
 .cc-select {
-  position: relative;
   flex: 1;
 
   select {

@@ -14,10 +14,10 @@
         <CCProp name="disabled" tooltip="测试禁用">
           <CCInput :disabled="true" value="disabled"></CCInput>
         </CCProp>
-        <CCProp name="readonly">
+        <CCProp name="readonly" tooltip="1111111 1111111111111111111111111111111111">
           <CCInput :readonly="true" value="readonly"></CCInput>
         </CCProp>
-        <CCProp name="readonly && disabled">
+        <CCProp name="readonly && disabled" tooltip="test tooltip 1111111111111111111111144444444444444444444444444444444441111444444444444444444444444444444444444444444444444411111111111">
           <CCInput :disabled="true" :readonly="true" value="readonly"></CCInput>
         </CCProp>
         <CCProp name="test2">

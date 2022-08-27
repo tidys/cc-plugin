@@ -11,7 +11,7 @@
          @mouseenter="onHover"
          @mouseleave="onOver"
     >
-      <span :class="isHove?'name-blue':''">{{ name }}</span>
+      <span :class="isHove?'name-blue':''" ref="text">{{ name }}</span>
     </div>
     <div class="value">
       <slot style="flex:1;"></slot>
@@ -50,7 +50,7 @@ export default defineComponent({
       if (props.tooltip) {
         isShowTips.value = true;
         popperInstance = createPopper(target, tips.value, {
-              placement: "top", modifiers: [
+              placement: "top-end", modifiers: [
                 {
                   name: 'arrow',
                   options: {
@@ -71,8 +71,9 @@ export default defineComponent({
     }
 
     let timer = null;
+    const text = ref<HTMLElement>();
     return {
-      tips, isShowTips, arrow,
+      tips, isShowTips, arrow, text,
       name,
       isHove,
       onHover(event) {
@@ -80,7 +81,7 @@ export default defineComponent({
 
           clearTimeout(timer);
           timer = setTimeout(() => {
-            showTipsFunc(event.target)
+            showTipsFunc(text.value)
           }, 600);
         }
       },
@@ -135,6 +136,8 @@ export default defineComponent({
       border-radius: 6px;
       user-select: none;
       padding: 3px 9px;
+      max-width: 200px;
+      word-break: break-all;
     }
 
     .arrow {
