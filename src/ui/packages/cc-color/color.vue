@@ -1,7 +1,7 @@
 <template>
   <div class="cc-color">
-    <div class="color" :style="style" @click.stop.prevent="onShowPanel" @mousedown.stop.prevent></div>
-    <div class="color-panel" v-show="show" @click.stop.prevent>
+    <div ref="color" class="color" :style="style" @click="onShowPanel"></div>
+    <div ref="panel" class="color-panel" v-show="show" @click.stop.prevent>
       <ColorSaturation ref="saturationComp" :color="hexColor" @change="onColorChangeSaturation"></ColorSaturation>
       <Hue class="board" title="" v-model:hue="hueValue" @change="onChangeColorHue"></Hue>
       <ColorInput title="HEX:" v-model:color="hexColor" @change="onColorChangeHex" @focusin="onFocusin"></ColorInput>
@@ -23,6 +23,7 @@ import Alpha from './alpha.vue';
 import ColorSaturation from './saturation.vue';
 import {getColorHex, getColorHex8, getColorHue, transformColorByHue} from './util';
 import ColorCase from './color-case.vue';
+import {createPopper} from '@popperjs/core'
 
 export default defineComponent({
   name: 't-color',
@@ -44,8 +45,10 @@ export default defineComponent({
         },
     );
     onMounted(() => {
-      document.addEventListener('click', () => {
-        show.value = false;
+      document.addEventListener('click', (event) => {
+        if (event.target !== color.value) {
+          show.value = false;
+        }
       });
     });
     watch(() => props.color, (val: string) => {
@@ -67,7 +70,11 @@ export default defineComponent({
       '#dc50ff', '#ff6400', '#e6dcc8', '#f8b551',
     ]);
     const saturationComp = ref();
+    const color = ref<HTMLElement>()
+    const panel = ref<HTMLElement>()
+    let popperInstance = null;
     return {
+      color, panel,
       saturationComp,
       colorList,
       hexColor,
@@ -75,7 +82,9 @@ export default defineComponent({
       style, show,
       onShowPanel() {
         show.value = !show.value;
+        popperInstance?.destroy();
         if (show.value) {
+          popperInstance = createPopper(color.value, panel.value, { placement: 'bottom-end' })
           hueValue.value = getColorHue(hexColor.value);
           saturationComp.value.updateBaseColor(hexColor.value);
         }

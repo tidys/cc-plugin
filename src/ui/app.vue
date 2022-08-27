@@ -36,7 +36,10 @@
       <i class="iconfont icon-refresh"></i>
       <div class="iconfont icon-doc"></div>
     </CCProp>
-    <CCProp name="color">
+    <CCProp name="color1">
+      <CCColor></CCColor>
+    </CCProp>
+    <CCProp name="color2">
       <CCColor></CCColor>
     </CCProp>
     <CCProp name="input number">
