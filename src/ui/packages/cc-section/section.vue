@@ -18,10 +18,14 @@ export default defineComponent({
   props: {
     name: {
       type: String
+    },
+    expand: {
+      type: Boolean,
+      default: true,
     }
   },
   setup(props, { emit }) {
-    const fold = ref(false);
+    const fold = ref(!props.expand || false);
     const name = ref(props.name || '');
     return { fold, name }
   }

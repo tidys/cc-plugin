@@ -29,6 +29,9 @@
         </CCProp>
       </div>
     </CCSection>
+    <CCSection :expand="false" name="测试折叠">
+      默认不展开
+    </CCSection>
     <CCProp name="iconfont">
       <i class="iconfont icon-refresh"></i>
       <div class="iconfont icon-doc"></div>
