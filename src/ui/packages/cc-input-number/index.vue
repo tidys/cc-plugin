@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, ref, watch} from 'vue';
+import { defineComponent, onMounted, ref, watch } from 'vue';
 
 export default defineComponent({
   name: "cc-input-number",
@@ -34,7 +34,7 @@ export default defineComponent({
       type: Number,
     },
   },
-  setup(props, {emit}) {
+  setup(props, { emit }) {
     const input = ref();
     const val = ref(parseFloat(props.value.toFixed(2).toString()));
     watch(() => props.value, () => {
@@ -71,6 +71,7 @@ export default defineComponent({
 <style scoped lang="less">
 .cc-input-number {
   display: flex;
+  flex: 1;
 
   label {
     height: 100%;
@@ -84,7 +85,25 @@ export default defineComponent({
       border: 1px solid #171717;
       margin: 0;
       box-sizing: border-box;
+      border-radius: 3px;
+      padding: .17em .5em;
+      display: inline-block;
+      background: #262626;
+      font-size: 12px;
+      color: #fd942b;
 
+      &:hover {
+        border-color: #888;
+      }
+
+      &:focus {
+        border-color: #fd942b;
+      }
+
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button {
+        //-webkit-appearance: none; // 好像只能修改这个样式
+      }
     }
   }
 

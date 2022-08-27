@@ -20,7 +20,6 @@ function getFallback(service) {
             "os": require.resolve("os-browserify/browser"),
             "constants": require.resolve("constants-browserify"),
             'process': require.resolve('process/browser'),
-            'process-nextick-args': require.resolve('browser-next-tick'),
             "express": false,
             "electron": false,
             'async_hooks': false,
