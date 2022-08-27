@@ -50,7 +50,7 @@ export default defineComponent({
       if (props.tooltip) {
         isShowTips.value = true;
         popperInstance = createPopper(target, tips.value, {
-              placement: "top-end", modifiers: [
+              placement: "top-start", modifiers: [
                 {
                   name: 'arrow',
                   options: {
