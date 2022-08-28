@@ -1,23 +1,21 @@
 <template>
   <div class="cc-select">
-    <div>
-      <label>
-        <select @change="onSelectChange" v-model="curValue">
-          <option
-              v-for="(item, index) in data"
-              :key="index"
-              :value="item.value"
-          >
-            {{ item.label }}
-          </option>
-        </select>
-      </label>
-    </div>
-    <slot></slot>
+    <label>
+      <select @change="onSelectChange" v-model="curValue">
+        <option
+            v-for="(item, index) in data"
+            :key="index"
+            :value="item.value"
+        >
+          {{ item.label }}
+        </option>
+      </select>
+    </label>
   </div>
+  <slot></slot>
 </template>
 <script lang="ts">
-import { defineComponent, ref, PropType, watch } from "vue";
+import {defineComponent, ref, PropType, watch} from "vue";
 
 interface Option {
   label: string,
@@ -81,19 +79,22 @@ export default defineComponent({
     }
   }
 
-  &:after {
-    display: block;
-    content: " ";
-    position: absolute;
-    right: 0.8em;
-    top: 50%;
-    width: 0;
-    height: 0;
-    pointer-events: none;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 7px solid #bdbdbd;
-    margin-top: -3px;
+  label {
+
+    &:after {
+      display: block;
+      content: " ";
+      float: right;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 7px solid #bdbdbd;
+      margin-top: -12px;
+      margin-right: 7px;
+    }
   }
+
 }
 </style>
