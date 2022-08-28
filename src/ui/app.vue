@@ -17,7 +17,8 @@
         <CCProp name="readonly" tooltip="1111111 1111111111111111111111111111111111">
           <CCInput :readonly="true" value="readonly"></CCInput>
         </CCProp>
-        <CCProp name="readonly && disabled" tooltip="test tooltip 1111111111111111111111144444444444444444444444444444444441111444444444444444444444444444444444444444444444444411111111111">
+        <CCProp name="readonly && disabled"
+                tooltip="test tooltip 1111111111111111111111144444444444444444444444444444444441111444444444444444444444444444444444444444444444444411111111111">
           <CCInput :disabled="true" :readonly="true" value="readonly"></CCInput>
         </CCProp>
         <CCProp name="test2">
@@ -45,10 +46,16 @@
     <CCProp name="input number">
       <CCInputNumber :value="1" :min="0"></CCInputNumber>
     </CCProp>
+    <div style="height: 100px;">
+
+    </div>
+    <CCProp name="textarea" align="flex-start;">
+      <CCTextarea data="111" @change="onChangeTextarea"></CCTextarea>
+    </CCProp>
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
+import {defineComponent, ref, onMounted} from 'vue'
 import CCButton from './packages/cc-button/button.vue';
 import CCSection from './packages/cc-section/section.vue';
 import CCInput from './packages/cc-input/input.vue';
@@ -56,10 +63,12 @@ import CCProp from './packages/cc-prop/prop.vue';
 import CCSelect from './packages/cc-select/select.vue';
 import CCInputNumber from './packages/cc-input-number/index.vue'
 import CCColor from "./packages/cc-color/color.vue";
+import CCTextarea from './packages/cc-textarea/textarea.vue'
 
 export default defineComponent({
   name: 'app',
   components: {
+    CCTextarea,
     CCColor, CCSelect, CCProp, CCInput, CCSection, CCButton, CCInputNumber,
   },
   setup() {
@@ -86,6 +95,9 @@ export default defineComponent({
       },
       onChangeSelect() {
         console.log(selectValue.value);
+      },
+      onChangeTextarea(v) {
+        console.log(v);
       }
     }
   }
