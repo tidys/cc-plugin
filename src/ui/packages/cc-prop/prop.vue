@@ -1,5 +1,6 @@
 <template>
   <div class="cc-prop"
+       :style="{'align-items':align}"
        @mouseenter="isHove=true"
        @mouseleave="isHove=false"
   >
@@ -19,9 +20,9 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
-import { createPopper } from '@popperjs/core'
-import { debounce, DebouncedFunc } from 'lodash'
+import {defineComponent, onMounted, ref} from 'vue'
+import {createPopper} from '@popperjs/core'
+import {debounce, DebouncedFunc} from 'lodash'
 
 export default defineComponent({
   name: 'cc-prop',
@@ -32,7 +33,11 @@ export default defineComponent({
     tooltip: {
       type: String,
       default: '',
-    }
+    },
+    align: {
+      type: String,
+      default: 'center'
+    },
   },
   setup(props, { emit }) {
     onMounted(() => {
@@ -102,12 +107,11 @@ export default defineComponent({
 .cc-prop {
   display: flex;
   width: 100%;
-  height: 26px;
+  min-height: 26px;
   flex-direction: row;
-  align-items: center;
   justify-content: center;
   margin: 2px 0;
-  overflow: hidden;
+  //overflow: hidden;
 
   .name {
     height: 100%;
@@ -184,7 +188,7 @@ export default defineComponent({
   }
 
   .value {
-    overflow: hidden;
+    //overflow: hidden;
     display: flex;
     flex: 1;
     align-items: center;
