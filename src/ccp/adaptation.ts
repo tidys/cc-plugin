@@ -412,6 +412,22 @@ class Dialog {
         });
     }
 
+    open(path: string) {
+        if (adaptation.Env.isWeb) {
+
+        } else {
+            if (!Fs.existsSync(path)) {
+                return
+            }
+            if (Fs.statSync(path).isDirectory()) {
+                Electron.shell.showItemInFolder(path)
+                Electron.shell.beep();
+            } else {
+
+            }
+        }
+    }
+
     // path:content
     // 返回值选择是Object的原因是希望获取文件路径的一些其他信息，比如 图片路径：图片base64
     async select(options: SelectDialogOptions): Promise<Record<string, string | null>> {
