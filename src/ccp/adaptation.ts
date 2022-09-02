@@ -365,7 +365,7 @@ class Log {
 interface DialogMessageOptions {
     message: string,
     title?: string,
-    type?: 'question',
+    type?: 'question' | 'warning',
     buttons?: Array<string>,
     defaultId?: number,
     noLink?: boolean,
@@ -414,7 +414,7 @@ class Dialog {
 
     open(path: string) {
         if (adaptation.Env.isWeb) {
-
+            console.warn('not support open： ', path)
         } else {
             if (!Fs.existsSync(path)) {
                 return
