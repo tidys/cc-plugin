@@ -1,7 +1,6 @@
 import { PluginApi } from '../plugin-api';
 import CocosPluginService from '../service';
-import Chain from 'webpack-chain';
-import Config from 'webpack-chain';
+import WebpackChain from 'webpack-chain';
 import { PluginMgr } from '../plugin-mgr';
 import { PluginType } from '../declare';
 import Path, { resolve } from 'path';
@@ -52,13 +51,13 @@ export default class Base extends PluginApi {
         return map;
     }
 
-    webpackEntry(service: CocosPluginService, webpackChain: Config, entryName: string, file: string, prepend?: string) {
+    webpackEntry(service: CocosPluginService, webpackChain: WebpackChain, entryName: string, file: string, prepend?: string) {
         const fileFsPath = Path.resolve(service.context, file);
         if (!Fs.existsSync(fileFsPath)) {
             log.red(`main file not exists: ${fileFsPath}`);
             process.exit(0);
         }
-        let entryPoint: Config.EntryPoint = webpackChain.entry(entryName).add(fileFsPath);
+        let entryPoint: WebpackChain.EntryPoint = webpackChain.entry(entryName).add(fileFsPath);
         if (prepend) {
             entryPoint.prepend(prepend);
         }
@@ -66,7 +65,7 @@ export default class Base extends PluginApi {
 
     apply(api: PluginMgr, service: CocosPluginService) {
         const { options, manifest } = service.projectConfig;
-        api.chainWebpack((webpackChain: Chain) => {
+        api.chainWebpack((webpackChain: WebpackChain) => {
             const pluginName = manifest.name;
             // target
             {
