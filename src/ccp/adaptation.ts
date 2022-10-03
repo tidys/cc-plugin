@@ -2,7 +2,9 @@ import { BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType }
 import { versionApi, Versions } from './version-api';
 import * as Fs from 'fs';
 import axios from 'axios';
-import { IUiMenuItem, showMenuByMouseEvent } from '../ui/packages/cc-menu';
+import { IUiMenuItem } from "@xuyanfeng/cc-ui/types/cc-menu";
+//@ts-ignore
+import { Methods } from '@xuyanfeng/cc-ui'
 
 const { V246, V247, V248, V249 } = Versions;
 const Path = require('path'); // 为了适配浏览器
@@ -525,10 +527,15 @@ class Dialog {
 export class Menu {
     popup(event: MouseEvent, menus: IUiMenuItem[]) {
         menus = menus.map((menu) => {
-            return new IUiMenuItem(menu.name, menu.callback || null, menu.enabled);
+            return {
+                name: menu.name,
+                callback: menu.callback || null,
+                enabled: menu.enabled,
+
+            };
         })
         if (adaptation.Env.isWeb) {
-            showMenuByMouseEvent(event, menus);
+            Methods.CCMenu.showMenuByMouseEvent(event, menus);
         } else {
             const { Menu, MenuItem, getCurrentWindow } = Electron.remote;
             let menu = new Menu();

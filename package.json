@@ -35,7 +35,7 @@
     "@types/webpack-sources": "^3.2.0",
     "@vue/cli-service": "^5.0.0-rc.1",
     "@vue/compiler-sfc": "3.2.26",
-    "@xuyanfeng/cc-ui": "^0.2.1",
+    "@xuyanfeng/cc-ui": "^0.2.3",
     "assert": "^2.0.0",
     "axios": "^0.26.1",
     "browserify-zlib": "^0.2.0",
