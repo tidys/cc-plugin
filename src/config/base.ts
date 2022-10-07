@@ -143,7 +143,11 @@ export default class Base extends PluginApi {
                 .use('extract').loader(MiniCssExtractPlugin.loader).end()
                 .use('css-loader').loader('css-loader').end()
             // .use('postcss-loader').loader('postcss-loader').end();
-
+            // webpackChain.module
+            //     .rule("css-default")
+            //     .test(/\.css$/)
+            //     .use('style-loader').loader('style-loader').end()
+            //     .use('css-loader').loader('css-loader').end();
             webpackChain.module
                 .rule('vue')
                 .test(/\.vue$/)
