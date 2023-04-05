@@ -6,7 +6,7 @@ import {
     PluginType
 } from '../declare';
 
-import adaptation, {Adaptation} from './adaptation';
+import adaptation, { Adaptation } from './adaptation';
 import profile from './profile';
 
 interface PanelOptions {
@@ -18,13 +18,13 @@ export class CocosCreatorPluginRender {
     public options: CocosPluginOptions | null = null;
     public Adaptation: Adaptation = adaptation;
 
-    public init (config: CocosPluginConfig, options: PanelOptions) {
-        const {type} = config.options;
+    public init(config: CocosPluginConfig, options: PanelOptions) {
+        const { type } = config.options;
         this.Adaptation.init(config, type || PluginType.PluginV2);
         this.manifest = config.manifest;
         this.options = Object.assign(DefaultCocosPluginOptions, config.options);
         profile.init({}, config);
-        const {enabled, port} = this.options.server!;
+        const { enabled, port } = this.options.server!;
         if (enabled) {
             let hot = () => {
                 if (this.options?.type === PluginType.Web) {
@@ -66,7 +66,7 @@ export class CocosCreatorPluginRender {
         return options;
     }
 
-    public builder () {
+    public builder() {
 
     }
 }
