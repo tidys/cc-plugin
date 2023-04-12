@@ -3,7 +3,7 @@ import CocosPluginService from '../service';
 import WebpackChain from 'webpack-chain';
 import { PluginMgr } from '../plugin-mgr';
 import { PluginType } from '../declare';
-import Path, { resolve } from 'path';
+import Path, { resolve, join } from 'path';
 import Fs, { existsSync } from 'fs';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import Panel from '../panel';
@@ -78,7 +78,7 @@ export default class Base extends PluginApi {
             }
             const vuePath = Path.resolve(service.root, './node_modules/vue');
             // webpackChain.resolve.alias.set('vue', vuePath).end();
-            webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json');
+            webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json').add('.glsl').end();
 
             // 排除模块
             if (service.isCreatorPlugin()) {
@@ -201,6 +201,13 @@ export default class Base extends PluginApi {
                     limit: 800 * 1024,// 800k以内都以base64内联
                     name: 'images/[name].[ext]'
                 });
+            // TODO 增加plugin的搜索路径，但是对于glsl-loader没有效果
+            webpackChain.resolve.modules.add(join(__dirname, "../plugin")).add("node_modules");
+            // TODO 这里使用的编译后的绝对路径，能用但是不优雅
+            webpackChain.module.rule('glsl-loader')
+                .test(/\.(glsl)$/)
+                .use("glsl-loader")
+                .loader(join(__dirname, "../plugin/glsl-loader.js"))
             webpackChain.module
                 .rule('svg')
                 .test(/\.(svg)$/)
@@ -236,6 +243,7 @@ export default class Base extends PluginApi {
                 webpackChain.plugin('cc-plugin-package.json')
                     .use(CocosPluginPackageJson, [service])
             }
+
             webpackChain
                 .plugin('vue')
                 .use(VueLoaderPlugin)

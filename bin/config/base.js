@@ -94,7 +94,7 @@ class Base extends plugin_api_1.PluginApi {
             }
             const vuePath = path_1.default.resolve(service.root, './node_modules/vue');
             // webpackChain.resolve.alias.set('vue', vuePath).end();
-            webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json');
+            webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json').add('.glsl').end();
             // 排除模块
             if (service.isCreatorPlugin()) {
                 let externals = this.getExternal(service.context, ['electron', 'fs-extra', 'express']);
@@ -155,6 +155,11 @@ class Base extends plugin_api_1.PluginApi {
                 .use('extract').loader(mini_css_extract_plugin_1.default.loader).end()
                 .use('css-loader').loader('css-loader').end();
             // .use('postcss-loader').loader('postcss-loader').end();
+            // webpackChain.module
+            //     .rule("css-default")
+            //     .test(/\.css$/)
+            //     .use('style-loader').loader('style-loader').end()
+            //     .use('css-loader').loader('css-loader').end();
             webpackChain.module
                 .rule('vue')
                 .test(/\.vue$/)
@@ -206,6 +211,13 @@ class Base extends plugin_api_1.PluginApi {
                 limit: 800 * 1024,
                 name: 'images/[name].[ext]'
             });
+            // TODO 增加plugin的搜索路径，但是对于glsl-loader没有效果
+            webpackChain.resolve.modules.add(path_1.join(__dirname, "../plugin")).add("node_modules");
+            // TODO 这里使用的编译后的绝对路径，能用但是不优雅
+            webpackChain.module.rule('glsl-loader')
+                .test(/\.(glsl)$/)
+                .use("glsl-loader")
+                .loader(path_1.join(__dirname, "../plugin/glsl-loader.js"));
             webpackChain.module
                 .rule('svg')
                 .test(/\.(svg)$/)
