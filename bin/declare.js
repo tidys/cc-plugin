@@ -3,8 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Platform = exports.DefaultCocosPluginOptions = exports.PluginType = exports.Panel = void 0;
 exports.Panel = {
     Type: {
-        Dockable: 'dockable',
+        DockAble: 'dockable',
         Simple: 'simple',
+        InnerIndex: 'inner-index'
     },
 };
 var PluginType;
