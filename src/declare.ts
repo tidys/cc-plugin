@@ -18,12 +18,15 @@ export interface PanelOptions {
     height?: number;
     minWidth?: number;
     minHeight?: number;
+    ejs?: string;// 自定义面板模板
+    ejsOptions?: Record<string, any>;// 自定义面板模板参数
 }
 
 export const Panel = {
     Type: {
-        Dockable: 'dockable',
+        DockAble: 'dockable',
         Simple: 'simple',
+        InnerIndex: 'inner-index'
     },
 
 };
