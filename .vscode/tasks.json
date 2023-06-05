@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "yalc-push",
+      "problemMatcher": [],
+      "label": "npm: yalc-push",
+      "detail": "npm run clean-bin-dir && tsc && yalc push",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}

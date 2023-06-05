@@ -90,12 +90,12 @@ export default class Panel {
         const options: CocosPluginOptions = this.service.projectConfig.options;
         if (panels && panels.length) {
             // 追加一个index页面，方便运行起来后，查看有多少个panel，也方便用户跳转
-            const optionsPanels = panels.map((panel) => {
+            const optionsPanels = JSON.stringify(panels.map((panel) => {
                 return {
                     label: `${panel.title}-${panel.name}`,
-                    href: './index.html',// todo 需要规整下链接
+                    href: `${panel.name}.html`,
                 };
-            });
+            }));
             panels.push({
                 name: 'index',
                 title: "index",
