@@ -5,6 +5,7 @@ import axios from 'axios';
 import { IUiMenuItem } from "@xuyanfeng/cc-ui/types/cc-menu";
 //@ts-ignore
 import { Methods } from '@xuyanfeng/cc-ui'
+import { basename, extname } from 'path';
 
 const { V246, V247, V248, V249 } = Versions;
 const Path = require('path'); // 为了适配浏览器
@@ -413,7 +414,17 @@ class Dialog {
             }
         });
     }
-
+    async readTTF(file: File): Promise<ArrayBuffer> {
+        // 也可以直接file.arrayBuffer();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const fontData = event.target!.result;
+                resolve(fontData as ArrayBuffer);
+            }
+            reader.readAsArrayBuffer(file);
+        });
+    }
     open(path: string) {
         if (adaptation.Env.isWeb) {
             console.warn('not support open： ', path)
@@ -432,16 +443,22 @@ class Dialog {
 
     // path:content
     // 返回值选择是Object的原因是希望获取文件路径的一些其他信息，比如 图片路径：图片base64
-    async select(options: SelectDialogOptions): Promise<Record<string, string | null>> {
+    async select(options: SelectDialogOptions): Promise<Record<string, string | null | ArrayBuffer>> {
         if (adaptation.Env.isWeb) {
             return new Promise((resolve, reject) => {
                 const inputEl: HTMLInputElement = document.createElement('input');
                 inputEl.type = 'file';// only file
                 // web只支持一个filter
+                const typeReader = {
+                    '.png': this.readPng,
+                    '.txt': this.readPng,
+                    '.jpg': this.readPng,
+                    '.jpeg': this.readPng,
+                    '.ttf': this.readTTF,
+                };
                 if (options.filters?.length) {
-                    const types = ['.png', '.txt', '.jpg', 'jpeg'];
                     let accept: string[] = [];
-
+                    const types = Object.keys(typeReader);
                     options.filters![0].extensions.forEach(ext => {
                         ext = ext.startsWith('.') ? ext : `.${ext}`;
                         const extItem = types.find(el => el === ext);
@@ -457,10 +474,17 @@ class Dialog {
                 inputEl.addEventListener('change', async () => {
                     let ret: Record<string, any> = {};
                     for (let i = 0; i < inputEl.files!.length; i++) {
-                        let file: File = inputEl.files![i];
-                        const imageData = await this.readPng(file);
-                        if (imageData) {
-                            ret[file.name.toString()] = imageData;
+                        const file: File = inputEl.files![i];
+                        // ttf 没有 type
+                        const type = file.type ? file.type : extname(file.name);
+                        const readerFunction = typeReader[type];
+                        if (readerFunction) {
+                            const imageData = await readerFunction(file);
+                            if (imageData) {
+                                ret[file.name.toString()] = imageData;
+                            }
+                        } else {
+                            console.error(`${file.name} no reader`);
                         }
                     }
                     resolve(ret);
