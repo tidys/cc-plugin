@@ -265,6 +265,10 @@ export default class Base extends PluginApi {
                     __VUE_OPTIONS_API__: true,
                     __VUE_PROD_DEVTOOLS__: false
                 }]);
+            webpackChain.plugin("process_define")
+                .use(webpack.DefinePlugin, [{
+                    'process.env': JSON.stringify(process.env)
+                }]);
             webpackChain
                 .plugin('CriticalDependency')
                 .use(filter, [{ exclude: [/Critical dependency/] }])
