@@ -475,8 +475,7 @@ class Dialog {
                     let ret: Record<string, any> = {};
                     for (let i = 0; i < inputEl.files!.length; i++) {
                         const file: File = inputEl.files![i];
-                        // ttf 没有 type
-                        const type = file.type ? file.type : extname(file.name);
+                        const type = extname(file.name);
                         const readerFunction = typeReader[type];
                         if (readerFunction) {
                             const imageData = await readerFunction(file);
