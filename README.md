@@ -71,7 +71,9 @@ const options: CocosPluginOptions = {
         enabled: true,
         port: 2022,
     },
-    outputProject: { // 最终插件的输出目录，必须是绝对路径，指向项目路径即可
+    outputProject: { 
+        // 最终插件的输出目录，必须是指向creator项目的绝对路径
+        // 该配置项会优先从project.json中获取
         v2: '/cocos-creator/project-v2/',
         v3: '/cocos-creator/project-v3/',
     },
@@ -136,3 +138,17 @@ npm i @xuyanfeng/cc-editor -g
 ```
 插件开发过程中需要在不同的creator版本进行自测，通过 [cc-editor](https://github.com/cocos-creator-plugin/cc-editor) 快速切换配置项，而且cc-editor自身还增加了调试主进程的参数，提高插件开发效率。
 
+## 关于options.outputProject
+在`cc-plugin.config.ts`中我们会配置不同类型插件的输出目录，`cc-plugin.config.ts`是需要纳入版本管理的。
+
+但是有可能你需要在多台电脑上进行开发，outputProject的配置也不同，修改`cc-plugin.config.ts`肯定不行，容易造成冲突。
+
+`cc-plugin`考虑到了这种情况，你可以在同目录新建一个`project.json`文件，内容如下：
+```json
+{
+    "v2":"xx",
+    "v3":"xx",
+}
+```
+`project.json`不建议纳入版本管理，它更像是一个本机配置，满足了不同电脑，配置不同的需求。
+`cc-plugin`检索`outputProject`时会优先从`project.json`中读取配置。

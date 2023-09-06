@@ -1,3 +1,8 @@
 {
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "modifications",
+  "files.autoSave": "onFocusChange",
+  "[typescript]": {
     "editor.formatOnSave": true
+  }
 }

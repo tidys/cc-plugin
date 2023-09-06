@@ -61,7 +61,7 @@ export interface CocosPluginOptions {
     outputProject: string | { v2?: string, v3?: string, web?: string, vscode?: string, electron?: string },// 输出的项目路径
     output?: string, // 最终都要变成绝对路径
     cwd?: string;
-    type?: PluginType;
+    type: PluginType;
     min?: boolean;// 压缩
     treeShaking?: boolean;
 }

@@ -37,6 +37,8 @@ const log_1 = require("./log");
 const plugin_mgr_1 = require("./plugin-mgr");
 const create_1 = __importDefault(require("./commands/create"));
 const FsExtra = __importStar(require("fs-extra"));
+const ConfigTypeScript = "cc-plugin.config.ts";
+const ProjectJson = "project.json";
 class CocosPluginService {
     constructor(context) {
         this.webpackChainFns = [];
@@ -80,7 +82,7 @@ class CocosPluginService {
         });
     }
     loadUserOptions() {
-        const configNames = ['./cc-plugin.config.js', './cc-plugin.config.ts'];
+        const configNames = ['./cc-plugin.config.js', `./${ConfigTypeScript}`];
         let fileConfigPath = '';
         for (let name of configNames) {
             const fullPath = Path.join(this.context, name);
@@ -156,7 +158,7 @@ class CocosPluginService {
             }
         }
         else {
-            log_1.log.yellow(`options.outputProject需要配置为Creator生成的项目目录：${projectDir}`);
+            log_1.log.yellow(`options.outputProject需要配置为有效的Creator项目目录：${projectDir}`);
             output = projectDir;
         }
         return output;
@@ -169,6 +171,27 @@ class CocosPluginService {
             return 'extensions';
         }
     }
+    getConfigProjectPath(type) {
+        let projectPath = null;
+        const projCfg = Path.join(this.context, ProjectJson);
+        if (FS.existsSync(projCfg)) {
+            const cfg = JSON.parse(FS.readFileSync(projCfg, 'utf-8'));
+            switch (type) {
+                case declare_1.PluginType.PluginV2: {
+                    projectPath = cfg.v2;
+                    break;
+                }
+                case declare_1.PluginType.PluginV3: {
+                    projectPath = cfg.v3;
+                    break;
+                }
+            }
+        }
+        if (projectPath && FS.existsSync(projectPath)) {
+            return projectPath;
+        }
+        return null;
+    }
     checkUserOptions(userOptions) {
         // 根据配置，将output目录统一变为绝对路径
         const { options, manifest } = userOptions;
@@ -176,11 +199,34 @@ class CocosPluginService {
         const pluginDir = this.getPluginDir(type);
         if (typeof outputProject === 'object') {
             const { v2, v3, web } = outputProject;
-            if (v2 && type === declare_1.PluginType.PluginV2) {
-                options.output = this.catchOutput(v2, pluginDir, manifest.name);
-            }
-            else if (v3 && type === declare_1.PluginType.PluginV3) {
-                options.output = this.catchOutput(v3, pluginDir, manifest.name);
+            if (type === declare_1.PluginType.PluginV2 || type === declare_1.PluginType.PluginV3) {
+                // 优先支持配置文件
+                const cfgProject = this.getConfigProjectPath(type);
+                let dirs = [];
+                if (cfgProject) {
+                    dirs.push({ url: cfgProject, source: ProjectJson });
+                }
+                if (v2 !== undefined && type === declare_1.PluginType.PluginV2) {
+                    dirs.push({ url: v2, source: ConfigTypeScript });
+                }
+                if (v3 !== undefined && type === declare_1.PluginType.PluginV3) {
+                    dirs.push({ url: v3, source: ConfigTypeScript });
+                }
+                if (dirs.length <= 0) {
+                    log_1.log.red(`未配置options.outputProject`);
+                }
+                else {
+                    for (let i = 0; i < dirs.length; i++) {
+                        const { url, source } = dirs[i];
+                        if (url && FS.existsSync(url)) {
+                            options.output = this.catchOutput(url, pluginDir, manifest.name);
+                            break;
+                        }
+                        else {
+                            log_1.log.blue(`[${source}]里面的输出目录无效：${url}`);
+                        }
+                    }
+                }
             }
             else if (web && type === declare_1.PluginType.Web) {
                 let fullPath = Path.join(this.context, web);
@@ -194,11 +240,10 @@ class CocosPluginService {
         else {
             options.output = this.catchOutput(outputProject, pluginDir, manifest.name);
         }
-        if (!options.output) {
-            log_1.log.red(`无效的output：${options.output}`);
+        if (options.output && FS.existsSync(options.output)) {
         }
-        if (!FS.existsSync(options.output)) {
-            log_1.log.red(`options.outputProject目录不存在：${options.output}`);
+        else {
+            log_1.log.red(`options.outputProject配置无效:${options.output}`);
             process.exit(0);
         }
     }
