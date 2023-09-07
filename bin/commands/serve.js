@@ -93,8 +93,6 @@ class Serve extends plugin_api_1.PluginApi {
                 }
             }
             webpackConfig = lodash_1.merge(webpackConfig, { resolve: { fallback } });
-            log_1.log.yellow("----------------webpack config------------------------");
-            log_1.log.yellow(JSON.stringify(webpackConfig, null, 2));
             const compiler = webpack_1.default(webpackConfig, ((err, stats) => {
                 if (err) {
                     return console.error(err);

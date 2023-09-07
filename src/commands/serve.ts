@@ -69,8 +69,6 @@ export default class Serve extends PluginApi {
                 }
             }
             webpackConfig = merge(webpackConfig, { resolve: { fallback } });
-            log.yellow("----------------webpack config------------------------")
-            log.yellow(JSON.stringify(webpackConfig, null, 2))
             const compiler = webpack(webpackConfig, ((err, stats) => {
                 if (err) {
                     return console.error(err)
