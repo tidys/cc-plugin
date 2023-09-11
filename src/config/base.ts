@@ -265,9 +265,16 @@ export default class Base extends PluginApi {
                     __VUE_OPTIONS_API__: true,
                     __VUE_PROD_DEVTOOLS__: false
                 }]);
+            // can't set full process.env
+            const { OS, NUMBER_OF_PROCESSORS, LANG, PROCESSOR_LEVEL } = process.env;
+            const envCopy: Record<string, any> = {};
+            if (OS) envCopy['OS'] = OS
+            if (LANG) envCopy['LANG'] = LANG
+            if (PROCESSOR_LEVEL) envCopy['PROCESSOR_LEVEL'] = PROCESSOR_LEVEL
+            if (NUMBER_OF_PROCESSORS) envCopy['NUMBER_OF_PROCESSORS'] = NUMBER_OF_PROCESSORS; 
             webpackChain.plugin("process_define")
                 .use(webpack.DefinePlugin, [{
-                    'process.env': JSON.stringify(process.env)
+                    'process.env': {}
                 }]);
             webpackChain
                 .plugin('CriticalDependency')
