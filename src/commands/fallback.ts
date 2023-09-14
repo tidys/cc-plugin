@@ -6,7 +6,7 @@ export function getFallback(service: CocosPluginService) {
         fs: false,
     };
     if (service.isWeb()) {
-        // web情况下： net模块重定向
+        // web情况下： 模块重定向，不需要的设置为false即可
         fallback = Object.assign(fallback, {
             'assert': require.resolve('assert'),
             'net': require.resolve('net-browserify'),
@@ -19,6 +19,9 @@ export function getFallback(service: CocosPluginService) {
             "os": require.resolve("os-browserify/browser"),
             "constants": require.resolve("constants-browserify"),
             'process': require.resolve('process/browser'),
+            "querystring": require.resolve("querystring-es3"),
+            "https": require.resolve("https-browserify"),
+            "tls": false,
             "express": false,
             "electron": false,
             'async_hooks': false,

@@ -1,6 +1,7 @@
 import { BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType } from '../declare';
 import { versionApi, Versions } from './version-api';
 import * as Fs from 'fs';
+import * as OS from 'os';
 import axios from 'axios';
 import { IUiMenuItem } from "@xuyanfeng/cc-ui/types/cc-menu";
 //@ts-ignore
@@ -32,6 +33,9 @@ class Project {
                     // @ts-ignore
                     return Editor.projectInfo.path;
                 })
+        } else if (adaptation.Env.isWeb) {
+            console.error(`web not support editor path`);
+            return "";
         } else {
             // @ts-ignore
             return Editor.Project.path;
@@ -94,13 +98,35 @@ class Util {
 const Electron = require('electron');
 
 class Shell {
+    private _getCmd(path: string): string {
+        if (!Fs.existsSync(path)) {
+            return '';
+        }
+        if (Fs.statSync(path).isFile()) {
+            path = Path.dirname(path)
+        }
+        let cmd = '';
+        switch (OS.platform()) {
+            case 'win32': {
+                cmd = `start "" "${path}"`;
+                break;
+            }
+            case 'darwin': {
+                cmd = `open "${path}"`;
+                break;
+            }
+        }
+        // require('child_process').exec(cmd);
+        return cmd;
+    }
     showItem(path: string) {
         if (adaptation.Env.isPluginV2) {
             // @ts-ignore
             Electron.remote?.shell?.showItemInFolder(path);
-        } else {
+        } else if (adaptation.Env.isPluginV3) {
             // @ts-ignore
             Electron.remote?.shell?.showItemInFolder(path);
+        } else if (adaptation.Env.isWeb) {
         }
     }
 
@@ -184,7 +210,7 @@ class Builder {
                     });
                 }
             }
-        } else {
+        } else if (adaptation.Env.isPluginV3) {
             // @ts-ignore
             let cfg = await Editor.Profile.getConfig('builder', 'BuildTaskManager.taskMap', 'local');
             Object.keys(cfg).forEach(key => {
