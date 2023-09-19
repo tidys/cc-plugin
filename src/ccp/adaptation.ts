@@ -16,6 +16,17 @@ let config: CocosPluginConfig, options: PanelOptions;
 let adaptation: Adaptation;
 
 class Project {
+    public isValid(projPath: string) {
+
+    }
+    _path: string = '';
+    set path(value: string) {
+        if (adaptation.Env.isWeb) {
+            this._path = value;
+        } else {
+            console.warn(`not supported set project path`)
+        }
+    }
     get path(): string {
         if (adaptation.Env.isPluginV2) {
             return versionApi(
@@ -34,12 +45,14 @@ class Project {
                     return Editor.projectInfo.path;
                 })
         } else if (adaptation.Env.isWeb) {
-            console.error(`web not support editor path`);
-            return "";
-        } else {
+            return this._path;
+        } else if (adaptation.Env.isPluginV3) {
             // @ts-ignore
             return Editor.Project.path;
+        } else {
+
         }
+        return ''
     }
 }
 
@@ -363,6 +376,7 @@ export interface SelectDialogOptions {
     multi?: boolean;
     filters?: FileFilter[];
     extensions?: string;
+    fillData?: boolean;
 }
 
 class Log {
@@ -474,6 +488,10 @@ class Dialog {
             return new Promise((resolve, reject) => {
                 const inputEl: HTMLInputElement = document.createElement('input');
                 inputEl.type = 'file';// only file
+                if (options.type === "directory") {
+                    inputEl.setAttribute('directory', '');
+                    inputEl.setAttribute('webkitdirectory', '')
+                }
                 // web只支持一个filter
                 const typeReader = {
                     '.png': this.readPng,
@@ -499,17 +517,25 @@ class Dialog {
                 inputEl.multiple = !!options.multi;
                 inputEl.addEventListener('change', async () => {
                     let ret: Record<string, any> = {};
+                    let fillData = true;
+                    if (options.fillData === false) {
+                        fillData = false
+                    }
                     for (let i = 0; i < inputEl.files!.length; i++) {
                         const file: File = inputEl.files![i];
-                        const type = extname(file.name);
-                        const readerFunction = typeReader[type];
-                        if (readerFunction) {
-                            const imageData = await readerFunction(file);
-                            if (imageData) {
-                                ret[file.name.toString()] = imageData;
+                        if (fillData) {
+                            const type = extname(file.name);
+                            const readerFunction = typeReader[type];
+                            if (readerFunction) {
+                                const data = await readerFunction(file);
+                                if (data) {
+                                    ret[file.name.toString()] = data;
+                                }
+                            } else {
+                                console.warn(`${file.name} no reader`);
                             }
                         } else {
-                            console.error(`${file.name} no reader`);
+                            ret[file.name.toString()] = ''
                         }
                     }
                     resolve(ret);
