@@ -249,7 +249,9 @@ class Env {
     get isPluginV3() {
         return this._type === PluginType.PluginV3;
     }
-
+    get isPlugin() {
+        return this.isPluginV2 || this.isPluginV3;
+    }
     get isWin() {
         return process.platform === 'win32'
     }

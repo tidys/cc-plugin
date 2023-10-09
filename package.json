@@ -10,6 +10,7 @@
   },
   "scripts": {
     "clean-bin-dir": "node ./clean-bin-dir.js",
+    "install-force": "yarn install --force",
     "yalc-push": "npm run clean-bin-dir && tsc && yalc push",
     "tsc-build": "tsc --watch",
     "demo-test": "vue-cli-service serve",
