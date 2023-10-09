@@ -8,7 +8,7 @@ import { IUiMenuItem } from "@xuyanfeng/cc-ui/types/cc-menu";
 import { Methods } from '@xuyanfeng/cc-ui'
 import { basename, extname } from 'path';
 
-const { V246, V247, V248, V249 } = Versions;
+const { V246, V247, V248, V249, V2410, V2411 } = Versions;
 const Path = require('path'); // 为了适配浏览器
 const URL = require('url')
 
@@ -33,7 +33,7 @@ class Project {
                 adaptation.CCEditor.version,
                 [
                     {
-                        version: [V246, V247, V248, V249],
+                        version: [V246, V247, V248, V249, V2410, V2411],
                         fn: () => {
                             // @ts-ignore
                             return Editor.Project.path;
@@ -343,7 +343,16 @@ class AssetDB {
             // 暂时不需要实现，编辑器会自动刷新
         }
     }
+    create(url: string, data: string) {
+        if (adaptation.Env.isPluginV2) {
+            // @ts-ignore
+            Editor.assetdb.create(url, data, function (err, result) {
+                console.log(err, result);
+            });
+        } else {
 
+        }
+    }
 
     async fileData(url: string): Promise<string> {
         let fspath = adaptation.Util.urlToFspath(url);
