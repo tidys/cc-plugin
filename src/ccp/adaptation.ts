@@ -8,7 +8,7 @@ import { IUiMenuItem } from "@xuyanfeng/cc-ui/types/cc-menu";
 import { Methods } from '@xuyanfeng/cc-ui'
 import { basename, extname } from 'path';
 
-const { V246, V247, V248, V249 } = Versions;
+const { V246, V247, V248, V249, V2410, V2411 } = Versions;
 const Path = require('path'); // 为了适配浏览器
 const URL = require('url')
 
@@ -16,13 +16,24 @@ let config: CocosPluginConfig, options: PanelOptions;
 let adaptation: Adaptation;
 
 class Project {
+    public isValid(projPath: string) {
+
+    }
+    _path: string = '';
+    set path(value: string) {
+        if (adaptation.Env.isWeb) {
+            this._path = value;
+        } else {
+            console.warn(`not supported set project path`)
+        }
+    }
     get path(): string {
         if (adaptation.Env.isPluginV2) {
             return versionApi(
                 adaptation.CCEditor.version,
                 [
                     {
-                        version: [V246, V247, V248, V249],
+                        version: [V246, V247, V248, V249, V2410, V2411],
                         fn: () => {
                             // @ts-ignore
                             return Editor.Project.path;
@@ -34,12 +45,14 @@ class Project {
                     return Editor.projectInfo.path;
                 })
         } else if (adaptation.Env.isWeb) {
-            console.error(`web not support editor path`);
-            return "";
-        } else {
+            return this._path;
+        } else if (adaptation.Env.isPluginV3) {
             // @ts-ignore
             return Editor.Project.path;
+        } else {
+
         }
+        return ''
     }
 }
 
@@ -332,7 +345,16 @@ class AssetDB {
             // 暂时不需要实现，编辑器会自动刷新
         }
     }
+    create(url: string, data: string) {
+        if (adaptation.Env.isPluginV2) {
+            // @ts-ignore
+            Editor.assetdb.create(url, data, function (err, result) {
+                console.log(err, result);
+            });
+        } else {
 
+        }
+    }
 
     async fileData(url: string): Promise<string> {
         let fspath = adaptation.Util.urlToFspath(url);
@@ -365,6 +387,7 @@ export interface SelectDialogOptions {
     multi?: boolean;
     filters?: FileFilter[];
     extensions?: string;
+    fillData?: boolean;
 }
 
 class Log {
@@ -476,6 +499,10 @@ class Dialog {
             return new Promise((resolve, reject) => {
                 const inputEl: HTMLInputElement = document.createElement('input');
                 inputEl.type = 'file';// only file
+                if (options.type === "directory") {
+                    inputEl.setAttribute('directory', '');
+                    inputEl.setAttribute('webkitdirectory', '')
+                }
                 // web只支持一个filter
                 const typeReader = {
                     '.png': this.readPng,
@@ -501,17 +528,25 @@ class Dialog {
                 inputEl.multiple = !!options.multi;
                 inputEl.addEventListener('change', async () => {
                     let ret: Record<string, any> = {};
+                    let fillData = true;
+                    if (options.fillData === false) {
+                        fillData = false
+                    }
                     for (let i = 0; i < inputEl.files!.length; i++) {
                         const file: File = inputEl.files![i];
-                        const type = extname(file.name);
-                        const readerFunction = typeReader[type];
-                        if (readerFunction) {
-                            const imageData = await readerFunction(file);
-                            if (imageData) {
-                                ret[file.name.toString()] = imageData;
+                        if (fillData) {
+                            const type = extname(file.name);
+                            const readerFunction = typeReader[type];
+                            if (readerFunction) {
+                                const data = await readerFunction(file);
+                                if (data) {
+                                    ret[file.name.toString()] = data;
+                                }
+                            } else {
+                                console.warn(`${file.name} no reader`);
                             }
                         } else {
-                            console.error(`${file.name} no reader`);
+                            ret[file.name.toString()] = ''
                         }
                     }
                     resolve(ret);

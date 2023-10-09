@@ -123,7 +123,11 @@ export interface CocosPluginV3 {
 export interface PluginMainWrapper {
     load: Function,
     unload?: Function,
-    builder?: Record<string | 'onAfterBuild', Function>,
+    builder?: {
+        'onAfterBuildAssetsFinish': Function,
+        'onAfterBuild': Function,
+        'onBeforeBuild': Function
+    },
     messages?: Record<string, Function>;
 }
 
