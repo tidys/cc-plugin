@@ -121,14 +121,14 @@ export interface CocosPluginV3 {
 }
 
 export interface PluginMainWrapper {
-    load: Function,
-    unload?: Function,
-    builder?: {
-        'onAfterBuildAssetsFinish': Function,
-        'onAfterBuild': Function,
-        'onBeforeBuild': Function
-    },
-    messages?: Record<string, Function>;
+  load: Function;
+  unload?: Function;
+  builder?: {
+    onAfterBuildAssetsFinish?: Function;
+    onAfterBuild?: Function;
+    onBeforeBuild?: Function;
+  };
+  messages?: Record<string, Function>;
 }
 
 // 目前先加一些自己关心的，后续慢慢添加完善
