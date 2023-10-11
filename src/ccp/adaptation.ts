@@ -512,44 +512,46 @@ class Dialog {
                     '.ttf': this.readTTF,
                 };
                 if (options.filters?.length) {
-                    let accept: string[] = [];
-                    const types = Object.keys(typeReader);
-                    options.filters![0].extensions.forEach(ext => {
-                        ext = ext.startsWith('.') ? ext : `.${ext}`;
-                        const extItem = types.find(el => el === ext);
-                        if (extItem) {
-                            accept.push(extItem);
-                        }
-                    });
+                  let accept: string[] = [];
+                  const types = Object.keys(typeReader);
+                  options.filters![0].extensions.forEach((ext) => {
+                    ext = ext.startsWith(".") ? ext : `.${ext}`;
+                    const extItem = types.find(
+                      (el) => el === ext.toLocaleLowerCase()
+                    );
+                    if (extItem) {
+                      accept.push(extItem);
+                    }
+                  });
 
-                    inputEl.accept = accept.join(',');
+                  inputEl.accept = accept.join(",");
                 }
 
                 inputEl.multiple = !!options.multi;
-                inputEl.addEventListener('change', async () => {
-                    let ret: Record<string, any> = {};
-                    let fillData = true;
-                    if (options.fillData === false) {
-                        fillData = false
-                    }
-                    for (let i = 0; i < inputEl.files!.length; i++) {
-                        const file: File = inputEl.files![i];
-                        if (fillData) {
-                            const type = extname(file.name);
-                            const readerFunction = typeReader[type];
-                            if (readerFunction) {
-                                const data = await readerFunction(file);
-                                if (data) {
-                                    ret[file.name.toString()] = data;
-                                }
-                            } else {
-                                console.warn(`${file.name} no reader`);
-                            }
-                        } else {
-                            ret[file.name.toString()] = ''
+                inputEl.addEventListener("change", async () => {
+                  let ret: Record<string, any> = {};
+                  let fillData = true;
+                  if (options.fillData === false) {
+                    fillData = false;
+                  }
+                  for (let i = 0; i < inputEl.files!.length; i++) {
+                    const file: File = inputEl.files![i];
+                    if (fillData) {
+                      const type = extname(file.name).toLocaleLowerCase();
+                      const readerFunction = typeReader[type];
+                      if (readerFunction) {
+                        const data = await readerFunction(file);
+                        if (data) {
+                          ret[file.name.toString()] = data;
                         }
+                      } else {
+                        console.warn(`${file.name} no reader`);
+                      }
+                    } else {
+                      ret[file.name.toString()] = "";
                     }
-                    resolve(ret);
+                  }
+                  resolve(ret);
                 });
                 inputEl.dispatchEvent(new MouseEvent('click'));
             });
