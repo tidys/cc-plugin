@@ -95,16 +95,20 @@ export default class Serve extends PluginApi {
     async runWebpackServer(compiler: webpack.Compiler) {
         const host = await webpackDevSever.internalIP('v4');
         const port = await PortFinder.getPortPromise();
-        const server = new webpackDevSever({
+        const server = new webpackDevSever(
+          {
             // inputFileSystem: FsExtra,
             // outputFileSystem: FsExtra,
             hot: true,
-            allowedHosts: ['all'],
+            allowedHosts: ["all"],
             open: true,
             host,
+            https: true,
             port,
-            static: './dist',
-        }, compiler);
+            static: "./dist",
+          },
+          compiler
+        );
         server.startCallback((error) => {
             if (error) {
                 console.error(error);

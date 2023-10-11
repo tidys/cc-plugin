@@ -123,11 +123,12 @@ class Serve extends plugin_api_1.PluginApi {
                 // inputFileSystem: FsExtra,
                 // outputFileSystem: FsExtra,
                 hot: true,
-                allowedHosts: ['all'],
+                allowedHosts: ["all"],
                 open: true,
                 host,
+                https: true,
                 port,
-                static: './dist',
+                static: "./dist",
             }, compiler);
             server.startCallback((error) => {
                 if (error) {
