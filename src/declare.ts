@@ -36,7 +36,11 @@ export interface CocosPluginManifest {
   version: string;
   description?: string;
   /**
-   * 插件的web站点地址
+   * 插件的商店链接
+   */
+  store?: string;
+  /**
+   * 插件的web站点地址，可以配置多个，比如GitHub/Gitee
    */
   site?: string[];
   author?: string;
