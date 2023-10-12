@@ -3,9 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Platform = exports.DefaultCocosPluginOptions = exports.PluginType = exports.Panel = void 0;
 exports.Panel = {
     Type: {
-        DockAble: 'dockable',
-        Simple: 'simple',
-        InnerIndex: 'inner-index'
+        DockAble: "dockable",
+        Simple: "simple",
+        InnerIndex: "inner-index",
     },
 };
 var PluginType;
@@ -18,8 +18,8 @@ var PluginType;
 })(PluginType = exports.PluginType || (exports.PluginType = {}));
 // 一些默认值
 exports.DefaultCocosPluginOptions = {
-    outputProject: './',
-    output: './dist',
+    outputProject: "./",
+    output: "./dist",
     type: PluginType.PluginV2,
     server: {
         enabled: false,
@@ -29,10 +29,10 @@ exports.DefaultCocosPluginOptions = {
     min: false,
 };
 exports.Platform = {
-    WebMobile: 'web-mobile',
-    WebDesktop: 'web-desktop',
-    Android: 'android',
-    Ios: 'ios',
-    Mac: 'mac',
-    Win32: 'win32',
+    WebMobile: "web-mobile",
+    WebDesktop: "web-desktop",
+    Android: "android",
+    Ios: "ios",
+    Mac: "mac",
+    Win32: "win32",
 };
