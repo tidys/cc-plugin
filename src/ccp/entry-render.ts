@@ -6,7 +6,7 @@ import {
     PluginType
 } from '../declare';
 
-import adaptation, { Adaptation } from './adaptation';
+import adaptation, { Adaptation } from './adaptation/index';
 import profile from './profile';
 
 interface PanelOptions {
