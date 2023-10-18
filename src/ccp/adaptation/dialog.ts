@@ -109,7 +109,7 @@ export class Dialog extends Base {
             }
         }
     }
-    async select(options: SelectDialogOptions): Promise<Record<string, ArrayBuffer>> {
+    async select(options: SelectDialogOptions): Promise<Record<string, ArrayBuffer | null>> {
         if (this.adaptation.Env.isWeb) {
             return new Promise((resolve, reject) => {
                 const inputEl: HTMLInputElement = document.createElement('input');
@@ -169,24 +169,32 @@ export class Dialog extends Base {
                 inputEl.dispatchEvent(new MouseEvent('click'));
             });
         } else if (this.adaptation.Env.isPluginV2) {
-            let properties = '';
-            if (options.type === 'directory') {
-                properties = 'openDirectory';
-            } else if (options.type === 'file') {
-                properties = 'openFile';
-            }
-            //@ts-ignore 更多的参数后续慢慢适配
-            const result = Editor.Dialog.openFile({
+            // https://www.electronjs.org/zh/docs/latest/api/dialog#dialogshowopendialogsyncbrowserwindow-options
+            const dialogOptions = {
                 title: options.title,
                 defaultPath: options.path,
-                properties: [properties],
-            });
+                properties: [""],
+                filters: [],
+            }
+            if (options.type === 'directory') {
+                dialogOptions.properties = ['openDirectory'];
+            } else if (options.type === 'file') {
+                dialogOptions.properties = ['openFile'];
+                // @ts-ignore
+                dialogOptions.filters = options.filters || [];
+            }
+            //@ts-ignore
+            const result = Editor.Dialog.openFile(dialogOptions);
             if (result === -1) {
                 return {};
             }
             const ret: Record<string, any> = {};
             (result || []).forEach((e: string) => {
-                ret[e] = Fs.readFileSync(e).buffer;
+                if (options.type === 'file') {
+                    ret[e] = Fs.readFileSync(e).buffer;
+                } else {
+                    ret[e] = null;
+                }
             });
             return ret;
         } else {
@@ -194,7 +202,11 @@ export class Dialog extends Base {
             // @ts-ignore
             const result = await Editor.Dialog.select(options);
             (result.filePaths || []).forEach((e: string) => {
-                ret[e] = Fs.readFileSync(e).buffer;
+                if (options.type === 'file') {
+                    ret[e] = Fs.readFileSync(e).buffer;
+                } else {
+                    ret[e] = null;
+                }
             });
             return ret;
         }
