@@ -1,14 +1,30 @@
 import * as Fs from 'fs';
 import { Base } from './base';
 import { extname } from 'path';
+
 interface DialogMessageOptions {
-    message: string,
-    title?: string,
-    type?: 'question' | 'warning',
-    buttons?: Array<string>,
-    defaultId?: number,
-    noLink?: boolean,
-    cancelId?: number,
+    /**
+     * 对话框内容
+     */
+    message: string;
+    /**
+     * 标题
+     */
+    title?: string;
+    type?: "question" | "warning" | "none" | "info" | "error";
+    /**
+     * 按钮文本数组
+     */
+    buttons?: Array<string>;
+    /**
+     * 按钮索引
+     */
+    defaultId?: number;
+    noLink?: boolean;
+    /**
+     * 通过 Esc 键取消对话框的按钮索引
+     */
+    cancelId?: number;
 }
 
 const DefaultDialogMessageOptions: DialogMessageOptions = {
@@ -37,18 +53,21 @@ export interface SelectDialogOptions {
 }
 const Electron = require('electron');
 export class Dialog extends Base {
+    /**
+     * 目前web平台暂时不支持设置buttons
+     */
     message(options: DialogMessageOptions | string): boolean {
         if (typeof options === 'string') {
             options = { message: options };
         }
         options = Object.assign(DefaultDialogMessageOptions, options);
         if (this.adaptation.Env.isWeb) {
+            // true 确定，false 取消
             return confirm(options.message || '')
         } else {
-            // todo
-            console.log('有待实现')
+            // 0 确定，!0取消
+            return !Electron.remote?.dialog.showMessageBoxSync(options);
         }
-        return false;
     }
 
     async readAsBase64(file: File): Promise<string> {
