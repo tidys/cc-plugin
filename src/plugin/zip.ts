@@ -161,7 +161,8 @@ export default class Zip {
         }
     }
     apply(compiler: webpack.Compiler) {
-        compiler.hooks.afterDone.tap('zip', () => {
+        compiler.hooks.afterDone.tap('zip', (state: webpack.Stats) => {
+            const bProduction = state.compilation.compiler.options.mode === "production";
             console.log('开始构建压缩包')
             const dir = compiler.options.output.path;
             if (dir) {

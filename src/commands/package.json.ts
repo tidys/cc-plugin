@@ -13,9 +13,10 @@ export default class CocosPluginPackageJson {
         this.service = service;
     }
 
-
+    private bProduction: boolean = false;
     apply(compiler: webpack.Compiler) {
-        compiler.hooks.afterEmit.tap('PackageJson', () => {
+        compiler.hooks.afterEmit.tap('PackageJson', (compilation: webpack.Compilation) => {
+            this.bProduction = compilation.compiler.options.mode === "production";
             this.buildPackageJsonFile();
         })
     }
@@ -84,6 +85,9 @@ export default class CocosPluginPackageJson {
         const options = this.service.projectConfig.options!;
         const packageJsonFile = Path.join(options.output! as string, 'package.json');
         let spaces = options.min ? 0 : 4;
+        if (this.bProduction) {
+            spaces = 0;
+        }
         FsExtra.writeJSONSync(packageJsonFile, data, { spaces });
     }
 
