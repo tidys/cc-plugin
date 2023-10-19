@@ -5,6 +5,8 @@ import { exec } from 'child_process'
 import * as OS from 'os'
 // @ts-ignore
 import JsZip from 'jszip'
+import { ProjectConfig } from '../service';
+import { PluginType } from '../declare';
 
 export default class Zip {
     _packageDir(rootPath: string, zip: any) {
@@ -37,14 +39,16 @@ export default class Zip {
     }
 
     private zipDir(dir: string, pluginName: string) {
-        const zip = new JsZip();
-        this._packageDir(dir, zip.folder(pluginName))
+        // remove old zip
         const outDir = this.getOutDir(dir);
         const zipFilePath = Path.join(outDir, `${pluginName}.zip`)
         if (Fs.existsSync(zipFilePath)) {
             Fs.unlinkSync(zipFilePath);
-            console.log('⚠[删除] 旧版本压缩包: ' + zipFilePath);
+            console.log('删除旧版本压缩包: ' + zipFilePath);
         }
+        // pack
+        const zip = new JsZip();
+        this._packageDir(dir, zip.folder(pluginName))
         zip.generateNodeStream({
             type: 'nodebuffer',
             streamFiles: true,
@@ -56,13 +60,48 @@ export default class Zip {
             .pipe(Fs.createWriteStream(zipFilePath))
             .on('finish', () => {
                 this.showFileInExplore(zipFilePath)
-                console.log(`生成压缩包成功，把压缩包上传到cocos store就可以啦\n ${zipFilePath}`);
+                const { type } = this.projectConfig.options
+                const { site, store } = this.projectConfig.manifest;
+                console.log(`生成压缩包成功: ${zipFilePath}`)
+                if (type === PluginType.Web) {
+                    const siteString = site ? site.join(', ') : "";
+                    console.log(`压缩包部署到网站即可。${siteString}`);
+                } else if (type === PluginType.PluginV2 || type === PluginType.PluginV3) {
+                    const url = "https://store-my.cocos.com/seller/resources/";
+                    console.log(`把压缩包上传到cocos store就可以啦: ${url}`);
+                    if (store) {
+                        const storeDev = this.getStoreDev(store)
+                        if (storeDev) {
+                            console.log(`插件开发者后台：${storeDev}`)
+                        } else {
+                            console.warn(`配置的store字段异常`);
+                        }
+                    }
+                }
             })
             .on('error', () => {
                 console.log('生成压缩包失败');
             });
     }
-
+    private getStoreDev(store: string): string {
+        const storeTest = "https://store.cocos.com/app/detail/5205"
+        const devTest = "https://store-my.cocos.com/seller/resources/detail/5205"
+        if (!store) {
+            return ""
+        }
+        const char = '/';
+        while (store.endsWith(char)) {
+            store = store.substring(0, store.length - char.length)
+        }
+        const arr = store.split(char);
+        if (arr.length) {
+            const id = arr[arr.length - 1];
+            if (id) {
+                return `https://store-my.cocos.com/seller/resources/detail/${id}`;
+            }
+        }
+        return "";
+    }
 
     showFileInExplore(showPath: string) {
         let platform = OS.platform();
@@ -88,13 +127,31 @@ export default class Zip {
     private fileName: string = ''
     private version: string = '';
     private outDir: string = '';
-
-    constructor(fileName: string, version: string, outDir: string) {
-        this.fileName = fileName;
+    private projectConfig: ProjectConfig;
+    constructor(projectConfig: ProjectConfig, outDir: string) {
+        let { name, version } = projectConfig.manifest;
+        const { type } = projectConfig.options;
+        const typeName = this.getPluginTypeName(type!);
+        if (typeName && typeName.length > 0) {
+            name = `${name}_${typeName}`;
+        }
+        this.fileName = name;
         this.version = version;
         this.outDir = outDir;
+        this.projectConfig = projectConfig;
     }
-
+    private getPluginTypeName(type: PluginType) {
+        switch (type) {
+            case PluginType.PluginV2:
+                return 'plugin-v2';
+            case PluginType.PluginV3:
+                return 'plugin-v3';
+            case PluginType.Web:
+                return "web";
+            default:
+                return '';
+        }
+    }
     apply(compiler: webpack.Compiler) {
         compiler.hooks.afterDone.tap('zip', () => {
             console.log('开始构建压缩包')

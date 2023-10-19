@@ -74,10 +74,20 @@ export interface CocosPluginOptions {
         vscode?: string;
         electron?: string;
       }; // 输出的项目路径
-  output?: string; // 最终都要变成绝对路径
+    /**
+     * 发布文件的输出目录，支持相对路径和绝对路径
+     *  */
+    output?: string;
+    /**
+     * pack模式下是否清理上次的输出目录结果
+     */
+    cleanBeforeBuildWithPack?: boolean;
   cwd?: string;
   type: PluginType;
-  min?: boolean; // 压缩
+    /**
+     * package.json是否压缩
+     */
+    min?: boolean; 
   treeShaking?: boolean;
 }
 

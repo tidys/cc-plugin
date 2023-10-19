@@ -11,21 +11,12 @@ import * as Path from 'path';
 import { PluginType } from '../declare';
 import { merge } from 'lodash';
 import { getFallback } from './fallback';
+import { existsSync } from 'fs';
+import { emptyDirSync } from 'fs-extra';
 
 export default class Pack extends PluginApi {
     exit() {
         process.exit(0);
-    }
-
-    private getPluginTypeName(type: PluginType) {
-        switch (type) {
-            case PluginType.PluginV2:
-                return 'plugin-v2';
-            case PluginType.PluginV3:
-                return 'plugin-v3';
-            default:
-                return '';
-        }
     }
 
     apply(api: PluginMgr, service: CocosPluginService) {
@@ -67,15 +58,20 @@ export default class Pack extends PluginApi {
                     //     }])
                     //     .end();
 
-                    let { name, version } = service.projectConfig.manifest;
-                    const { type } = service.projectConfig.options;
-                    const typeName = this.getPluginTypeName(type!);
-                    if (typeName && typeName.length > 0) {
-                        name = `${name}_${typeName}`;
-                    }
                     const outDir = Path.join(service.context, 'dist');
-                    webpackChain.plugin('zip').use(Zip, [name, version, outDir])
+                    webpackChain.plugin('zip').use(Zip, [service.projectConfig, outDir])
                 })
+
+                // clean output results
+                const { cleanBeforeBuildWithPack } = service.projectConfig.options;
+                if (cleanBeforeBuildWithPack) {
+                    const { output } = service.projectConfig.options;
+                    if (output && existsSync(output)) {
+                        emptyDirSync(output)
+                        console.log(`clean output:${output}`)
+                    }
+                }
+
                 let webpackConfig = api.resolveChainWebpackConfig();
                 let fallback = getFallback(service);
                 webpackConfig = merge(webpackConfig, { resolve: { fallback } });
