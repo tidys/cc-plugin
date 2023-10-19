@@ -26,6 +26,7 @@ const plugin_api_1 = require("../plugin-api");
 const path_1 = __importStar(require("path"));
 const fs_1 = __importStar(require("fs"));
 const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
+const css_minimizer_webpack_plugin_1 = __importDefault(require("css-minimizer-webpack-plugin"));
 const panel_1 = __importDefault(require("../panel"));
 const npm_install_1 = __importDefault(require("../plugin/npm-install"));
 const package_json_1 = __importDefault(require("../commands/package.json"));
@@ -138,6 +139,12 @@ class Base extends plugin_api_1.PluginApi {
             if (service.isCreatorPlugin()) {
                 webpackChain.output.libraryTarget('commonjs');
                 webpackChain.output.publicPath(`packages://${pluginName}/`);
+            }
+            if (service.isWeb()) {
+                webpackChain.output.filename('[name].[fullhash].js');
+            }
+            else if (service.isCreatorPlugin()) {
+                webpackChain.output.filename('[name].js');
             }
             webpackChain.output.path(output);
             // .libraryExport('default') // 这里暂时不能使用这个
@@ -256,9 +263,13 @@ class Base extends plugin_api_1.PluginApi {
                 .plugin('vue')
                 .use(vue_loader_1.VueLoaderPlugin)
                 .end();
+            let cssFileName = '[name].css';
+            if (service.isWeb()) {
+                cssFileName = '[name].[fullhash].css';
+            }
             webpackChain.plugin('extract-css')
                 .use(mini_css_extract_plugin_1.default, [{
-                    filename: '[name].css',
+                    filename: cssFileName,
                     chunkFilename: '[id].css'
                 }]).end();
             if (service.isCreatorPluginV3()) {
@@ -266,6 +277,8 @@ class Base extends plugin_api_1.PluginApi {
                     .use(require_v3_1.default)
                     .end();
             }
+            webpackChain.optimization.minimizer("min-css")
+                .use(css_minimizer_webpack_plugin_1.default);
             webpackChain
                 .plugin('vue_env')
                 .use(webpack_1.default.DefinePlugin, [{

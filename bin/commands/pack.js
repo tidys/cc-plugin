@@ -37,22 +37,13 @@ const log_1 = require("../log");
 const zip_1 = __importDefault(require("../plugin/zip"));
 const terser_webpack_plugin_1 = __importDefault(require("terser-webpack-plugin"));
 const Path = __importStar(require("path"));
-const declare_1 = require("../declare");
 const lodash_1 = require("lodash");
 const fallback_1 = require("./fallback");
+const fs_1 = require("fs");
+const fs_extra_1 = require("fs-extra");
 class Pack extends plugin_api_1.PluginApi {
     exit() {
         process.exit(0);
-    }
-    getPluginTypeName(type) {
-        switch (type) {
-            case declare_1.PluginType.PluginV2:
-                return 'plugin-v2';
-            case declare_1.PluginType.PluginV3:
-                return 'plugin-v3';
-            default:
-                return '';
-        }
     }
     apply(api, service) {
         api.registerCommand('pack', { description: '打包插件' }, (param) => {
@@ -87,15 +78,17 @@ class Pack extends plugin_api_1.PluginApi {
                 //         cleanOnceBeforeBuildPatterns: ['**/*'],
                 //     }])
                 //     .end();
-                let { name, version } = service.projectConfig.manifest;
-                const { type } = service.projectConfig.options;
-                const typeName = this.getPluginTypeName(type);
-                if (typeName && typeName.length > 0) {
-                    name = `${name}_${typeName}`;
-                }
-                const outDir = Path.join(service.context, 'dist');
-                webpackChain.plugin('zip').use(zip_1.default, [name, version, outDir]);
+                webpackChain.plugin('zip').use(zip_1.default, [service]);
             }));
+            // clean output results
+            const { cleanBeforeBuildWithPack } = service.projectConfig.options;
+            if (cleanBeforeBuildWithPack) {
+                const { output } = service.projectConfig.options;
+                if (output && fs_1.existsSync(output)) {
+                    fs_extra_1.emptyDirSync(output);
+                    console.log(`clean output:${output}`);
+                }
+            }
             let webpackConfig = api.resolveChainWebpackConfig();
             let fallback = fallback_1.getFallback(service);
             webpackConfig = lodash_1.merge(webpackConfig, { resolve: { fallback } });

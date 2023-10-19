@@ -60,6 +60,10 @@ class Serve extends plugin_api_1.PluginApi {
             var _a;
             log_1.log.blue(printf_1.default('%-20s %s', 'service root:    ', service.root));
             log_1.log.blue(printf_1.default('%-20s %s', 'service context: ', service.context));
+            const { output } = service.projectConfig.options;
+            if (service.isCreatorPlugin() && output) {
+                log_1.log.blue(printf_1.default('%-20s %s', 'plugin dir:      ', output));
+            }
             const { options, manifest } = service.projectConfig;
             api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
                 var _b;

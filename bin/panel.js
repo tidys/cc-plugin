@@ -12,6 +12,19 @@ class Panel {
         this.service = service;
         this.webpackChain = webpackChain;
     }
+    getHtmlMinHash() {
+        const ret = { min: false, hash: false };
+        const { type } = this.service.projectConfig.options;
+        if (type === declare_1.PluginType.Web) {
+            ret.min = true;
+            ret.hash = true;
+        }
+        else if (type === declare_1.PluginType.PluginV2 || type === declare_1.PluginType.PluginV3) {
+            ret.min = false;
+            ret.hash = false;
+        }
+        return ret;
+    }
     dealPanel(panel, options) {
         let ejsTemplate = null;
         if (panel.ejs && fs_extra_1.existsSync(panel.ejs)) {
@@ -46,10 +59,12 @@ class Panel {
             }
             else {
                 const filename = `${entryName}_panel.js`;
+                const { min, hash } = this.getHtmlMinHash();
                 let options = {
+                    title: panel.title || panel.name,
                     template: ejsTemplate,
-                    minify: false,
-                    hash: false,
+                    minify: min,
+                    hash: hash,
                     chunks: ['vendor', entryName],
                 };
                 // creator插件必须有模板

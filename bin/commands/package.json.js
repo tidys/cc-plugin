@@ -28,10 +28,12 @@ const FsExtra = __importStar(require("fs-extra"));
 const package_worker_1 = require("./package-worker");
 class CocosPluginPackageJson {
     constructor(service) {
+        this.bProduction = false;
         this.service = service;
     }
     apply(compiler) {
-        compiler.hooks.afterEmit.tap('PackageJson', () => {
+        compiler.hooks.afterEmit.tap('PackageJson', (compilation) => {
+            this.bProduction = compilation.compiler.options.mode === "production";
             this.buildPackageJsonFile();
         });
     }
@@ -99,6 +101,9 @@ class CocosPluginPackageJson {
         const options = this.service.projectConfig.options;
         const packageJsonFile = path_1.default.join(options.output, 'package.json');
         let spaces = options.min ? 0 : 4;
+        if (this.bProduction) {
+            spaces = 0;
+        }
         FsExtra.writeJSONSync(packageJsonFile, data, { spaces });
     }
     get manifest() {
