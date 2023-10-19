@@ -126,6 +126,11 @@ export default class Base extends PluginApi {
                 webpackChain.output.libraryTarget('commonjs');
                 webpackChain.output.publicPath(`packages://${pluginName}/`);
             }
+            if (service.isWeb()) {
+                webpackChain.output.filename('[name].[fullhash].js')
+            } else if (service.isCreatorPlugin()) {
+                webpackChain.output.filename('[name].js')
+            }
             webpackChain.output.path(output)
             // .libraryExport('default') // 这里暂时不能使用这个
 

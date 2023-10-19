@@ -72,6 +72,10 @@ export interface CocosPluginOptions {
     port?: number; // 监听端口，需要优化判断下端口是否占用的问题
   };
   watchBuild?: boolean; // 监听构建
+    /**
+     * 配置的不同类型的输出目录，支持相对路径和绝对路径
+     * 最终都会汇总到output字段
+     */
   outputProject:
     | string
     | {
@@ -82,7 +86,7 @@ export interface CocosPluginOptions {
         electron?: string;
       }; // 输出的项目路径
     /**
-     * 发布文件的输出目录，支持相对路径和绝对路径
+     * 发布文件的最终输出目录，一般用户不需要设置这个字段，是cc-plugin的私有字段
      *  */
     output?: string;
     /**
