@@ -15,7 +15,18 @@ export default class Panel {
         this.service = service;
         this.webpackChain = webpackChain;
     }
-
+    getHtmlMinHash(): { min: boolean, hash: boolean } {
+        const ret = { min: false, hash: false }
+        const { type } = this.service.projectConfig.options;
+        if (type === PluginType.Web) {
+            ret.min = true;
+            ret.hash = true;
+        } else if (type === PluginType.PluginV2 || type === PluginType.PluginV3) {
+            ret.min = false;
+            ret.hash = false;
+        }
+        return ret;
+    }
     dealPanel(panel: PanelOptions, options: CocosPluginOptions) {
         let ejsTemplate = null;
         if (panel.ejs && existsSync(panel.ejs)) {
@@ -50,10 +61,12 @@ export default class Panel {
                 console.error(`has same entry ${entryName}`);
             } else {
                 const filename = `${entryName}_panel.js`;
+                const { min, hash } = this.getHtmlMinHash();
                 let options: HtmlWebpackPlugin.Options = {
+                    title: panel.title || panel.name,
                     template: ejsTemplate,
-                    minify: false,
-                    hash: false,
+                    minify: min,
+                    hash: hash,
                     chunks: ['vendor', entryName],
                 };
                 // creator插件必须有模板

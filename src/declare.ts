@@ -10,7 +10,14 @@ export interface MenuOptions {
 
 export interface PanelOptions {
   main: string;
+    /**
+     * creator插件面板的名字，是面板的key值，打开面板需要这个key
+     * web版本，如果没有title，就会使用该字段
+     */
   name: string;
+    /**
+     * creator插件面板或者网页的标题
+     */
   title: string;
   type: string;
   icon?: string;

@@ -6,6 +6,7 @@ import { PluginType } from '../declare';
 import Path, { resolve, join } from 'path';
 import Fs, { existsSync } from 'fs';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import CssMinimizerPlugin from "css-minimizer-webpack-plugin"
 import Panel from '../panel';
 import NpmInstall from '../plugin/npm-install';
 import CocosPluginPackageJson from '../commands/package.json';
@@ -248,9 +249,13 @@ export default class Base extends PluginApi {
                 .plugin('vue')
                 .use(VueLoaderPlugin)
                 .end();
+            let cssFileName = '[name].css'
+            if (service.isWeb()) {
+                cssFileName = '[name].[fullhash].css'
+            }
             webpackChain.plugin('extract-css')
                 .use(MiniCssExtractPlugin, [{
-                    filename: '[name].css',
+                    filename: cssFileName,
                     chunkFilename: '[id].css'
                 }]).end();
             if (service.isCreatorPluginV3()) {
@@ -258,7 +263,8 @@ export default class Base extends PluginApi {
                     .use(requireV3)
                     .end();
             }
-
+            webpackChain.optimization.minimizer("min-css")
+                .use(CssMinimizerPlugin);
             webpackChain
                 .plugin('vue_env')
                 .use(webpack.DefinePlugin, [{
