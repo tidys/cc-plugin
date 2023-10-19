@@ -58,8 +58,7 @@ export default class Pack extends PluginApi {
                     //     }])
                     //     .end();
 
-                    const outDir = Path.join(service.context, 'dist');
-                    webpackChain.plugin('zip').use(Zip, [service.projectConfig, outDir])
+                    webpackChain.plugin('zip').use(Zip, [service])
                 })
 
                 // clean output results

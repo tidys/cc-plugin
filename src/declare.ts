@@ -79,6 +79,10 @@ export interface CocosPluginOptions {
      *  */
     output?: string;
     /**
+     * 插件的zip包的存放位置，支持绝对路径和相对路径，默认相对路径./dist
+     */
+    zipOutput?: string;
+    /**
      * pack模式下是否清理上次的输出目录结果
      */
     cleanBeforeBuildWithPack?: boolean;

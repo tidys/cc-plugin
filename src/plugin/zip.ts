@@ -5,7 +5,7 @@ import { exec } from 'child_process'
 import * as OS from 'os'
 // @ts-ignore
 import JsZip from 'jszip'
-import { ProjectConfig } from '../service';
+import CocosPluginService, { ProjectConfig } from '../service';
 import { PluginType } from '../declare';
 
 export default class Zip {
@@ -128,9 +128,17 @@ export default class Zip {
     private version: string = '';
     private outDir: string = '';
     private projectConfig: ProjectConfig;
-    constructor(projectConfig: ProjectConfig, outDir: string) {
-        let { name, version } = projectConfig.manifest;
-        const { type } = projectConfig.options;
+    constructor(service: CocosPluginService,) {
+        const zipOutput = service.projectConfig.options.zipOutput || './dist';
+        let outDir = "";
+        if (zipOutput.startsWith("./")) {
+            outDir = Path.join(service.context, zipOutput);
+        } else {
+            outDir = zipOutput;
+        }
+
+        let { name, version } = service.projectConfig.manifest;
+        const { type } = service.projectConfig.options;
         const typeName = this.getPluginTypeName(type!);
         if (typeName && typeName.length > 0) {
             name = `${name}_${typeName}`;
@@ -138,7 +146,7 @@ export default class Zip {
         this.fileName = name;
         this.version = version;
         this.outDir = outDir;
-        this.projectConfig = projectConfig;
+        this.projectConfig = service.projectConfig;
     }
     private getPluginTypeName(type: PluginType) {
         switch (type) {
