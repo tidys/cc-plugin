@@ -100,21 +100,23 @@ class Panel {
         let panels = this.service.projectConfig.manifest.panels;
         const options = this.service.projectConfig.options;
         if (panels && panels.length) {
-            // 追加一个index页面，方便运行起来后，查看有多少个panel，也方便用户跳转
-            const optionsPanels = JSON.stringify(panels.map((panel) => {
-                return {
-                    label: `${panel.title}-${panel.name}`,
-                    href: `${panel.name}.html`,
-                };
-            }));
-            panels.push({
-                name: 'index',
-                title: "index",
-                main: path_1.join(this.service.root, "src/index/index.ts"),
-                ejs: path_1.join(this.service.root, "src/index/index.ejs"),
-                ejsOptions: { panels: optionsPanels },
-                type: declare_1.Panel.Type.InnerIndex,
-            });
+            if (this.service.isWeb()) {
+                // 追加一个index页面，方便运行起来后，查看有多少个panel，也方便用户跳转
+                const optionsPanels = JSON.stringify(panels.map((panel) => {
+                    return {
+                        label: `${panel.title}-${panel.name}`,
+                        href: `${panel.name}.html`,
+                    };
+                }));
+                panels.push({
+                    name: 'index',
+                    title: "index",
+                    main: path_1.join(this.service.root, "src/index/index.ts"),
+                    ejs: path_1.join(this.service.root, "src/index/index.ejs"),
+                    ejsOptions: { panels: optionsPanels },
+                    type: declare_1.Panel.Type.InnerIndex,
+                });
+            }
             // 主要是处理main的字段
             panels.forEach(panel => {
                 // 需要知道这个面板被哪个HTMLWebpack chunk

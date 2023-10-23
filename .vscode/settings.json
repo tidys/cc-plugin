@@ -6,5 +6,9 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "vscode.typescript-language-features"
   },
-  "typescript.tsserver.maxTsServerMemory": 3072
+  "typescript.tsserver.maxTsServerMemory": 3072,
+  "files.exclude": {
+    ".bin": true,
+    "bin": true
+  }
 }
