@@ -1,5 +1,8 @@
 export interface MenuOptions {
-  path: () => string;
+  /**
+   * 目前只能放到package下边，creator会审核这个菜单路径
+   */
+  path: string;
   icon?: string;
   accelerator?: string;
   message: {
