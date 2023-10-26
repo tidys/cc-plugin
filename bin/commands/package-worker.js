@@ -1,11 +1,16 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PackageV3 = exports.PackageV2 = exports.PackageInterface = void 0;
 const log_1 = require("../log");
 const lodash_1 = require("lodash");
+const utils_1 = __importDefault(require("../utils"));
 class PackageInterface {
     constructor(config) {
         this.config = config;
+        utils_1.default.init(config.manifest, config.options);
     }
     menuReady() { }
     ;
@@ -27,12 +32,23 @@ class PackageV2 extends PackageInterface {
         super.menuReady();
         this.packageData['main-menu'] = {};
     }
+    /**
+     * 2.x的menu
+     "main-menu": {
+        "小王子/BitMap字体工具/字体图集(IMAGE)": {
+            "message": "bitmap-font:openFNT"
+        },
+        "小王子/BitMap字体工具/字体文件(TTF)": {
+            "message": "bitmap-font:openTTF"
+        }
+      },
+     */
     menuBuild(menu) {
         super.menuBuild(menu);
         let menus = this.packageData['main-menu'];
         const { name } = menu.message;
         const panel = menu.message.panel || this.config.manifest.name;
-        menus[lodash_1.trim(menu.path, '/')] = { message: `${panel}:${name}` };
+        menus[lodash_1.trim(menu.path(), '/')] = { message: `${panel}:${name}` };
     }
     panelReady() {
         super.panelReady();
@@ -99,13 +115,23 @@ class PackageV3 extends PackageInterface {
         super.menuBuild(menuOpts);
         let menu = this.packageData.contributions.menu;
         let msgKey = this.addMessage(menuOpts);
-        let { newLabel, newPath } = this.dealPath(menuOpts.path);
+        let { newLabel, newPath } = this.dealPath(menuOpts.path());
         menu.push({
             path: newPath,
             label: newLabel,
             message: msgKey,
         });
     }
+    /**
+     * 3.x的menu格式
+     menu:[
+        {
+            "path": "小王子/BitMap字体工具",
+            "label": "字体图集(IMAGE)",
+            "message": "openFNT"
+        }
+    ]
+     */
     dealPath(path) {
         let newPath = '', newLabel = '';
         path = lodash_1.trim(path, '/');
