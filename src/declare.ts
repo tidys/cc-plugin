@@ -1,5 +1,5 @@
 export interface MenuOptions {
-  path: string;
+  path: () => string;
   icon?: string;
   accelerator?: string;
   message: {

@@ -3,7 +3,7 @@ import { CocosPluginManifest, CocosPluginOptions, PluginType } from './declare';
 class Utils {
     private manifest: CocosPluginManifest | null = null;
     public options: CocosPluginOptions | null = null;
-
+    private _init: boolean = false;
     // 内置的菜单
     public builtinMenu = {
         project: '',
@@ -11,6 +11,7 @@ class Utils {
     }
 
     init(manifest: CocosPluginManifest, options: CocosPluginOptions) {
+        this._init = true;
         this.manifest = manifest;
         this.options = options;
         const { type } = options;
@@ -21,7 +22,20 @@ class Utils {
             this.builtinMenu.project = this.toi18n('menu.project')
         }
     }
-
+    menuProject(name: string, i18n: boolean = true): string {
+        if (!this._init) {
+            console.error("need init");
+            return "";
+        }
+        return `${utils.builtinMenu.project}/${i18n ? this.i18n(name) : name}`;
+    }
+    menuPackage(name: string, i18n: boolean = true): string {
+        if (!this._init) {
+            console.error("need init");
+            return "";
+        }
+        return `${utils.builtinMenu.package}/${i18n ? this.i18n(name) : name}`;
+    }
     i18n(key: string) {
         const pkgName = this.manifest!.name;
         return this.toi18n(`${pkgName}.${key}`);
