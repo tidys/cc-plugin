@@ -1,6 +1,6 @@
 {
   "editor.formatOnSave": true,
-  "editor.tabSize": 2,
+  "editor.tabSize": 4,
   "editor.formatOnSaveMode": "modifications",
   "files.autoSave": "onFocusChange",
   "[typescript]": {

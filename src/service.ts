@@ -101,7 +101,7 @@ export default class CocosPluginService {
 
     private loadModule(file: string) {
         // 从当前package的node_modules中找依赖
-        prepare(extensions, file);
+        prepare(extensions, file, this.root);
         const module = require(file);
         if (module.hasOwnProperty('default')) {
             return module.default;
