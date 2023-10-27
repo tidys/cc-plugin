@@ -98,7 +98,7 @@ class CocosPluginService {
     }
     loadModule(file) {
         // 从当前package的node_modules中找依赖
-        rechoir_1.prepare(interpret_1.extensions, file);
+        rechoir_1.prepare(interpret_1.extensions, file, this.root);
         const module = require(file);
         if (module.hasOwnProperty('default')) {
             return module.default;
