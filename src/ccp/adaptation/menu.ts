@@ -1,4 +1,5 @@
 import { IUiMenuItem } from '@xuyanfeng/cc-ui/types/cc-menu';
+import ccui from '@xuyanfeng/cc-ui'
 import { Base } from './base';
 const Electron = require('electron');
 
@@ -12,8 +13,7 @@ export class Menu extends Base {
             };
         });
         if (this.adaptation.Env.isWeb) {
-            // TODO: fix version
-            // Methods.CCMenu.showMenuByMouseEvent(event, menus);
+            ccui.menu.showMenuByMouseEvent(event, menus);
         } else {
             const { Menu, MenuItem, getCurrentWindow } = Electron.remote;
             let menu = new Menu();
