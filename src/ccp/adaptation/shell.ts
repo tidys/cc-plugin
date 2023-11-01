@@ -39,9 +39,11 @@ export class Shell extends Base {
         if (this.adaptation.Env.isPluginV2) {
             // @ts-ignore
             Electron.remote?.shell?.beep();
-        } else {
+        } else if (this.adaptation.Env.isPluginV3) {
             // @ts-ignore
             Electron.remote?.shell?.beep();
+        } else if (this.adaptation.Env.isWeb) {
+
         }
     }
 

@@ -124,7 +124,9 @@ export const messages = Object.assign(CCP.wrapper?.messages || {}, {
             outputPath: dest,
             buildPath: Path.dirname(dest),
         }
-        CCP.wrapper?.builder?.onBeforeBuild(param);
+        if (CCP && CCP.wrapper && CCP.wrapper.builder && CCP.wrapper.builder.onBeforeBuild) {
+            CCP.wrapper.builder.onBeforeBuild(param);
+        }
     },
     'editor:build-finished'(event: any, options: any) {
         const { platform, md5Cache, dest } = options;
@@ -134,6 +136,8 @@ export const messages = Object.assign(CCP.wrapper?.messages || {}, {
             outputPath: dest,
             buildPath: Path.dirname(dest),
         }
-        CCP.wrapper?.builder?.onAfterBuild(param);
+        if (CCP && CCP.wrapper && CCP.wrapper.builder && CCP.wrapper.builder.onAfterBuild) {
+            CCP.wrapper.builder.onAfterBuild(param);
+        }
     }
 })
