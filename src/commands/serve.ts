@@ -30,6 +30,9 @@ export default class Serve extends PluginApi {
     apply(api: PluginMgr, service: CocosPluginService): void {
         api.registerCommand('serve', {
             description: '开发插件',
+            arguments: [
+                { name: "validCode", required: false, value: false }
+            ]
         }, async (param) => {
             log.blue(printf('%-20s %s', 'service root:    ', service.root))
             log.blue(printf('%-20s %s', 'service context: ', service.context))
@@ -37,13 +40,28 @@ export default class Serve extends PluginApi {
             if (service.isCreatorPlugin() && output) {
                 log.blue(printf('%-20s %s', 'plugin dir:      ', output))
             }
+            // validCode variable
+            const p1 = param[0];
+            let validCode = true;
+            try {
+                if (typeof p1 === 'string') {
+                    validCode = JSON.parse(p1);
+                }
+            } catch (e) {
+
+            }
+
             const { options, manifest } = service.projectConfig;
             api.chainWebpack(async (webpackChain: Config) => {
                 // 当server开启时，一般来说都需要启用watchBuild，不然没有实际意义
                 webpackChain.watch(!!options.watchBuild || options.server?.enabled!)
                 webpackChain.mode('development');
                 webpackChain.devtool('source-map');
-
+                // 传递变量给项目，用于代码剔除
+                webpackChain.plugin("validCode")
+                    .use(webpack.DefinePlugin, [{
+                        __VALID_CODE__: validCode,
+                    }]);
                 webpackChain
                     .plugin('clean')
                     .use(CleanWebpackPlugin, [{

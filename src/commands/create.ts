@@ -12,7 +12,7 @@ export default class Create extends PluginApi {
         api.registerCommand('create', {
             description: '创建项目',
             arguments: [
-                { name: 'name', desc: '项目名字' }
+                { name: 'name', desc: '项目名字', required: false, value: "ccp-plugin" }
             ]
         }, (param) => {
             const projectName = param[0];

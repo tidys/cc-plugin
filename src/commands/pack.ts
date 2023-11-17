@@ -1,7 +1,7 @@
 import { PluginApi } from '../plugin-api';
 import CocosPluginService, { ProjectConfig } from '../service';
 import Config from 'webpack-chain';
-import webpack from 'webpack'
+import webpack, { cache } from 'webpack'
 import { PluginMgr } from '../plugin-mgr';
 import { log } from '../log';
 import Zip from '../plugin/zip';
@@ -21,12 +21,30 @@ export default class Pack extends PluginApi {
 
     apply(api: PluginMgr, service: CocosPluginService) {
         api.registerCommand('pack',
-            { description: '打包插件' },
+            {
+                description: '打包插件',
+                arguments: [
+                    { name: 'validCode', desc: "设置有效代码的变量值, 当为false时可以将这部分的代码剔除掉", required: false, value: false }
+                ]
+            },
             (param) => {
+                const p1 = param[0];
+                let validCode = true;
+                try {
+                    if (typeof p1 === 'string') {
+                        validCode = JSON.parse(p1);
+                    }
+                } catch (e) {
+
+                }
                 api.chainWebpack(async (webpackChain: Config) => {
                     webpackChain.mode('production')
                     webpackChain.devtool(false);
-
+                    // 传递变量给项目，用于代码剔除
+                    webpackChain.plugin("validCode")
+                        .use(webpack.DefinePlugin, [{
+                            __VALID_CODE__: validCode,
+                        }]);
                     webpackChain.optimization.minimizer('TerserPlugin').use(TerserPlugin, [
                         // @ts-ignore 不输出license.txt
                         {
@@ -35,6 +53,7 @@ export default class Pack extends PluginApi {
                             terserOptions: {
                                 // @ts-ignore
                                 compress: {
+                                    dead_code: true,
                                     drop_console: true,
                                     drop_debugger: true,
                                 }

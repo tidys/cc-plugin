@@ -1,3 +1,4 @@
+declare const __VALID_CODE__: boolean;
 export interface MenuOptions {
   /**
    * 目前只能放到package下边，creator会审核这个菜单路径

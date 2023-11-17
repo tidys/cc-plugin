@@ -1,6 +1,6 @@
 {
   "name": "cc-plugin",
-"version": "2.1.9",
+  "version": "2.1.10",
   "description": "专为Cocos Creator插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。",
   "main": "index.js",
   "types": "",
@@ -36,7 +36,7 @@
     "@types/webpack-sources": "^3.2.0",
     "@vue/cli-service": "^5.0.0-rc.1",
     "@vue/compiler-sfc": "3.2.26",
-    "@xuyanfeng/cc-ui": "^0.2.3",
+    "@xuyanfeng/cc-ui": "^0.2.7",
     "assert": "^2.0.0",
     "axios": "^0.26.1",
     "browserify-buffer": "^1.1.2",

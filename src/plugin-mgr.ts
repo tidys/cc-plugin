@@ -2,9 +2,9 @@ import CocosPluginService from './service';
 import Chain from 'webpack-chain'
 import Config from 'webpack-chain';
 import { PluginApi } from './plugin-api';
-import { Command, program } from 'commander';
+import { Argument, Command, program } from 'commander';
 
-export type PluginCmdOptions = { description?: string, arguments?: Array<{ name: string, desc?: string }> };
+export type PluginCmdOptions = { description?: string, arguments?: Array<{ name: string, desc?: string, value?: any, required?: boolean }> };
 export type PluginCmdCallback = (param: string[]) => void;
 
 
@@ -23,7 +23,11 @@ export class PluginMgr {
             .description(opts.description || '');
         if (opts.arguments) {
             opts.arguments.forEach(opt => {
-                cmd.argument(opt.name, opt.desc || opt.name)
+                const arg = new Argument(opt.name, opt.desc || opt.name)
+                arg.required = !!opt.required;
+                arg.argParser;
+                arg.default(opt.value);
+                cmd.addArgument(arg);
             })
         }
         cmd.action((...args) => {
