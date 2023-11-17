@@ -1,11 +1,21 @@
 const Path = require('path')
 const URL = require('url')
-
+const Fs=require("fs")
 
 function urlToFsPath(urlPath) {
 const result = URL.parse(urlPath)
 if (result.protocol === 'packages:') {
-return Path.join(Editor.Project.path, 'extensions', result.hostname, result.pathname)
+let ret = Path.join(Editor.Project.path, 'extensions', result.hostname, result.pathname);
+if (Fs.existsSync(ret)) {
+return ret;
+}
+
+const packageDir = Editor.Package.getPath(result.hostname);
+ret = Path.join(packageDir, result.pathname);
+if (Fs.existsSync(ret)) {
+return ret;
+}
+return null;
 }
 }
 
@@ -24,7 +34,7 @@ return null;
 
 <% const jsLength = htmlWebpackPlugin.files.js.length; %>
 <% for (let i = 0; i < jsLength; i++) { %>
-    const panel = requireWithUrl('<%= htmlWebpackPlugin.files.js[i] %>');
+const panel = requireWithUrl('<%= htmlWebpackPlugin.files.js[i] %>');
 <% } %>
 
 function loadCss (parent, cssPaths) {
@@ -53,8 +63,8 @@ exports.ready=function(...args){
 // 加载css
 <% const cssLength = htmlWebpackPlugin.files.css.length; %>
 <% for(let i = 0;i < cssLength;i++){ %>
-    loadCss(this.$.app.parentNode,'<%= htmlWebpackPlugin.files.css[i] %>')
-    loadCss(document.head,'<%= htmlWebpackPlugin.files.css[i] %>')
+loadCss(this.$.app.parentNode,'<%= htmlWebpackPlugin.files.css[i] %>')
+loadCss(document.head,'<%= htmlWebpackPlugin.files.css[i] %>')
 <% } %>
 
 
