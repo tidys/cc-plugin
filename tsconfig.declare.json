@@ -3,10 +3,15 @@
     "target": "ES6",
     "experimentalDecorators": true,
     "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "outDir": "types",
+    "skipLibCheck": true,
     "declaration": true,
     "emitDeclarationOnly": true
   },
   "include": ["./src/declare.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["./node_modules", "node_modules"]
 }

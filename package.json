@@ -12,7 +12,7 @@
     "clean-bin-dir": "node ./clean-bin-dir.js",
     "install-force": "yarn install --force",
     "types": "tsc -p tsconfig.declare.json",
-    "yalc-push": "npm run clean-bin-dir && tsc && yalc push",
+    "yalc-push": "npm run clean-bin-dir && npm run types && tsc && yalc push",
     "tsc-build": "tsc --watch",
     "demo-test": "vue-cli-service serve",
     "demo-test-debug": "node --inspect-brk=6666 ./node_modules/@vue/cli-service/bin/vue-cli-service.js serve"

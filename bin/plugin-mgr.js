@@ -17,7 +17,11 @@ class PluginMgr {
             .description(opts.description || '');
         if (opts.arguments) {
             opts.arguments.forEach(opt => {
-                cmd.argument(opt.name, opt.desc || opt.name);
+                const arg = new commander_1.Argument(opt.name, opt.desc || opt.name);
+                arg.required = !!opt.required;
+                arg.argParser;
+                arg.default(opt.value);
+                cmd.addArgument(arg);
             });
         }
         cmd.action((...args) => {

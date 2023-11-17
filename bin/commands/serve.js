@@ -56,6 +56,9 @@ class Serve extends plugin_api_1.PluginApi {
     apply(api, service) {
         api.registerCommand('serve', {
             description: '开发插件',
+            arguments: [
+                { name: "validCode", required: false, value: false }
+            ]
         }, (param) => __awaiter(this, void 0, void 0, function* () {
             var _a;
             log_1.log.blue(printf_1.default('%-20s %s', 'service root:    ', service.root));
@@ -64,6 +67,16 @@ class Serve extends plugin_api_1.PluginApi {
             if (service.isCreatorPlugin() && output) {
                 log_1.log.blue(printf_1.default('%-20s %s', 'plugin dir:      ', output));
             }
+            // validCode variable
+            const p1 = param[0];
+            let validCode = true;
+            try {
+                if (typeof p1 === 'string') {
+                    validCode = JSON.parse(p1);
+                }
+            }
+            catch (e) {
+            }
             const { options, manifest } = service.projectConfig;
             api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
                 var _b;
@@ -71,6 +84,11 @@ class Serve extends plugin_api_1.PluginApi {
                 webpackChain.watch(!!options.watchBuild || ((_b = options.server) === null || _b === void 0 ? void 0 : _b.enabled));
                 webpackChain.mode('development');
                 webpackChain.devtool('source-map');
+                // 传递变量给项目，用于代码剔除
+                webpackChain.plugin("validCode")
+                    .use(webpack_1.default.DefinePlugin, [{
+                        __VALID_CODE__: validCode,
+                    }]);
                 webpackChain
                     .plugin('clean')
                     .use(clean_webpack_plugin_1.CleanWebpackPlugin, [{
