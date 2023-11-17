@@ -7,6 +7,14 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "vscode.typescript-language-features"
   },
+  "[json]": {
+    "editor.quickSuggestions": {
+      "strings": true
+    },
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "editor.suggest.insertMode": "replace"
+  },
   "typescript.tsserver.maxTsServerMemory": 3072,
   "files.exclude": {
     ".bin": true,
