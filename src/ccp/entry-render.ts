@@ -18,16 +18,18 @@ export class CocosCreatorPluginRender {
     public options: CocosPluginOptions | null = null;
     public Adaptation: Adaptation = adaptation;
 
+    /**
+     * 调用来自插件
+     */
     public init(config: CocosPluginConfig, options: PanelOptions) {
-        const { type } = config.options;
-        this.Adaptation.init(config, type || PluginType.PluginV2);
+        this.Adaptation.init(config);
         this.manifest = config.manifest;
         this.options = Object.assign(DefaultCocosPluginOptions, config.options);
         profile.init({}, config);
         const { enabled, port } = this.options.server!;
         if (enabled) {
             let hot = () => {
-                if (this.options?.type === PluginType.Web) {
+                if (this.Adaptation.Env.isWeb) {
                     console.log('TODO web reload');
                 } else {
                     const ClientSocket = require('./client-socket').default;
@@ -57,7 +59,7 @@ export class CocosCreatorPluginRender {
                 originReady(rootElement, args);
             }
         }
-        if (type === PluginType.Web) {
+        if (this.Adaptation.Env.isWeb) {
             let el = document.body.querySelector('#app');
             if (el && options.ready) {
                 options.ready(el, null);

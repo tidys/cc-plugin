@@ -29,6 +29,9 @@ export class Adaptation {
     public Builder = new Builder(this);
     public Log = new Log(this);
     public Menu = new Menu(this);
+    constructor() {
+        this.Env.init();
+    }
     public require(name: string): any {
         if (this.Env.isPluginV2) {
             // @ts-ignore
@@ -62,9 +65,8 @@ export class Adaptation {
         }
     }
 
-    init(pluginConfig: CocosPluginConfig, type: PluginType) {
+    init(pluginConfig: CocosPluginConfig) {
         this.config = pluginConfig;
-        this.Env.init(type);
     }
 }
 

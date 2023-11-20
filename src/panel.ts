@@ -1,7 +1,7 @@
 import { CocosPluginOptions, PanelOptions, PluginType, Panel as PanelOptionsType } from './declare';
 import { join } from 'path'
 import { existsSync } from 'fs-extra'
-import CocosPluginService from './service';
+import { CocosPluginService } from './service';
 import Config from 'webpack-chain';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { template } from "lodash";
@@ -17,7 +17,7 @@ export default class Panel {
     }
     getHtmlMinHash(): { min: boolean, hash: boolean } {
         const ret = { min: false, hash: false }
-        const { type } = this.service.projectConfig.options;
+        const { type } = this.service.projectConfig;
         if (type === PluginType.Web) {
             ret.min = true;
             ret.hash = true;

@@ -1,5 +1,6 @@
 declare global {
-    const __VALID_CODE__: boolean;
+    const __VALID_CODE__: boolean; 
+    const __PLUGIN_TYPE__: string;
 }
 export interface MenuOptions {
   /**
@@ -64,11 +65,11 @@ export interface CocosPluginManifest {
 }
 
 export enum PluginType {
-  PluginV2, // cocos creator 插件v2版本
-  PluginV3, // cocos creator 插件v3版本
-  Web, // web页面
-  Electron, // 桌面应用
-  Vscode, // vscode插件
+    PluginV2 = "cp-v2", // cocos creator 插件v2版本
+    PluginV3 = "cp-v3", // cocos creator 插件v3版本
+    Web = "web", // web页面
+  // Electron="electron", // 桌面应用
+  // Vscode="vscode", // vscode插件
 }
 
 export interface CocosPluginOptions {
@@ -103,8 +104,7 @@ export interface CocosPluginOptions {
      * pack模式下是否清理上次的输出目录结果
      */
     cleanBeforeBuildWithPack?: boolean;
-  cwd?: string;
-  type: PluginType;
+    cwd?: string;
     /**
      * package.json是否压缩
      */
@@ -115,8 +115,7 @@ export interface CocosPluginOptions {
 // 一些默认值
 export const DefaultCocosPluginOptions: CocosPluginOptions = {
   outputProject: "./",
-  output: "./dist",
-  type: PluginType.PluginV2,
+    output: "./dist",
   server: {
     enabled: false,
     port: 2022,

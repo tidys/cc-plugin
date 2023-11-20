@@ -1,5 +1,5 @@
 import { PluginApi } from '../plugin-api';
-import CocosPluginService from '../service';
+import { CocosPluginService } from '../service';
 import WebpackChain from 'webpack-chain';
 import { PluginMgr } from '../plugin-mgr';
 import { PluginType } from '../declare';

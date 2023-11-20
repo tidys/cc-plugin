@@ -2,7 +2,7 @@ import { PluginApi } from '../plugin-api';
 import Config from 'webpack-chain';
 import Chain from 'webpack-chain';
 import webpack from 'webpack';
-import CocosPluginService from '../service';
+import { cocosPluginService, CocosPluginService } from '../service';
 import * as Path from 'path';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import * as Fs from 'fs';
@@ -14,6 +14,9 @@ import { log } from '../log'
 import { PluginMgr } from '../plugin-mgr';
 import { merge } from 'lodash';
 import { getFallback } from './fallback';
+import { checkBuildType, getBuildOptions, parseBuildOptions } from './commonOptions';
+import { OptionValues } from 'commander';
+import { PluginType } from 'declare';
 
 PortFinder.basePort = 9087;
 
@@ -28,29 +31,15 @@ function buildTargetNode(service: CocosPluginService) {
 
 export default class Serve extends PluginApi {
     apply(api: PluginMgr, service: CocosPluginService): void {
-        api.registerCommand('serve', {
-            description: '开发插件',
-            arguments: [
-                { name: "validCode", required: false, value: false }
-            ]
-        }, async (param) => {
+        api.registerCommand('serve', getBuildOptions('开发插件'), async (type: string, opts: OptionValues) => {
             log.blue(printf('%-20s %s', 'service root:    ', service.root))
             log.blue(printf('%-20s %s', 'service context: ', service.context))
             const { output } = service.projectConfig.options
             if (service.isCreatorPlugin() && output) {
                 log.blue(printf('%-20s %s', 'plugin dir:      ', output))
             }
-            // validCode variable
-            const p1 = param[0];
-            let validCode = true;
-            try {
-                if (typeof p1 === 'string') {
-                    validCode = JSON.parse(p1);
-                }
-            } catch (e) {
-
-            }
-
+            checkBuildType(type, true);
+            cocosPluginService.init(type as PluginType);
             const { options, manifest } = service.projectConfig;
             api.chainWebpack(async (webpackChain: Config) => {
                 // 当server开启时，一般来说都需要启用watchBuild，不然没有实际意义
@@ -58,10 +47,7 @@ export default class Serve extends PluginApi {
                 webpackChain.mode('development');
                 webpackChain.devtool('source-map');
                 // 传递变量给项目，用于代码剔除
-                webpackChain.plugin("validCode")
-                    .use(webpack.DefinePlugin, [{
-                        __VALID_CODE__: validCode,
-                    }]);
+                parseBuildOptions(webpackChain, type, opts);
                 webpackChain
                     .plugin('clean')
                     .use(CleanWebpackPlugin, [{

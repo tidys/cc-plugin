@@ -16,12 +16,10 @@ export class CocosCreatorPluginMain {
     public isV2: boolean = true;
 
     public init(config: CocosPluginConfig, wrapper: PluginMainWrapper) {
-        const { type } = config.options;
-        this.isV2 = type === PluginType.PluginV2;
         this.manifest = config.manifest;
         this.options = Object.assign(DefaultCocosPluginOptions, config.options);
         this.wrapper = wrapper;
-        this.Adaptation.init(config, type || PluginType.PluginV2)
+        this.Adaptation.init(config)
     }
 }
 

@@ -25,14 +25,6 @@ export class Profile {
         this._write();
     }
 
-    private get isWeb() {
-        if (this.pluginConfig) {
-            const { type } = this.pluginConfig.options;
-            return type === PluginType.Web;
-        }
-        return false;
-    }
-
     load(fileName: string): Record<string, any> {
         if (this.pluginConfig) {
             const data = this._read(fileName);
@@ -44,7 +36,7 @@ export class Profile {
     public _read(fileName: string) {
         this.Key = fileName;
         let retData: Record<string, any> = {}
-        if (this.isWeb) {
+        if (CCP.Adaptation.Env.isWeb) {
             // 从localstorage中读取
             const str = localStorage.getItem(this.Key);
             if (str) {
@@ -75,7 +67,7 @@ export class Profile {
 
     private _write() {
         const str = JSON.stringify(this.data, null, this.format ? 4 : 0);
-        if (this.isWeb) {
+        if (CCP.Adaptation.Env.isWeb) {
             localStorage.setItem(this.Key, str);
         } else {
             Fs.writeFileSync(this.nativeFile, str, 'utf-8')

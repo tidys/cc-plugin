@@ -1,4 +1,4 @@
-import CocosPluginService from '../service';
+import { CocosPluginService } from '../service';
 
 export function getFallback(service: CocosPluginService) {
     // https://webpack.docschina.org/configuration/resolve/#resolvefallback

@@ -25,11 +25,12 @@ import * as FsExtra from 'fs-extra'
 export interface ProjectConfig {
     manifest: CocosPluginManifest,
     options: CocosPluginOptions,
+    type: PluginType,
 }
 const ConfigTypeScript = "cc-plugin.config.ts";
 const ProjectJson = "project.json";
 
-export default class CocosPluginService {
+export class CocosPluginService {
     public webpackChainFns: Function[] = [];
     public plugins: PluginApi[] = [];
     public context: string;
@@ -45,22 +46,22 @@ export default class CocosPluginService {
     }
 
     public isCreatorPlugin() {
-        const { type } = this.projectConfig.options;
+        const { type } = this.projectConfig;
         return type === PluginType.PluginV2 || type === PluginType.PluginV3;
     }
 
     public isCreatorPluginV2() {
-        const { type } = this.projectConfig.options;
+        const { type } = this.projectConfig;
         return type === PluginType.PluginV2;
     }
 
     public isCreatorPluginV3() {
-        const { type } = this.projectConfig.options;
+        const { type } = this.projectConfig;
         return type === PluginType.PluginV3;
     }
 
     public isWeb() {
-        const { type } = this.projectConfig.options;
+        const { type } = this.projectConfig;
         return type === PluginType.Web;
     }
 
@@ -117,18 +118,20 @@ export default class CocosPluginService {
             version: '0.0.0',
             main: './src/main.ts',
         }
-        return { manifest, options };
+        return { manifest, options, type: PluginType.Web };
     }
 
-
-    private init() {
-        this.loadEnv();
-        const userOptions = this.loadUserOptions();
-        userOptions && this.checkUserOptions(userOptions);
-        this.projectConfig = defaultsDeep(userOptions, this.defaults);
+    public readyPlugins() {
         this.plugins.forEach((plugin) => {
             plugin.apply(this.pluginMgr, this);
         })
+    }
+    public init(type: PluginType) {
+        this.loadEnv();
+        const userOptions = this.loadUserOptions();
+        userOptions && this.checkUserOptions(userOptions, type);
+        this.projectConfig = defaultsDeep(userOptions, this.defaults);
+        this.projectConfig.type = type;
     }
 
     private checkIsProjectDir(projDir: string) {
@@ -201,10 +204,10 @@ export default class CocosPluginService {
         }
         return null;
     }
-    private checkUserOptions(userOptions: CocosPluginConfig) {
+    private checkUserOptions(userOptions: CocosPluginConfig, type: PluginType) {
         // 根据配置，将output目录统一变为绝对路径
         const { options, manifest } = userOptions;
-        let { type, outputProject } = options;
+        let { outputProject } = options;
         const pluginDir = this.getPluginDir(type!);
         if (typeof outputProject === 'object') {
             const { v2, v3, web } = outputProject!;
@@ -251,8 +254,5 @@ export default class CocosPluginService {
             process.exit(0);
         }
     }
-
-    run() {
-        this.init();
-    }
 }
+export const cocosPluginService = new CocosPluginService(process.cwd());

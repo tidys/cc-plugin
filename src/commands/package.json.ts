@@ -2,7 +2,7 @@ import webpack from 'webpack';
 import {CocosPluginV2, CocosPluginV3, PluginType} from '../declare';
 import Path from 'path';
 import * as FsExtra from 'fs-extra';
-import CocosPluginService from '../service';
+import { CocosPluginService } from '../service';
 import {PackageInterface, PackageV2, PackageV3} from './package-worker';
 
 export default class CocosPluginPackageJson {
@@ -29,7 +29,7 @@ export default class CocosPluginPackageJson {
             author: this.manifest.author || 'cocos-plugin-cli',
             main: './main.js',
         };
-        const { type } = this.options;
+        const { type } = this.service.projectConfig;
 
         let packageWorker: PackageInterface | null = null;
         if (type === PluginType.PluginV2) {

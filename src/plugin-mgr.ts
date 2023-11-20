@@ -1,11 +1,24 @@
-import CocosPluginService from './service';
+import { CocosPluginService } from './service';
 import Chain from 'webpack-chain'
 import Config from 'webpack-chain';
 import { PluginApi } from './plugin-api';
-import { Argument, Command, program } from 'commander';
+import { Argument, Command, program, Option, OptionValues } from 'commander';
 
-export type PluginCmdOptions = { description?: string, arguments?: Array<{ name: string, desc?: string, value?: any, required?: boolean }> };
-export type PluginCmdCallback = (param: string[]) => void;
+export type PluginCmdOptions = {
+    description?: string,
+    arguments?: Array<{
+        name: string,
+        desc?: string,
+        value?: any,
+        required?: boolean
+    }>,
+    options?: Array<{
+        name: string,
+        desc?: string,
+        required?: boolean
+    }>
+};
+export type PluginCmdCallback = (param: string, options: OptionValues[]) => void;
 
 
 export class PluginMgr {
@@ -30,9 +43,14 @@ export class PluginMgr {
                 cmd.addArgument(arg);
             })
         }
-        cmd.action((...args) => {
+        if (opts.options) {
+            opts.options.forEach(opt => {
+                cmd.option(opt.name, opt.desc || "");
+            })
+        }
+        cmd.action((str, options) => {
             // 把参数传递进去
-            callback(args)
+            callback(str, options);
         })
     }
 

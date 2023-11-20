@@ -1,4 +1,4 @@
-import CocosPluginService from './service';
+import { CocosPluginService } from './service';
 import { PluginMgr } from './plugin-mgr';
 
 export abstract class PluginApi {

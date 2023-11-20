@@ -1,6 +1,6 @@
 import { PluginApi } from '../plugin-api';
 import { PluginMgr } from '../plugin-mgr';
-import CocosPluginService from '../service';
+import { CocosPluginService } from '../service';
 import * as Fs from 'fs';
 import * as Path from 'path';
 import { log } from '../log';

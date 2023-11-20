@@ -37,7 +37,9 @@ export const methods = Object.assign(
             }
 
             if (type === 'onAfterBuild') {
-                CCP.wrapper?.builder?.onAfterBuild(param);
+                if (CCP && CCP.wrapper && CCP.wrapper.builder && CCP.wrapper.builder.onAfterBuild) {
+                    CCP.wrapper?.builder?.onAfterBuild(param);
+                }
             }
         }
     }

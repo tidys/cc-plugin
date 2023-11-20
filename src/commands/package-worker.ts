@@ -2,12 +2,13 @@ import { CocosPluginConfig, CocosPluginV2, CocosPluginV3, MenuOptions, PanelOpti
 import { log } from '../log';
 import { trim } from 'lodash'
 import utils from "../utils"
+import { ProjectConfig } from 'service';
 export abstract class PackageInterface {
     protected config: CocosPluginConfig;
 
-    constructor(config: CocosPluginConfig) {
+    constructor(config: ProjectConfig) {
         this.config = config;
-      utils.init(config.manifest, config.options);
+        utils.init(config);
     }
 
     menuReady() {};
@@ -22,7 +23,7 @@ export abstract class PackageInterface {
 export class PackageV2 extends PackageInterface {
     private packageData: CocosPluginV2 | null = null;
 
-    constructor(config: CocosPluginConfig, packageDta: CocosPluginV2) {
+    constructor(config: ProjectConfig, packageDta: CocosPluginV2) {
         super(config);
         this.packageData = packageDta;
     }
@@ -81,9 +82,9 @@ export class PackageV2 extends PackageInterface {
 export class PackageV3 extends PackageInterface {
     private packageData: CocosPluginV3 | null = null;
 
-    constructor(config: CocosPluginConfig, packageData: CocosPluginV3) {
+    constructor(config: ProjectConfig, packageData: CocosPluginV3) {
         super(config);
-      this.packageData = packageData;
+        this.packageData = packageData; 
         this.packageData.package_version = 2;
         this.packageData!.contributions = {
             builder: './builder.js', // todo 目前这里是写死的，需要后续优化下

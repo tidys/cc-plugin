@@ -5,7 +5,7 @@ import { exec } from 'child_process'
 import * as OS from 'os'
 // @ts-ignore
 import JsZip from 'jszip'
-import CocosPluginService, { ProjectConfig } from '../service';
+import { CocosPluginService, ProjectConfig } from '../service';
 import { PluginType } from '../declare';
 
 export default class Zip {
@@ -60,7 +60,7 @@ export default class Zip {
             .pipe(Fs.createWriteStream(zipFilePath))
             .on('finish', () => {
                 this.showFileInExplore(zipFilePath)
-                const { type } = this.projectConfig.options
+                const { type } = this.projectConfig;
                 const { site, store } = this.projectConfig.manifest;
                 console.log(`生成压缩包成功: ${zipFilePath}`)
                 if (type === PluginType.Web) {
@@ -138,7 +138,7 @@ export default class Zip {
         }
 
         let { name, version } = service.projectConfig.manifest;
-        const { type } = service.projectConfig.options;
+        const { type } = service.projectConfig;
         const typeName = this.getPluginTypeName(type!);
         if (typeName && typeName.length > 0) {
             name = `${name}_${typeName}`;

@@ -1,4 +1,5 @@
-import { CocosPluginManifest, CocosPluginOptions, PluginType } from './declare';
+import { ProjectConfig } from 'service';
+import { CocosPluginConfig, CocosPluginManifest, CocosPluginOptions, PluginType } from './declare';
 
 class Utils {
     private manifest: CocosPluginManifest | null = null;
@@ -27,12 +28,11 @@ class Utils {
        */
       develop: "",
     }
-
-    init(manifest: CocosPluginManifest, options: CocosPluginOptions) {
+    init(config: ProjectConfig) {
         this._init = true;
-        this.manifest = manifest;
-        this.options = options;
-        const { type } = options;
+        this.manifest = config.manifest;
+        this.options = config.options;
+        const { type } = config;
         if (type === PluginType.PluginV2) {
             this.builtinMenu.project = this.toi18n('MAIN_MENU.project.title')
             this.builtinMenu.package = this.toi18n('MAIN_MENU.package.title');

@@ -3,8 +3,9 @@ import { BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType }
 export class Env extends Base {
     private _type: PluginType | null = null;
 
-    init(type: PluginType) {
-        this._type = type;
+    init() {
+        console.log(__PLUGIN_TYPE__);
+        this._type = __PLUGIN_TYPE__ as PluginType;
     }
 
     get isWeb() {
