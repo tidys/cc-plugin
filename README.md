@@ -36,11 +36,16 @@ yarn install
 ```
 4. 构建插件
 ```shell
-cc-plugin serve
+cc-plugin serve web
+cc-plugin serve cp-v2
+cc-plugin serve cp-v3
+
 ```
 5. 打包插件
 ```shell
-cc-plugin pack
+cc-plugin pack web
+cc-plugin pack cp-v2
+cc-plugin pack cp-v3
 ```
 玩的开心！
 
@@ -176,4 +181,4 @@ if (!!__VALID_CODE__) {
 }
 ```
 
-执行`cc-plugin pack false`、`cc-plugin serve false`，第三个参数直接决定了`__VALID_CODE__`的值，当为false时，build后就会将相关的逻辑剔除掉。
+执行`cc-plugin pack web --validCode=true`，validCode选项直接决定了`__VALID_CODE__`的值，当为false时，pack后就会将相关的逻辑剔除掉。
