@@ -5,6 +5,7 @@
   "files.autoSave": "onFocusChange",
   "[typescript]": {
     "editor.formatOnSave": true,
+    "editor.tabSize": 4,
     "editor.defaultFormatter": "vscode.typescript-language-features"
   },
   "[json]": {

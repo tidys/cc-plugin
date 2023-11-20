@@ -65,8 +65,8 @@ export default class Base extends PluginApi {
     }
 
     apply(api: PluginMgr, service: CocosPluginService) {
-        const { options, manifest } = service.projectConfig;
         api.chainWebpack((webpackChain: WebpackChain) => {
+            const { options, manifest } = service.projectConfig;
             const pluginName = manifest.name;
             // target
             {

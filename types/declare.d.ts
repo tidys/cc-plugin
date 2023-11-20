@@ -1,5 +1,6 @@
 declare global {
     const __VALID_CODE__: boolean;
+    const __PLUGIN_TYPE__: string;
 }
 export interface MenuOptions {
     /**
@@ -60,11 +61,9 @@ export interface CocosPluginManifest {
     i18n_en?: string;
 }
 export declare enum PluginType {
-    PluginV2 = 0,
-    PluginV3 = 1,
-    Web = 2,
-    Electron = 3,
-    Vscode = 4
+    PluginV2 = "cp-v2",
+    PluginV3 = "cp-v3",
+    Web = "web"
 }
 export interface CocosPluginOptions {
     server?: {
@@ -96,7 +95,6 @@ export interface CocosPluginOptions {
      */
     cleanBeforeBuildWithPack?: boolean;
     cwd?: string;
-    type: PluginType;
     /**
      * package.json是否压缩
      */

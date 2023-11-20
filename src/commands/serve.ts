@@ -32,14 +32,14 @@ function buildTargetNode(service: CocosPluginService) {
 export default class Serve extends PluginApi {
     apply(api: PluginMgr, service: CocosPluginService): void {
         api.registerCommand('serve', getBuildOptions('开发插件'), async (type: string, opts: OptionValues) => {
+            checkBuildType(type, true);
+            cocosPluginService.init(type as PluginType);
             log.blue(printf('%-20s %s', 'service root:    ', service.root))
             log.blue(printf('%-20s %s', 'service context: ', service.context))
             const { output } = service.projectConfig.options
             if (service.isCreatorPlugin() && output) {
                 log.blue(printf('%-20s %s', 'plugin dir:      ', output))
             }
-            checkBuildType(type, true);
-            cocosPluginService.init(type as PluginType);
             const { options, manifest } = service.projectConfig;
             api.chainWebpack(async (webpackChain: Config) => {
                 // 当server开启时，一般来说都需要启用watchBuild，不然没有实际意义

@@ -26,6 +26,7 @@ export function getFallback(service: CocosPluginService) {
           express: false,
           electron: false,
           async_hooks: false,
+            string_decoder: false 
         });
     }
     return fallback;
