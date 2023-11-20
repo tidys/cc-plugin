@@ -81,8 +81,8 @@ class Base extends plugin_api_1.PluginApi {
         }
     }
     apply(api, service) {
-        const { options, manifest } = service.projectConfig;
         api.chainWebpack((webpackChain) => {
+            const { options, manifest } = service.projectConfig;
             const pluginName = manifest.name;
             // target
             {

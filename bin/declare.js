@@ -10,17 +10,16 @@ exports.Panel = {
 };
 var PluginType;
 (function (PluginType) {
-    PluginType[PluginType["PluginV2"] = 0] = "PluginV2";
-    PluginType[PluginType["PluginV3"] = 1] = "PluginV3";
-    PluginType[PluginType["Web"] = 2] = "Web";
-    PluginType[PluginType["Electron"] = 3] = "Electron";
-    PluginType[PluginType["Vscode"] = 4] = "Vscode";
+    PluginType["PluginV2"] = "cp-v2";
+    PluginType["PluginV3"] = "cp-v3";
+    PluginType["Web"] = "web";
+    // Electron="electron", // 桌面应用
+    // Vscode="vscode", // vscode插件
 })(PluginType = exports.PluginType || (exports.PluginType = {}));
 // 一些默认值
 exports.DefaultCocosPluginOptions = {
     outputProject: "./",
     output: "./dist",
-    type: PluginType.PluginV2,
     server: {
         enabled: false,
         port: 2022,

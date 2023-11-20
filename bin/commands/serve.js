@@ -34,6 +34,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const plugin_api_1 = require("../plugin-api");
 const webpack_chain_1 = __importDefault(require("webpack-chain"));
 const webpack_1 = __importDefault(require("webpack"));
+const service_1 = require("../service");
 const Path = __importStar(require("path"));
 const clean_webpack_plugin_1 = require("clean-webpack-plugin");
 const Fs = __importStar(require("fs"));
@@ -44,6 +45,7 @@ const printf_1 = __importDefault(require("printf"));
 const log_1 = require("../log");
 const lodash_1 = require("lodash");
 const fallback_1 = require("./fallback");
+const commonOptions_1 = require("./commonOptions");
 portfinder_1.default.basePort = 9087;
 function buildTargetNode(service) {
     let config = new webpack_chain_1.default();
@@ -54,28 +56,15 @@ function buildTargetNode(service) {
 }
 class Serve extends plugin_api_1.PluginApi {
     apply(api, service) {
-        api.registerCommand('serve', {
-            description: '开发插件',
-            arguments: [
-                { name: "validCode", required: false, value: false }
-            ]
-        }, (param) => __awaiter(this, void 0, void 0, function* () {
+        api.registerCommand('serve', commonOptions_1.getBuildOptions('开发插件'), (type, opts) => __awaiter(this, void 0, void 0, function* () {
             var _a;
+            commonOptions_1.checkBuildType(type, true);
+            service_1.cocosPluginService.init(type);
             log_1.log.blue(printf_1.default('%-20s %s', 'service root:    ', service.root));
             log_1.log.blue(printf_1.default('%-20s %s', 'service context: ', service.context));
             const { output } = service.projectConfig.options;
             if (service.isCreatorPlugin() && output) {
                 log_1.log.blue(printf_1.default('%-20s %s', 'plugin dir:      ', output));
-            }
-            // validCode variable
-            const p1 = param[0];
-            let validCode = true;
-            try {
-                if (typeof p1 === 'string') {
-                    validCode = JSON.parse(p1);
-                }
-            }
-            catch (e) {
             }
             const { options, manifest } = service.projectConfig;
             api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
@@ -85,10 +74,7 @@ class Serve extends plugin_api_1.PluginApi {
                 webpackChain.mode('development');
                 webpackChain.devtool('source-map');
                 // 传递变量给项目，用于代码剔除
-                webpackChain.plugin("validCode")
-                    .use(webpack_1.default.DefinePlugin, [{
-                        __VALID_CODE__: validCode,
-                    }]);
+                commonOptions_1.parseBuildOptions(webpackChain, type, opts);
                 webpackChain
                     .plugin('clean')
                     .use(clean_webpack_plugin_1.CleanWebpackPlugin, [{

@@ -46,7 +46,7 @@ class CocosPluginPackageJson {
             author: this.manifest.author || 'cocos-plugin-cli',
             main: './main.js',
         };
-        const { type } = this.options;
+        const { type } = this.service.projectConfig;
         let packageWorker = null;
         if (type === declare_1.PluginType.PluginV2) {
             packageWorker = new package_worker_1.PackageV2(this.service.projectConfig, packageJson);

@@ -32,6 +32,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const plugin_api_1 = require("../plugin-api");
+const service_1 = require("../service");
 const webpack_1 = __importDefault(require("webpack"));
 const log_1 = require("../log");
 const zip_1 = __importDefault(require("../plugin/zip"));
@@ -41,34 +42,20 @@ const lodash_1 = require("lodash");
 const fallback_1 = require("./fallback");
 const fs_1 = require("fs");
 const fs_extra_1 = require("fs-extra");
+const commonOptions_1 = require("./commonOptions");
 class Pack extends plugin_api_1.PluginApi {
     exit() {
         process.exit(0);
     }
     apply(api, service) {
-        api.registerCommand('pack', {
-            description: '打包插件',
-            arguments: [
-                { name: 'validCode', desc: "设置有效代码的变量值, 当为false时可以将这部分的代码剔除掉", required: false, value: false }
-            ]
-        }, (param) => {
-            const p1 = param[0];
-            let validCode = true;
-            try {
-                if (typeof p1 === 'string') {
-                    validCode = JSON.parse(p1);
-                }
-            }
-            catch (e) {
-            }
+        api.registerCommand('pack', commonOptions_1.getBuildOptions("打包插件"), (type, options) => {
+            commonOptions_1.checkBuildType(type, true);
+            service_1.cocosPluginService.init(type);
             api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
                 webpackChain.mode('production');
                 webpackChain.devtool(false);
                 // 传递变量给项目，用于代码剔除
-                webpackChain.plugin("validCode")
-                    .use(webpack_1.default.DefinePlugin, [{
-                        __VALID_CODE__: validCode,
-                    }]);
+                commonOptions_1.parseBuildOptions(webpackChain, type, options);
                 webpackChain.optimization.minimizer('TerserPlugin').use(terser_webpack_plugin_1.default, [
                     // @ts-ignore 不输出license.txt
                     {

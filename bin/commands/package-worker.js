@@ -10,7 +10,7 @@ const utils_1 = __importDefault(require("../utils"));
 class PackageInterface {
     constructor(config) {
         this.config = config;
-        utils_1.default.init(config.manifest, config.options);
+        utils_1.default.init(config);
     }
     menuReady() { }
     ;

@@ -24,9 +24,14 @@ class PluginMgr {
                 cmd.addArgument(arg);
             });
         }
-        cmd.action((...args) => {
+        if (opts.options) {
+            opts.options.forEach(opt => {
+                cmd.option(opt.name, opt.desc || "");
+            });
+        }
+        cmd.action((str, options) => {
             // 把参数传递进去
-            callback(args);
+            callback(str, options);
         });
     }
     chainWebpack(fn) {

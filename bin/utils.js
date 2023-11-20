@@ -8,21 +8,43 @@ class Utils {
         this._init = false;
         // 内置的菜单
         this.builtinMenu = {
+            /**
+             * 项目菜单
+             */
             project: '',
+            /**
+             * 节点菜单
+             */
+            node: '',
+            /**
+             * 面板菜单
+             */
+            panel: '',
+            /**
+         * 扩展菜单
+         */
             package: '',
+            /**
+             * 开发者菜单
+             */
+            develop: "",
         };
     }
-    init(manifest, options) {
+    init(config) {
         this._init = true;
-        this.manifest = manifest;
-        this.options = options;
-        const { type } = options;
+        this.manifest = config.manifest;
+        this.options = config.options;
+        const { type } = config;
         if (type === declare_1.PluginType.PluginV2) {
             this.builtinMenu.project = this.toi18n('MAIN_MENU.project.title');
             this.builtinMenu.package = this.toi18n('MAIN_MENU.package.title');
         }
         else if (type === declare_1.PluginType.PluginV3) {
             this.builtinMenu.project = this.toi18n('menu.project');
+            this.builtinMenu.node = this.toi18n('menu.node');
+            this.builtinMenu.panel = this.toi18n('menu.panel');
+            this.builtinMenu.package = this.toi18n('menu.extension');
+            this.builtinMenu.develop = this.toi18n('develop');
         }
     }
     menuProject(name, i18n = true) {

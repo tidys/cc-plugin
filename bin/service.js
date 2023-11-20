@@ -22,6 +22,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.cocosPluginService = exports.CocosPluginService = void 0;
 const declare_1 = require("./declare");
 const Path = __importStar(require("path"));
 const serve_1 = __importDefault(require("./commands/serve"));
@@ -50,19 +51,19 @@ class CocosPluginService {
         this.resolvePlugins();
     }
     isCreatorPlugin() {
-        const { type } = this.projectConfig.options;
+        const { type } = this.projectConfig;
         return type === declare_1.PluginType.PluginV2 || type === declare_1.PluginType.PluginV3;
     }
     isCreatorPluginV2() {
-        const { type } = this.projectConfig.options;
+        const { type } = this.projectConfig;
         return type === declare_1.PluginType.PluginV2;
     }
     isCreatorPluginV3() {
-        const { type } = this.projectConfig.options;
+        const { type } = this.projectConfig;
         return type === declare_1.PluginType.PluginV3;
     }
     isWeb() {
-        const { type } = this.projectConfig.options;
+        const { type } = this.projectConfig;
         return type === declare_1.PluginType.Web;
     }
     resolvePlugins() {
@@ -114,16 +115,19 @@ class CocosPluginService {
             version: '0.0.0',
             main: './src/main.ts',
         };
-        return { manifest, options };
+        return { manifest, options, type: declare_1.PluginType.Web };
     }
-    init() {
-        this.loadEnv();
-        const userOptions = this.loadUserOptions();
-        userOptions && this.checkUserOptions(userOptions);
-        this.projectConfig = lodash_1.defaultsDeep(userOptions, this.defaults);
+    readyPlugins() {
         this.plugins.forEach((plugin) => {
             plugin.apply(this.pluginMgr, this);
         });
+    }
+    init(type) {
+        this.loadEnv();
+        const userOptions = this.loadUserOptions();
+        userOptions && this.checkUserOptions(userOptions, type);
+        this.projectConfig = lodash_1.defaultsDeep(userOptions, this.defaults);
+        this.projectConfig.type = type;
     }
     checkIsProjectDir(projDir) {
         // 必须存在这个目录
@@ -192,10 +196,10 @@ class CocosPluginService {
         }
         return null;
     }
-    checkUserOptions(userOptions) {
+    checkUserOptions(userOptions, type) {
         // 根据配置，将output目录统一变为绝对路径
         const { options, manifest } = userOptions;
-        let { type, outputProject } = options;
+        let { outputProject } = options;
         const pluginDir = this.getPluginDir(type);
         if (typeof outputProject === 'object') {
             const { v2, v3, web } = outputProject;
@@ -247,8 +251,6 @@ class CocosPluginService {
             process.exit(0);
         }
     }
-    run() {
-        this.init();
-    }
 }
-exports.default = CocosPluginService;
+exports.CocosPluginService = CocosPluginService;
+exports.cocosPluginService = new CocosPluginService(process.cwd());

@@ -14,7 +14,7 @@ class Panel {
     }
     getHtmlMinHash() {
         const ret = { min: false, hash: false };
-        const { type } = this.service.projectConfig.options;
+        const { type } = this.service.projectConfig;
         if (type === declare_1.PluginType.Web) {
             ret.min = true;
             ret.hash = true;
