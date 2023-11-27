@@ -13,7 +13,6 @@ export class CocosCreatorPluginMain {
     public options: CocosPluginOptions | null = null;
     public Adaptation: Adaptation = adaptation;
     public wrapper: PluginMainWrapper | null = null;
-    public isV2: boolean = true;
 
     public init(config: CocosPluginConfig, wrapper: PluginMainWrapper) {
         this.manifest = config.manifest;

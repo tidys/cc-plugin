@@ -111,6 +111,28 @@ export class CocosPluginService {
         }
     }
 
+    /**
+     * @param name 校验是否在zh.ts,en.ts存在这个key
+     */
+    checkI18nKey(name: string) {
+        const { i18n_en, i18n_zh } = this.projectConfig.manifest;
+        this._checkI18nKey(i18n_en, name);
+        this._checkI18nKey(i18n_zh, name);
+    }
+    private _checkI18nKey(i18nFile: string | undefined, key: string) {
+        if (i18nFile) {
+            const fullPath = Path.join(this.context, i18nFile);
+            if (FS.existsSync(fullPath)) {
+                const obj = this.loadModule(fullPath);
+                if (obj && obj[key] === undefined) {
+                    console.log(`not exist ${key} in ${i18nFile}`)
+                }
+            } else {
+                console.log(`not exist i18n file:${i18nFile}`)
+            }
+
+        }
+    }
     get defaults() {
         const options: CocosPluginOptions = DefaultCocosPluginOptions;
         const manifest: CocosPluginManifest = {

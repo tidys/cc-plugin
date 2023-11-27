@@ -5,6 +5,8 @@ declare global {
 export interface MenuOptions {
   /**
    * 目前只能放到package下边，creator会审核这个菜单路径
+   * 如果是以i18n.开头，会自动进行i18n相关的展开
+   * 比如在2.x插件中，i18n.title会展开为 EditorMenu/i18n:PackageName.title
    */
   path: string;
   icon?: string;

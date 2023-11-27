@@ -1,4 +1,4 @@
-import { ProjectConfig } from 'service';
+import { ProjectConfig, cocosPluginService } from './service';
 import { CocosPluginConfig, CocosPluginManifest, CocosPluginOptions, PluginType } from './declare';
 
 class Utils {
@@ -44,19 +44,25 @@ class Utils {
           this.builtinMenu.develop = this.toi18n('develop');
         }
     }
-    menuProject(name: string, i18n: boolean = true): string {
-        if (!this._init) {
-            console.error("need init");
-            return "";
-        }
-        return `${utils.builtinMenu.project}/${i18n ? this.i18n(name) : name}`;
+    menuProject(name: string): string {
+        return this.doI18n(this.builtinMenu.project, name);
     }
-    menuPackage(name: string, i18n: boolean = true): string {
+    menuPackage(name: string): string {
+        return this.doI18n(this.builtinMenu.package, name);
+    }
+    private doI18n(head: string, name: string): string {
         if (!this._init) {
             console.error("need init");
             return "";
         }
-        return `${utils.builtinMenu.package}/${i18n ? this.i18n(name) : name}`;
+        const i18nFlag = "i18n.";
+        if (name.startsWith(i18nFlag)) {
+            name = name.substring(i18nFlag.length, name.length);
+            cocosPluginService.checkI18nKey(name);
+            return `${head}/${this.i18n(name)}`;
+        } else {
+            return `${head}/${name}`;
+        }
     }
     i18n(key: string) {
         const pkgName = this.manifest!.name;
