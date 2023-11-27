@@ -8,21 +8,24 @@ function onBeforeBuildFinish(options, callback) {
     callback && callback()
 }
 export const load = (() => {
-    // 发布后的不再进行watch
-    const { enabled, port } = CCP.options?.server!;
-    if (!!enabled) {
-        let client = new ClientSocket();
-        client.setReloadCallback(() => {
-            const { name } = CCP.manifest!;
-            // @ts-ignore
-            const fsPath = Editor.url(`packages://${name}`)
-            // @ts-ignore
-            Editor.Package.reload(fsPath, () => {
-                console.log('reload success')
-            });
-        })
-        client.connect(port!)
+    if (CCP.options && CCP.options.server) {
+        // 发布后的不再进行watch
+        const { enabled, port } = CCP.options.server;
+        if (!!enabled) {
+            let client = new ClientSocket();
+            client.setReloadCallback(() => {
+                const { name } = CCP.manifest!;
+                // @ts-ignore
+                const fsPath = Editor.url(`packages://${name}`)
+                // @ts-ignore
+                Editor.Package.reload(fsPath, () => {
+                    console.log('reload success')
+                });
+            })
+            client.connect(port!)
+        }
     }
+
     CCP.wrapper?.load();
     // 'build-start'：构建开始时触发。
     // 'before-change-files'：在构建结束 之前 触发，此时除了计算文件 MD5、生成 settings.js、原生平台的加密脚本以外，大部分构建操作都已执行完毕。我们通常会在这个事件中对已经构建好的文件做进一步处理。

@@ -4,15 +4,17 @@ import { BuilderOptions } from '../declare';
 import * as Path from 'path';
 
 export function load() {
-    const { enabled, port } = CCP.options?.server!;
-    if (!!enabled) {
-        const client = new ClientSocket();
-        client.setReloadCallback(() => {
-            const pkgDir = CCP.Adaptation.Util.urlToFspath(`packages://${CCP.manifest!.name}`)
-            // @ts-ignore 这个会把窗口也关闭了，需需要考虑下判断
-            //Editor.Message.request('extension', 'reload', pkgDir);
-        });
-        client.connect(port!);
+    if (CCP.options && CCP.options.server) {
+        const { enabled, port } = CCP.options.server;
+        if (!!enabled) {
+            const client = new ClientSocket();
+            client.setReloadCallback(() => {
+                const pkgDir = CCP.Adaptation.Util.urlToFspath(`packages://${CCP.manifest!.name}`)
+                // @ts-ignore 这个会把窗口也关闭了，需需要考虑下判断
+                //Editor.Message.request('extension', 'reload', pkgDir);
+            });
+            client.connect(port!);
+        }
     }
     CCP.wrapper?.load();
 }
