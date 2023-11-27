@@ -78,7 +78,7 @@ const options: CocosPluginOptions = {
     },
     outputProject: { 
         // 最终插件的输出目录，必须是指向creator项目的绝对路径
-        // 该配置项会优先从project.json中获取
+        // 该配置项会优先从cc-plugin.json中获取
         v2: '/cocos-creator/project-v2/',
         v3: '/cocos-creator/project-v3/',
     },
@@ -148,15 +148,15 @@ npm i @xuyanfeng/cc-editor -g
 
 但是有可能你需要在多台电脑上进行开发，outputProject的配置也不同，修改`cc-plugin.config.ts`肯定不行，容易造成冲突。
 
-`cc-plugin`考虑到了这种情况，你可以在同目录新建一个`project.json`文件，内容如下：
+`cc-plugin`考虑到了这种情况，你可以在同目录新建一个`cc-plugin.json`文件，内容如下：
 ```json
 {
     "v2":"xx",
     "v3":"xx",
 }
 ```
-`project.json`不建议纳入版本管理，它更像是一个本机配置，满足了不同电脑，配置不同的需求。
-`cc-plugin`检索`outputProject`时会优先从`project.json`中读取配置。
+`cc-plugin.json`不建议纳入版本管理，它更像是一个本机配置，满足了不同电脑，配置不同的需求。
+`cc-plugin`检索`outputProject`时会优先从`cc-plugin.json`中读取配置。
 ## `__VALID_CODE__`
 
 有时我们希望某些代码不出现在打包后的项目中，比如导出生成最终的产出文件，发布为creator插件我们是必须有的，但是web的引流体验版本我们是不能携带的，原因大家懂得。

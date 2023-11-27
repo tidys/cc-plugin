@@ -28,7 +28,7 @@ export interface ProjectConfig {
     type: PluginType,
 }
 const ConfigTypeScript = "cc-plugin.config.ts";
-const ProjectJson = "project.json";
+const ccpConfigJson = "cc-plugin.json";
 
 export class CocosPluginService {
     public webpackChainFns: Function[] = [];
@@ -207,9 +207,9 @@ export class CocosPluginService {
 
     private getConfigProjectPath(type: PluginType): string | null {
         let projectPath = null;
-        const projCfg = Path.join(this.context, ProjectJson);
-        if (FS.existsSync(projCfg)) {
-            const cfg: { v2: string, v3: string } = JSON.parse(FS.readFileSync(projCfg, 'utf-8'));
+        const configFile = Path.join(this.context, ccpConfigJson);
+        if (FS.existsSync(configFile)) {
+            const cfg: { v2: string, v3: string } = JSON.parse(FS.readFileSync(configFile, 'utf-8'));
             switch (type) {
                 case PluginType.PluginV2: {
                     projectPath = cfg.v2;
@@ -238,7 +238,7 @@ export class CocosPluginService {
                 const cfgProject = this.getConfigProjectPath(type);
                 let dirs: { url: string, source: string }[] = [];
                 if (cfgProject) {
-                    dirs.push({ url: cfgProject, source: ProjectJson })
+                    dirs.push({ url: cfgProject, source: ccpConfigJson })
                 }
                 if (v2 !== undefined && type === PluginType.PluginV2) {
                     dirs.push({ url: v2, source: ConfigTypeScript })

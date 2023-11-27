@@ -6,6 +6,7 @@ import * as Path from 'path';
 import { log } from '../log';
 import *as FsExtra from 'fs-extra'
 import { npmInstall } from '../plugin/npm-install';
+import { OptionValues } from 'commander';
 
 export default class Create extends PluginApi {
     apply(api: PluginMgr, service: CocosPluginService): void {
@@ -13,13 +14,22 @@ export default class Create extends PluginApi {
             description: '创建项目',
             arguments: [
                 { name: 'name', desc: '项目名字', required: false, value: "ccp-plugin" }
+            ],
+            options: [
+                { name: '--override', desc: "强制覆盖当前目录" },
+                { name: '--clean', desc: '清空目录' }
             ]
-        }, (param) => {
-            const projectName = param[0];
+        }, (projectName: string, opts: OptionValues) => {
             const projectDir = Path.join(service.context, projectName)
             if (Fs.existsSync(projectDir)) {
-                log.red(`目录已经存在：${projectDir}`);
-                return
+                if (opts.override) {
+                } else {
+                    log.red(`目录已经存在：${projectDir}`);
+                    return
+                }
+                if (opts.clean) {
+                    FsExtra.emptydirSync(projectDir);
+                }
             }
             const templateDir = Path.join(service.root, './template/project')
             FsExtra.copySync(templateDir, projectDir);
