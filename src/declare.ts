@@ -144,6 +144,62 @@ export interface CocosPluginV2 {
   dependencies?: string[];
 }
 
+export interface PanelOptionsV3 {
+    /**
+     * 面板标题
+     */
+    title: string;
+    /**
+     * 标记
+     */
+    flags?: {
+        /**
+         * 默认为true
+         */
+        resizable?: boolean;
+        /**
+         * 是否需要保存
+         */
+        save?: boolean;
+        /**
+         * 是否保持顶层显示，默认为false
+         */
+        alwaysOnTop: boolean;
+    },
+    /**
+     * 面板类型
+     */
+    type?: string | 'dockable' | 'simple';
+    /**
+     * 面板源码目录
+     */
+    main: string;
+    /**
+     * 面板图标的相对目录
+     */
+    icon?: string;
+    /**
+     * 面板尺寸
+     */
+    size?: {
+        /**
+         * 最小宽度
+         */
+        'min-width'?: number;
+        /**
+         * 最小高度
+         */
+        'min-height'?: number;
+        /**
+         * 默认宽度
+         */
+        'width'?: number;
+        /**
+         * 默认高度
+         */
+        'height'?: number;
+    }
+}
 export interface CocosPluginV3 {
   name: string;
   version: string;
@@ -157,19 +213,7 @@ export interface CocosPluginV3 {
     messages?: Record<string, { methods?: string[] }>;
     shortcuts?: Array<{ message?: string; win?: string; mac?: string }>;
   };
-  panels?: Record<
-    string,
-    {
-      type: string;
-      main: string;
-      title?: string;
-      icon?: string;
-      width?: number;
-      height?: number;
-      "min-width"?: number;
-      "min-height"?: number;
-    }
-  >;
+    panels?: Record<string, PanelOptionsV3>;
   dependencies?: string[];
 }
 

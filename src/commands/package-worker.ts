@@ -1,4 +1,4 @@
-import { CocosPluginConfig, CocosPluginV2, CocosPluginV3, MenuOptions, PanelOptions } from '../declare';
+import { CocosPluginConfig, CocosPluginV2, CocosPluginV3, MenuOptions, PanelOptions, PanelOptionsV3 } from '../declare';
 import { log } from '../log';
 import { trim } from 'lodash'
 import utils from "../utils"
@@ -105,16 +105,17 @@ export class PackageV3 extends PackageInterface {
         super.panelBuild(panel);
         const panels = this.packageData!.panels!;
         const panelName = panel.name || 'default';
-        let cfg: any = panels[panelName] = {
+        let cfg: PanelOptionsV3 = panels[panelName] = {
             main: panel.main,
             title: panel.title,
             type: panel.type,
+            size: {}
         }
         panel.icon && (cfg.icon = panel.icon);
-        panel.width && (cfg.width = panel.width);
-        panel.height && (cfg.height = panel.height);
-        panel.minWidth && (cfg['min-width'] = panel.minWidth);
-        panel.minHeight && (cfg['min-height'] = panel.minHeight);
+        panel.width && (cfg.size!.width = panel.width);
+        panel.height && (cfg.size!.height = panel.height);
+        panel.minWidth && (cfg.size!['min-width'] = panel.minWidth);
+        panel.minHeight && (cfg.size!['min-height'] = panel.minHeight);
     }
 
     menuReady() {
