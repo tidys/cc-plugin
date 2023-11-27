@@ -1,10 +1,17 @@
-import { IUiMenuItem } from '@xuyanfeng/cc-ui/types/cc-menu';
-import ccui from '@xuyanfeng/cc-ui'
 import { Base } from './base';
 const Electron = require('electron');
-
+// 要和cc-ui保持一致
+interface IUiMenuItem {
+    name: string;
+    enabled?: true;
+    callback: Function | null;
+}
 export class Menu extends Base {
-    popup(event: MouseEvent, menus: IUiMenuItem[]) {
+    /**
+     * web平台需要自己实现，可以使用 ccui.menu.showMenuByMouseEvent(event, menus); 
+     * 插件使用的是electron底层接口
+     */
+    popup(event: MouseEvent, menus: IUiMenuItem[], cb: { web?: (event: MouseEvent, menus: IUiMenuItem[]) => void }) {
         menus = menus.map((menu) => {
             return {
                 name: menu.name,
@@ -13,7 +20,8 @@ export class Menu extends Base {
             };
         });
         if (this.adaptation.Env.isWeb) {
-            ccui.menu.showMenuByMouseEvent(event, menus);
+            const { web } = cb;
+            web && web(event, menus);
         } else {
             const { Menu, MenuItem, getCurrentWindow } = Electron.remote;
             let menu = new Menu();
