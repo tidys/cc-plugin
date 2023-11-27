@@ -4,12 +4,17 @@
   "description": "cocos creator plugin",
   "author": "cc-plugin",
   "scripts": {
-    "ccp-pack": "cc-plugin pack",
-    "ccp-serve": "cc-plugin serve"
+    "ccp-pack-web": "cc-plugin pack web",
+    "ccp-pack-v2": "cc-plugin pack cp-v2",
+    "ccp-pack-v3": "cc-plugin pack cp-v3",
+    "ccp-serve-web": "cc-plugin serve web",
+    "ccp-pack-v2": "cc-plugin serve cp-v2",
+    "ccp-pack-v3": "cc-plugin serve cp-v3"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",
     "@types/node": "^16.11.12",
-    "cc-plugin": "^2.0.3"
+    "cc-plugin": "^2.1.12",
+    "@xuyanfeng/cc-ui": "^0.2.10"
   }
 }
