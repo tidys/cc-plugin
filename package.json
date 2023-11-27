@@ -1,6 +1,6 @@
 {
   "name": "cc-plugin",
-  "version": "2.1.14",
+  "version": "2.1.15",
   "description": "专为Cocos Creator插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。",
   "main": "index.js",
   "types": "./types/declare.d.ts",

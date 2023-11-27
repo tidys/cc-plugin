@@ -35,18 +35,24 @@
     npm install # 可能会导致后续构建失败，暂时没有定位到原因
     ```
 4. 运行插件
-    ```shell
-    cc-plugin serve web
-    cc-plugin serve cp-v2
-    cc-plugin serve cp-v3
-    ```
+   - 必须使用这种方式，直接调用的是项目本地安装的cc-plugin
+        ```
+        npm run ccp-serve-web
+        npm run ccp-serve-v2
+        npm run ccp-serve-v3
+        ```
+    - 这种方式调用的是全局安装的cc-plugin，会导致build结果异常，暂时没有将`cli`和`runtime code`剥离的计划。
+        ```shell
+        cc-plugin serve web
+        cc-plugin serve cp-v2
+        cc-plugin serve cp-v3
+        ```
 5. 打包插件
-    ```shell
-    cc-plugin pack web
-    cc-plugin pack cp-v2
-    cc-plugin pack cp-v3
     ```
- 
+    npm run ccp-pack-web
+    npm run ccp-pack-v2
+    npm run ccp-pack-v3
+    ``` 
 
 ## cc-plugin.config.ts 配置
 
