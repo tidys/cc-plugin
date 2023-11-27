@@ -208,7 +208,12 @@ export default class Base extends PluginApi {
                     name: 'images/[name].[ext]'
                 });
             // TODO 增加plugin的搜索路径，但是对于glsl-loader没有效果
-            webpackChain.resolve.modules.add(join(__dirname, "../plugin")).add("node_modules");
+
+            webpackChain.resolve.modules
+                .add(join(__dirname, "../plugin"))
+                .add(join(service.context, 'node_modules')) // 优先从当前目录下找
+                .add("node_modules") // 最后再从全局目录下找
+                ;
             // TODO 这里使用的编译后的绝对路径，能用但是不优雅
             webpackChain.module.rule('glsl-loader')
                 .test(/\.(glsl)$/)
