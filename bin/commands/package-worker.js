@@ -48,7 +48,7 @@ class PackageV2 extends PackageInterface {
         let menus = this.packageData['main-menu'];
         const { name } = menu.message;
         const panel = menu.message.panel || this.config.manifest.name;
-        const menuReal = utils_1.default.menuPackage(menu.path, false);
+        const menuReal = utils_1.default.menuPackage(menu.path);
         menus[lodash_1.trim(menuReal, '/')] = { message: `${panel}:${name}` };
     }
     panelReady() {
@@ -102,12 +102,13 @@ class PackageV3 extends PackageInterface {
             main: panel.main,
             title: panel.title,
             type: panel.type,
+            size: {}
         };
         panel.icon && (cfg.icon = panel.icon);
-        panel.width && (cfg.width = panel.width);
-        panel.height && (cfg.height = panel.height);
-        panel.minWidth && (cfg['min-width'] = panel.minWidth);
-        panel.minHeight && (cfg['min-height'] = panel.minHeight);
+        panel.width && (cfg.size.width = panel.width);
+        panel.height && (cfg.size.height = panel.height);
+        panel.minWidth && (cfg.size['min-width'] = panel.minWidth);
+        panel.minHeight && (cfg.size['min-height'] = panel.minHeight);
     }
     menuReady() {
         super.panelReady();
@@ -116,7 +117,7 @@ class PackageV3 extends PackageInterface {
         super.menuBuild(menuOpts);
         let menu = this.packageData.contributions.menu;
         let msgKey = this.addMessage(menuOpts);
-        const menuReal = utils_1.default.menuPackage(menuOpts.path, false);
+        const menuReal = utils_1.default.menuPackage(menuOpts.path);
         let { newLabel, newPath } = this.dealPath(menuReal);
         menu.push({
             path: newPath,

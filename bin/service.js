@@ -39,7 +39,7 @@ const plugin_mgr_1 = require("./plugin-mgr");
 const create_1 = __importDefault(require("./commands/create"));
 const FsExtra = __importStar(require("fs-extra"));
 const ConfigTypeScript = "cc-plugin.config.ts";
-const ProjectJson = "project.json";
+const ccpConfigJson = "cc-plugin.json";
 class CocosPluginService {
     constructor(context) {
         this.webpackChainFns = [];
@@ -106,6 +106,28 @@ class CocosPluginService {
         }
         else {
             return module;
+        }
+    }
+    /**
+     * @param name 校验是否在zh.ts,en.ts存在这个key
+     */
+    checkI18nKey(name) {
+        const { i18n_en, i18n_zh } = this.projectConfig.manifest;
+        this._checkI18nKey(i18n_en, name);
+        this._checkI18nKey(i18n_zh, name);
+    }
+    _checkI18nKey(i18nFile, key) {
+        if (i18nFile) {
+            const fullPath = Path.join(this.context, i18nFile);
+            if (FS.existsSync(fullPath)) {
+                const obj = this.loadModule(fullPath);
+                if (obj && obj[key] === undefined) {
+                    console.log(`not exist ${key} in ${i18nFile}`);
+                }
+            }
+            else {
+                console.log(`not exist i18n file:${i18nFile}`);
+            }
         }
     }
     get defaults() {
@@ -177,9 +199,9 @@ class CocosPluginService {
     }
     getConfigProjectPath(type) {
         let projectPath = null;
-        const projCfg = Path.join(this.context, ProjectJson);
-        if (FS.existsSync(projCfg)) {
-            const cfg = JSON.parse(FS.readFileSync(projCfg, 'utf-8'));
+        const configFile = Path.join(this.context, ccpConfigJson);
+        if (FS.existsSync(configFile)) {
+            const cfg = JSON.parse(FS.readFileSync(configFile, 'utf-8'));
             switch (type) {
                 case declare_1.PluginType.PluginV2: {
                     projectPath = cfg.v2;
@@ -208,7 +230,7 @@ class CocosPluginService {
                 const cfgProject = this.getConfigProjectPath(type);
                 let dirs = [];
                 if (cfgProject) {
-                    dirs.push({ url: cfgProject, source: ProjectJson });
+                    dirs.push({ url: cfgProject, source: ccpConfigJson });
                 }
                 if (v2 !== undefined && type === declare_1.PluginType.PluginV2) {
                     dirs.push({ url: v2, source: ConfigTypeScript });

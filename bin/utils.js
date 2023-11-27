@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const service_1 = require("./service");
 const declare_1 = require("./declare");
 class Utils {
     constructor() {
@@ -47,19 +48,26 @@ class Utils {
             this.builtinMenu.develop = this.toi18n('develop');
         }
     }
-    menuProject(name, i18n = true) {
-        if (!this._init) {
-            console.error("need init");
-            return "";
-        }
-        return `${utils.builtinMenu.project}/${i18n ? this.i18n(name) : name}`;
+    menuProject(name) {
+        return this.doI18n(this.builtinMenu.project, name);
     }
-    menuPackage(name, i18n = true) {
+    menuPackage(name) {
+        return this.doI18n(this.builtinMenu.package, name);
+    }
+    doI18n(head, name) {
         if (!this._init) {
             console.error("need init");
             return "";
         }
-        return `${utils.builtinMenu.package}/${i18n ? this.i18n(name) : name}`;
+        const i18nFlag = "i18n.";
+        if (name.startsWith(i18nFlag)) {
+            name = name.substring(i18nFlag.length, name.length);
+            service_1.cocosPluginService.checkI18nKey(name);
+            return `${head}/${this.i18n(name)}`;
+        }
+        else {
+            return `${head}/${name}`;
+        }
     }
     i18n(key) {
         const pkgName = this.manifest.name;

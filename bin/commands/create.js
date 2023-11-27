@@ -30,13 +30,23 @@ class Create extends plugin_api_1.PluginApi {
             description: '创建项目',
             arguments: [
                 { name: 'name', desc: '项目名字', required: false, value: "ccp-plugin" }
+            ],
+            options: [
+                { name: '--override', desc: "强制覆盖当前目录" },
+                { name: '--clean', desc: '清空目录' }
             ]
-        }, (param) => {
-            const projectName = param[0];
+        }, (projectName, opts) => {
             const projectDir = Path.join(service.context, projectName);
             if (Fs.existsSync(projectDir)) {
-                log_1.log.red(`目录已经存在：${projectDir}`);
-                return;
+                if (opts.override) {
+                }
+                else {
+                    log_1.log.red(`目录已经存在：${projectDir}`);
+                    return;
+                }
+                if (opts.clean) {
+                    FsExtra.emptydirSync(projectDir);
+                }
             }
             const templateDir = Path.join(service.root, './template/project');
             FsExtra.copySync(templateDir, projectDir);

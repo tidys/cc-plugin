@@ -5,6 +5,8 @@ declare global {
 export interface MenuOptions {
     /**
      * 目前只能放到package下边，creator会审核这个菜单路径
+     * 如果是以i18n.开头，会自动进行i18n相关的展开
+     * 比如在2.x插件中，i18n.title会展开为 EditorMenu/i18n:PackageName.title
      */
     path: string;
     icon?: string;
@@ -119,6 +121,62 @@ export interface CocosPluginV2 {
     }>;
     dependencies?: string[];
 }
+export interface PanelOptionsV3 {
+    /**
+     * 面板标题
+     */
+    title: string;
+    /**
+     * 标记
+     */
+    flags?: {
+        /**
+         * 默认为true
+         */
+        resizable?: boolean;
+        /**
+         * 是否需要保存
+         */
+        save?: boolean;
+        /**
+         * 是否保持顶层显示，默认为false
+         */
+        alwaysOnTop: boolean;
+    };
+    /**
+     * 面板类型
+     */
+    type?: string | 'dockable' | 'simple';
+    /**
+     * 面板源码目录
+     */
+    main: string;
+    /**
+     * 面板图标的相对目录
+     */
+    icon?: string;
+    /**
+     * 面板尺寸
+     */
+    size?: {
+        /**
+         * 最小宽度
+         */
+        'min-width'?: number;
+        /**
+         * 最小高度
+         */
+        'min-height'?: number;
+        /**
+         * 默认宽度
+         */
+        'width'?: number;
+        /**
+         * 默认高度
+         */
+        'height'?: number;
+    };
+}
 export interface CocosPluginV3 {
     name: string;
     version: string;
@@ -142,16 +200,7 @@ export interface CocosPluginV3 {
             mac?: string;
         }>;
     };
-    panels?: Record<string, {
-        type: string;
-        main: string;
-        title?: string;
-        icon?: string;
-        width?: number;
-        height?: number;
-        "min-width"?: number;
-        "min-height"?: number;
-    }>;
+    panels?: Record<string, PanelOptionsV3>;
     dependencies?: string[];
 }
 export interface PluginMainWrapper {
