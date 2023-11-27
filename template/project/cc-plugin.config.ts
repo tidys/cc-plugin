@@ -1,5 +1,5 @@
 // @ts-ignore
-import {CocosPluginManifest, CocosPluginOptions, Panel, PluginType} from 'cc-plugin/src/declare';
+import { CocosPluginManifest, CocosPluginOptions, Panel, PluginType } from 'cc-plugin/src/declare';
 
 const pkgName = 'cc-plugin-demo'
 
@@ -45,6 +45,7 @@ const options: CocosPluginOptions = {
     },
     watchBuild: true,
     outputProject: {
+        web: './web',
         v2: '', // 这里的路径需要替换为指向creator v2的项目
         v3: '', // 这里的路径需要替换为指向creator v3的项目
     }

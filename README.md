@@ -19,35 +19,34 @@
 
 1. 全局安装，命令行关键字cc-plugin、ccp都支持
 
-```shell
-npm install cc-plugin -g
-```
+    ```shell
+    npm install cc-plugin -g
+    ```
 
 2. 在当前的目录创建项目
-```shell
-cc-plugin create my-first-plugin
-```
+    ```shell
+    cc-plugin create my-first-plugin
+    ```
 
-3. 安装依赖，推荐yarn，后续版本会将这一步自动化
-```shell
-cd ./my-first-plugin
-npm install
-yarn install
-```
-4. 构建插件
-```shell
-cc-plugin serve web
-cc-plugin serve cp-v2
-cc-plugin serve cp-v3
-
-```
+3. 安装依赖
+    ```shell
+    cd ./my-first-plugin
+    yarn install # 推荐yarn
+    npm install # 可能会导致后续构建失败，暂时没有定位到原因
+    ```
+4. 运行插件
+    ```shell
+    cc-plugin serve web
+    cc-plugin serve cp-v2
+    cc-plugin serve cp-v3
+    ```
 5. 打包插件
-```shell
-cc-plugin pack web
-cc-plugin pack cp-v2
-cc-plugin pack cp-v3
-```
-玩的开心！
+    ```shell
+    cc-plugin pack web
+    cc-plugin pack cp-v2
+    cc-plugin pack cp-v3
+    ```
+ 
 
 ## cc-plugin.config.ts 配置
 
