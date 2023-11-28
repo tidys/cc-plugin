@@ -302,7 +302,7 @@ class Base extends plugin_api_1.PluginApi {
                 envCopy['NUMBER_OF_PROCESSORS'] = NUMBER_OF_PROCESSORS;
             webpackChain.plugin("process_define")
                 .use(webpack_1.default.DefinePlugin, [{
-                    'process.env': {}
+                    'process': JSON.stringify({})
                 }]);
             webpackChain
                 .plugin('CriticalDependency')
