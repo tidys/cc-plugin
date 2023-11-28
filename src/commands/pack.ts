@@ -15,6 +15,7 @@ import { existsSync } from 'fs';
 import { emptyDirSync } from 'fs-extra';
 import { Option, OptionValues } from 'commander';
 import { checkBuildType, getBuildOptions, parseBuildOptions } from './commonOptions';
+import { showWeChatQrCode } from './tool';
 
 export default class Pack extends PluginApi {
     exit() {
@@ -93,6 +94,7 @@ export default class Pack extends PluginApi {
                         return this.exit();
                     }
                     log.green('构建成功')
+                    // showWeChatQrCode();
                 }))
             }
         )

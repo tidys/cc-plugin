@@ -17,6 +17,7 @@ import { getFallback } from './fallback';
 import { checkBuildType, getBuildOptions, parseBuildOptions } from './commonOptions';
 import { OptionValues } from 'commander';
 import { PluginType } from 'declare';
+import { showWeChatQrCode } from './tool';
 
 PortFinder.basePort = 9087;
 
@@ -123,6 +124,7 @@ export default class Serve extends PluginApi {
                 return;
             }
             console.log(`webpack dev server listen ${host}:${port}`)
+            // showWeChatQrCode();
         });
     }
 }

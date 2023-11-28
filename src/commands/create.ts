@@ -7,6 +7,7 @@ import { log } from '../log';
 import *as FsExtra from 'fs-extra'
 import { npmInstall } from '../plugin/npm-install';
 import { OptionValues } from 'commander';
+import { showWeChatQrCode } from './tool';
 
 export default class Create extends PluginApi {
     apply(api: PluginMgr, service: CocosPluginService): void {
@@ -35,7 +36,7 @@ export default class Create extends PluginApi {
             FsExtra.copySync(templateDir, projectDir);
             log.green('生成模板成功')
             // npmInstall(projectDir)
-            log.green('玩的开心')
+            showWeChatQrCode()
         })
     }
 };

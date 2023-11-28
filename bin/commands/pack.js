@@ -112,6 +112,7 @@ class Pack extends plugin_api_1.PluginApi {
                     return this.exit();
                 }
                 log_1.log.green('构建成功');
+                // showWeChatQrCode();
             }));
         });
     }

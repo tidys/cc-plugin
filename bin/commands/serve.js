@@ -144,6 +144,7 @@ class Serve extends plugin_api_1.PluginApi {
                     return;
                 }
                 console.log(`webpack dev server listen ${host}:${port}`);
+                // showWeChatQrCode();
             });
         });
     }

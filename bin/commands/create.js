@@ -24,6 +24,7 @@ const Fs = __importStar(require("fs"));
 const Path = __importStar(require("path"));
 const log_1 = require("../log");
 const FsExtra = __importStar(require("fs-extra"));
+const tool_1 = require("./tool");
 class Create extends plugin_api_1.PluginApi {
     apply(api, service) {
         api.registerCommand('create', {
@@ -52,7 +53,7 @@ class Create extends plugin_api_1.PluginApi {
             FsExtra.copySync(templateDir, projectDir);
             log_1.log.green('生成模板成功');
             // npmInstall(projectDir)
-            log_1.log.green('玩的开心');
+            tool_1.showWeChatQrCode();
         });
     }
 }
