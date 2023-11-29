@@ -1,20 +1,20 @@
 {
-  "name": "cc-plugin-demo",
-  "version": "1.0.0",
-  "description": "cocos creator plugin",
   "author": "cc-plugin",
-  "scripts": {
-    "ccp-pack-web": "cc-plugin pack web",
-    "ccp-pack-v2": "cc-plugin pack cp-v2",
-    "ccp-pack-v3": "cc-plugin pack cp-v3",
-    "ccp-serve-web": "cc-plugin serve web",
-    "ccp-serve-v2": "cc-plugin serve cp-v2",
-    "ccp-serve-v3": "cc-plugin serve cp-v3"
-  },
+  "description": "cocos creator plugin",
   "devDependencies": {
     "@types/fs-extra": "9.0.1",
     "@types/node": "16.11.12",
-    "cc-plugin": "2.1.19",
-    "@xuyanfeng/cc-ui": "0.2.10"
-  }
+    "@xuyanfeng/cc-ui": "0.2.10",
+    "cc-plugin": "2.1.20"
+  },
+  "name": "cc-plugin-demo",
+  "scripts": {
+    "ccp-pack-v2": "cc-plugin pack cp-v2",
+    "ccp-pack-v3": "cc-plugin pack cp-v3",
+    "ccp-pack-web": "cc-plugin pack web",
+    "ccp-serve-v2": "cc-plugin serve cp-v2",
+    "ccp-serve-v3": "cc-plugin serve cp-v3",
+    "ccp-serve-web": "cc-plugin serve web"
+  },
+  "version": "1.0.0"
 }
