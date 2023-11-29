@@ -2,6 +2,7 @@ import * as Fs from 'fs';
 import * as OS from 'os';
 import { Base } from './base';
 const Path = require('path');
+const Electron = require('electron');
 export class Shell extends Base {
     private _getCmd(path: string): string {
         if (!Fs.existsSync(path)) {
