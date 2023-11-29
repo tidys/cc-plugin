@@ -100,3 +100,4 @@ function loader(source) {
     return newSource;
 }
 exports.default = loader;
+//# sourceMappingURL=cc-plugin-config.loader.js.map

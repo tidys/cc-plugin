@@ -16,3 +16,4 @@ if (panels.length > 0) {
         app.append(a);
     }
 }
+//# sourceMappingURL=index.js.map

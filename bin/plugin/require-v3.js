@@ -25,3 +25,4 @@ class RequireV3 {
     }
 }
 exports.default = RequireV3;
+//# sourceMappingURL=require-v3.js.map

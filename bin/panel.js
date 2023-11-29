@@ -127,3 +127,4 @@ class Panel {
     }
 }
 exports.default = Panel;
+//# sourceMappingURL=panel.js.map

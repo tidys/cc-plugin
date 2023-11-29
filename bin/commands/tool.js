@@ -13,3 +13,4 @@ function showWeChatQrCode() {
     qrcode_terminal_1.default.generate(weChat, { small: true });
 }
 exports.showWeChatQrCode = showWeChatQrCode;
+//# sourceMappingURL=tool.js.map

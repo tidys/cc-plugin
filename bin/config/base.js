@@ -313,3 +313,4 @@ class Base extends plugin_api_1.PluginApi {
     }
 }
 exports.default = Base;
+//# sourceMappingURL=base.js.map

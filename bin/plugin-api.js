@@ -4,3 +4,4 @@ exports.PluginApi = void 0;
 class PluginApi {
 }
 exports.PluginApi = PluginApi;
+//# sourceMappingURL=plugin-api.js.map

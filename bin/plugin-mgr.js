@@ -46,3 +46,4 @@ class PluginMgr {
     }
 }
 exports.PluginMgr = PluginMgr;
+//# sourceMappingURL=plugin-mgr.js.map

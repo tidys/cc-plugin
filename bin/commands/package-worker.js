@@ -190,3 +190,4 @@ class PackageV3 extends PackageInterface {
     }
 }
 exports.PackageV3 = PackageV3;
+//# sourceMappingURL=package-worker.js.map

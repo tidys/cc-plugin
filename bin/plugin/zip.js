@@ -192,3 +192,4 @@ class Zip {
     }
 }
 exports.default = Zip;
+//# sourceMappingURL=zip.js.map

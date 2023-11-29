@@ -20,3 +20,4 @@ class Log {
     }
 }
 exports.log = new Log();
+//# sourceMappingURL=log.js.map

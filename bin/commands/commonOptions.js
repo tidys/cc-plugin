@@ -57,3 +57,4 @@ function checkBuildType(type, exit = false) {
     }
 }
 exports.checkBuildType = checkBuildType;
+//# sourceMappingURL=commonOptions.js.map

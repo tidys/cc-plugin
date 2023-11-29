@@ -21,3 +21,4 @@ function default_1(source, map) {
     this.callback(null, source, map);
 }
 exports.default = default_1;
+//# sourceMappingURL=glsl-loader.js.map

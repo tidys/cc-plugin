@@ -25,6 +25,7 @@ const Path = __importStar(require("path"));
 const log_1 = require("../log");
 const FsExtra = __importStar(require("fs-extra"));
 const tool_1 = require("./tool");
+const declare_1 = require("../declare");
 class Create extends plugin_api_1.PluginApi {
     apply(api, service) {
         api.registerCommand('create', {
@@ -37,6 +38,26 @@ class Create extends plugin_api_1.PluginApi {
                 { name: '--clean', desc: '清空目录' }
             ]
         }, (projectName, opts) => {
+            // 校验是否在creator项目目录执行
+            const dir = process.cwd();
+            if (service.checkIsProjectDir(dir)) {
+                log_1.log.red(`创建失败: ${dir}是个creator项目`);
+                return;
+            }
+            const extDirs = [
+                service.getPluginDir(declare_1.PluginType.PluginV2),
+                service.getPluginDir(declare_1.PluginType.PluginV3)
+            ];
+            for (let i = 0; i < extDirs.length; i++) {
+                const ext = extDirs[i];
+                const dirName = Path.basename(dir);
+                if (dirName === ext) {
+                    if (service.checkIsProjectDir(Path.join(dir, '../'))) {
+                        log_1.log.red(`创建失败: ${dir}是creator项目的扩展目录`);
+                        return;
+                    }
+                }
+            }
             const projectDir = Path.join(service.context, projectName);
             if (Fs.existsSync(projectDir)) {
                 if (opts.override) {
@@ -59,3 +80,4 @@ class Create extends plugin_api_1.PluginApi {
 }
 exports.default = Create;
 ;
+//# sourceMappingURL=create.js.map

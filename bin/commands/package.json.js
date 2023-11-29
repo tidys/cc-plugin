@@ -114,3 +114,4 @@ class CocosPluginPackageJson {
     }
 }
 exports.default = CocosPluginPackageJson;
+//# sourceMappingURL=package.json.js.map

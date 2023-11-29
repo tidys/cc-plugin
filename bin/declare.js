@@ -35,3 +35,4 @@ exports.Platform = {
     Mac: "mac",
     Win32: "win32",
 };
+//# sourceMappingURL=declare.js.map

@@ -118,3 +118,4 @@ class Pack extends plugin_api_1.PluginApi {
     }
 }
 exports.default = Pack;
+//# sourceMappingURL=pack.js.map

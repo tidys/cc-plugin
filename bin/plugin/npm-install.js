@@ -65,3 +65,4 @@ class NpmInstall {
     }
 }
 exports.default = NpmInstall;
+//# sourceMappingURL=npm-install.js.map

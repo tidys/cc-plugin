@@ -196,6 +196,7 @@ class CocosPluginService {
         else if (version === declare_1.PluginType.PluginV3) {
             return 'extensions';
         }
+        return "";
     }
     getConfigProjectPath(type) {
         let projectPath = null;
@@ -276,3 +277,4 @@ class CocosPluginService {
 }
 exports.CocosPluginService = CocosPluginService;
 exports.cocosPluginService = new CocosPluginService(process.cwd());
+//# sourceMappingURL=service.js.map

@@ -150,3 +150,4 @@ class Serve extends plugin_api_1.PluginApi {
     }
 }
 exports.default = Serve;
+//# sourceMappingURL=serve.js.map
