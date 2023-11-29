@@ -1,7 +1,7 @@
 <template>
   <div class="panel">
     Hi, {{ msg }}
-    <CCButton @click="onClickBtn">btn</CCButton>
+    <CCButton @click="onClickBtn">btn click-{{ count }}</CCButton>
   </div>
 </template>
 <script lang="ts">
@@ -17,9 +17,12 @@ export default defineComponent({
       console.log('hi ~~~');
     });
     const msg = ref(PluginConfig.manifest.name);
+    const count = ref(0);
     return {
       msg,
+      count,
       onClickBtn() {
+        count.value++;
         console.log('click btn');
       },
     };
