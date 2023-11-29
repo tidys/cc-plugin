@@ -221,7 +221,7 @@ class Base extends plugin_api_1.PluginApi {
             // TODO 增加plugin的搜索路径，但是对于glsl-loader没有效果
             webpackChain.resolve.modules
                 .add(path_1.join(__dirname, "../plugin"))
-                .add(path_1.join(service.context, 'node_modules')) // 优先从当前目录下找
+                // .add(join(service.context, 'node_modules')) // 优先从当前目录下找，会导致process的问题
                 .add("node_modules") // 最后再从全局目录下找
             ;
             // TODO 这里使用的编译后的绝对路径，能用但是不优雅
@@ -302,7 +302,7 @@ class Base extends plugin_api_1.PluginApi {
                 envCopy['NUMBER_OF_PROCESSORS'] = NUMBER_OF_PROCESSORS;
             webpackChain.plugin("process_define")
                 .use(webpack_1.default.DefinePlugin, [{
-                    'process': JSON.stringify({})
+                    'process.env': JSON.stringify({})
                 }]);
             webpackChain
                 .plugin('CriticalDependency')

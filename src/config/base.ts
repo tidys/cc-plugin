@@ -211,7 +211,7 @@ export default class Base extends PluginApi {
 
             webpackChain.resolve.modules
                 .add(join(__dirname, "../plugin"))
-                .add(join(service.context, 'node_modules')) // 优先从当前目录下找
+                // .add(join(service.context, 'node_modules')) // 优先从当前目录下找，会导致process的问题
                 .add("node_modules") // 最后再从全局目录下找
                 ;
             // TODO 这里使用的编译后的绝对路径，能用但是不优雅
@@ -290,7 +290,7 @@ export default class Base extends PluginApi {
             if (NUMBER_OF_PROCESSORS) envCopy['NUMBER_OF_PROCESSORS'] = NUMBER_OF_PROCESSORS; 
             webpackChain.plugin("process_define")
                 .use(webpack.DefinePlugin, [{
-                    'process': JSON.stringify({}) 
+                    'process.env': JSON.stringify({}) 
                 }]);
             webpackChain
                 .plugin('CriticalDependency')
