@@ -290,7 +290,9 @@ export default class Base extends PluginApi {
             if (NUMBER_OF_PROCESSORS) envCopy['NUMBER_OF_PROCESSORS'] = NUMBER_OF_PROCESSORS; 
             webpackChain.plugin("process_define")
                 .use(webpack.DefinePlugin, [{
-                    'process.env': JSON.stringify({}) 
+                    // 这里不能使用'process.env': JSON.stringify({}), 会被替换为{}.Debug, 这个是有语法问题的
+                    // 'process.env': {} 替换的结果为 ({}).DEBUG , 是正常的
+                    'process.env': {} 
                 }]);
             webpackChain
                 .plugin('CriticalDependency')

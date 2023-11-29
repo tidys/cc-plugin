@@ -85,7 +85,7 @@ export default class Serve extends PluginApi {
                 if (stats?.hasErrors()) {
                     stats?.compilation.errors.forEach(error => {
                         log.yellow(error.message)
-                        log.blue(error.details)
+                        log.blue(error.details || "")
                         log.red(error.stack || '')
                     })
                     return console.log('Build failed with error');

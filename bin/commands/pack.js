@@ -106,7 +106,7 @@ class Pack extends plugin_api_1.PluginApi {
                 if (stats === null || stats === void 0 ? void 0 : stats.hasErrors()) {
                     stats === null || stats === void 0 ? void 0 : stats.compilation.errors.forEach(error => {
                         log_1.log.yellow(error.message);
-                        log_1.log.blue(error.details);
+                        log_1.log.blue(error.details || "");
                         log_1.log.red(error.stack || '');
                     });
                     return this.exit();
