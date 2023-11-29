@@ -4,14 +4,40 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}\\order.js"
-        }
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "test create1",
+        "skipFiles": ["<node_internals>/**"],
+        "args": ["${workspaceFolder}\\bin/index.js", "create", "ccp-demo"],
+        "cwd": "E:\\proj\\creator\\hot-update-2x",
+        "preLaunchTask": "tsc: build - tsconfig.json"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "test create2",
+        "skipFiles": ["<node_internals>/**"],
+        "args": ["${workspaceFolder}\\bin/index.js", "create", "ccp-demo"],
+        "cwd": "E:\\proj\\creator\\hot-update-2x\\packages",
+        "preLaunchTask": "tsc: build - tsconfig.json"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "test create3",
+        "skipFiles": ["<node_internals>/**"],
+        "args": ["${workspaceFolder}\\bin/index.js", "create", "ccp-demo"],
+        "cwd": "E:\\proj\\creator\\hot-update-3x\\extensions",
+        "preLaunchTask": "tsc: build - tsconfig.json"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "test create-test",
+        "skipFiles": ["<node_internals>/**"],
+        "args": ["${workspaceFolder}\\bin/index.js", "create", "test"],
+        "preLaunchTask": "tsc: build - tsconfig.json"
+      }
     ]
 }

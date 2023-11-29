@@ -156,7 +156,7 @@ export class CocosPluginService {
         this.projectConfig.type = type;
     }
 
-    private checkIsProjectDir(projDir: string) {
+    public checkIsProjectDir(projDir: string) {
         // 必须存在这个目录
         const needDirs = ['assets'];
         let isProject = true;
@@ -197,12 +197,13 @@ export class CocosPluginService {
         return output;
     }
 
-    getPluginDir(version: PluginType) {
+    getPluginDir(version: PluginType): string {
         if (version === PluginType.PluginV2) {
             return 'packages';
         } else if (version === PluginType.PluginV3) {
             return 'extensions';
         }
+        return ""
     }
 
     private getConfigProjectPath(type: PluginType): string | null {

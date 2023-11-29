@@ -23,7 +23,7 @@
     npm install cc-plugin -g
     ```
 
-2. 在当前的目录创建项目
+2. 在当前的目录创建项目，不推荐放到creator项目的packages/extensions目录
     ```shell
     cc-plugin create my-first-plugin
     ```
@@ -32,7 +32,6 @@
     ```shell
     cd ./my-first-plugin
     yarn install # 推荐yarn
-    npm install # 可能会导致后续构建失败，暂时没有定位到原因
     ```
 4. 运行插件
    - 必须使用这种方式，直接调用的是项目本地安装的cc-plugin

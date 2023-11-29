@@ -114,10 +114,11 @@
     "install-force": "yarn install --force",
     "sync-version": "node ./tools/sync-version.js",
     "test-create": "tsc && node ./bin/index.js create test --override",
-    "tsc-build": "tsc --watch",
+    "tsc-build--watch": "tsc --watch",
+    "tsc-build": "tsc",
     "types": "tsc -p tsconfig.declare.json",
     "yalc-push": "npm run clean-bin-dir && npm run sync-version && npm run types && tsc && yalc push"
   },
   "types": "./types/declare.d.ts",
-  "version": "2.1.21"
+  "version": "2.1.22"
 }
