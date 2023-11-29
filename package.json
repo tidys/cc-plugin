@@ -1,27 +1,11 @@
 {
-  "name": "cc-plugin",
-  "version": "2.1.19",
-  "description": "专为Cocos Creator插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。",
-  "main": "index.js",
-  "types": "./types/declare.d.ts",
+  "author": "xu_yanfeng",
   "bin": {
     "cc-plugin": "./bin/index.js",
     "ccp": "./bin/index.js"
   },
-  "scripts": {
-    "clean-bin-dir": "node ./tools/clean-bin-dir.js",
-    "sync-version": "node ./tools/sync-version.js",
-    "install-force": "yarn install --force",
-    "types": "tsc -p tsconfig.declare.json",
-    "yalc-push": "npm run clean-bin-dir && npm run sync-version && npm run types && tsc && yalc push",
-    "tsc-build": "tsc --watch",
-    "demo-test": "vue-cli-service serve",
-    "demo-test-debug": "node --inspect-brk=6666 ./node_modules/@vue/cli-service/bin/vue-cli-service.js serve",
-    "test-create": "tsc && node ./bin/index.js create test --override"
-  },
-  "directories": {
-    "doc": "doc",
-    "test": "test"
+  "bugs": {
+    "url": "https://github.com/tidys/cc-plugin/issues"
   },
   "dependencies": {
     "@babel/generator": "7.16.8",
@@ -94,8 +78,8 @@
     "webpack-sources": "3.2.2",
     "xmlhttprequest": "1.8.0"
   },
+  "description": "专为Cocos Creator插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。",
   "devDependencies": {
-    "@types/qrcode-terminal": "0.12.2",
     "@types/axios": "0.14.0",
     "@types/chroma-js": "2.1.3",
     "@types/fs-extra": "9.0.13",
@@ -104,20 +88,36 @@
     "@types/lodash": "4.14.184",
     "@types/mini-css-extract-plugin": "2.4.0",
     "@types/node": "16.11.12",
+    "@types/qrcode-terminal": "0.12.2",
     "@types/rechoir": "0.6.1",
     "@types/webpack": "5.28.0",
     "@types/webpack-sources": "3.2.0",
     "eslint": "7.32.0",
     "husky": "3.1.0"
   },
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "homepage": "https://github.com/tidys/cc-plugin#readme",
+  "license": "ISC",
+  "main": "index.js",
+  "name": "cc-plugin",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tidys/cc-plugin.git"
   },
-  "author": "xu_yanfeng",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/tidys/cc-plugin/issues"
+  "scripts": {
+    "clean-bin-dir": "node ./tools/clean-bin-dir.js",
+    "demo-test": "vue-cli-service serve",
+    "demo-test-debug": "node --inspect-brk=6666 ./node_modules/@vue/cli-service/bin/vue-cli-service.js serve",
+    "install-force": "yarn install --force",
+    "sync-version": "node ./tools/sync-version.js",
+    "test-create": "tsc && node ./bin/index.js create test --override",
+    "tsc-build": "tsc --watch",
+    "types": "tsc -p tsconfig.declare.json",
+    "yalc-push": "npm run clean-bin-dir && npm run sync-version && npm run types && tsc && yalc push"
   },
-  "homepage": "https://github.com/tidys/cc-plugin#readme"
+  "types": "./types/declare.d.ts",
+  "version": "2.1.19"
 }
