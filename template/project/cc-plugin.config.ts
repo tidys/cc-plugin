@@ -20,9 +20,9 @@ const manifest: CocosPluginManifest = {
             type: Panel.Type.DockAble,
             main: './src/panel/index.ts',
             title: 'CC-Plugin',
-            width: 900,
-            height: 900,
-            minWidth: 550,
+            width: 500,
+            height: 400,
+            minWidth: 50,
             minHeight: 400,
         }
     ],

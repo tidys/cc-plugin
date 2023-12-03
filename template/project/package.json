@@ -5,7 +5,7 @@
     "@types/fs-extra": "9.0.1",
     "@types/node": "16.11.12",
     "@xuyanfeng/cc-ui": "0.2.10",
-    "cc-plugin": "2.1.22"
+    "cc-plugin": "2.1.23"
   },
   "name": "cc-plugin-demo",
   "scripts": {

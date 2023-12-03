@@ -3,6 +3,7 @@ import { log } from '../log';
 import { trim } from 'lodash'
 import utils from "../utils"
 import { ProjectConfig } from 'service';
+import { CreatorV3Limit } from '../const';
 export abstract class PackageInterface {
     protected config: CocosPluginConfig;
 

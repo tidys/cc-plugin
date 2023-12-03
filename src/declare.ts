@@ -32,6 +32,10 @@ export interface PanelOptions {
   icon?: string;
   width?: number;
   height?: number;
+    /**
+     * 发现creator v3.6.1、v3.7.3等3.x版本中，因为面板的dock-layout容器组件设置的ccs min-width、min-height属性就是该值
+     * 当缩小面板后，发现ui面板被截断，当ui面板再次激活后，会重新调整ui面板的size，就正常了，这个是creator的bug
+     */
   minWidth?: number;
   minHeight?: number;
   ejs?: string; // 自定义面板模板
