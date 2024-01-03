@@ -9,6 +9,7 @@
   },
   "name": "cc-plugin-demo",
   "scripts": {
+    "installForce": "yarn install --force",
     "ccp-pack-v2": "cc-plugin pack cp-v2",
     "ccp-pack-v3": "cc-plugin pack cp-v3",
     "ccp-pack-web": "cc-plugin pack web",
