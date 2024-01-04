@@ -272,6 +272,13 @@ export class CocosPluginService {
             options.output = this.catchOutput(outputProject, pluginDir!, manifest.name);
         }
         if (options.output && FS.existsSync(options.output)) {
+            if (type === PluginType.Web) {
+                // web不会有node_modules目录，所以直接清空
+                FsExtra.emptyDirSync(options.output);
+                log.yellow(`清空目录：${options.output}`);
+            } else {
+                // TODO: 删除非node_modules目录
+            }
         } else {
             log.red(`options.outputProject配置无效:${options.output}`)
             process.exit(0);
