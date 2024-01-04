@@ -21,13 +21,14 @@ import { log } from './log';
 import { PluginMgr } from './plugin-mgr';
 import Create from './commands/create';
 import * as FsExtra from 'fs-extra'
+import { ConfigTypeScript } from './const';
 
 export interface ProjectConfig {
     manifest: CocosPluginManifest,
     options: CocosPluginOptions,
     type: PluginType,
 }
-const ConfigTypeScript = "cc-plugin.config.ts";
+
 const ccpConfigJson = "cc-plugin.json";
 
 export class CocosPluginService {

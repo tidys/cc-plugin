@@ -9,13 +9,14 @@ import { npmInstall } from '../plugin/npm-install';
 import { OptionValues } from 'commander';
 import { showWeChatQrCode } from './tool';
 import { PluginType } from '../declare';
+import { ConfigTypeScript } from '../const';
 
 export default class Create extends PluginApi {
     apply(api: PluginMgr, service: CocosPluginService): void {
         api.registerCommand('create', {
             description: '创建项目',
             arguments: [
-                { name: 'name', desc: '项目名字', required: false, value: "ccp-plugin" }
+                { name: 'name', desc: '项目名字', required: false, value: "ccp-plugin-demo" }
             ],
             options: [
                 { name: '--override', desc: "强制覆盖当前目录" },
@@ -56,7 +57,14 @@ export default class Create extends PluginApi {
             }
             const templateDir = Path.join(service.root, './template/project')
             FsExtra.copySync(templateDir, projectDir);
-            log.green('生成模板成功')
+            // 替换名字
+            const file = Path.join(projectDir, ConfigTypeScript);
+            if (Fs.existsSync(file)) {
+                const content = Fs.readFileSync(file, 'utf8')
+                    .replace(/%pkg_name%/g, projectName);
+                Fs.writeFileSync(file, content);
+            }
+            log.green(`生成模板成功: ${projectDir}`);
             // npmInstall(projectDir)
             showWeChatQrCode()
         })

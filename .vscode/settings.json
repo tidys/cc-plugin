@@ -20,5 +20,6 @@
   "files.exclude": {
     ".bin": true,
     "bin": true
-  }
+  },
+  "git.ignoreLimitWarning": true
 }

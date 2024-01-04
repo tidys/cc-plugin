@@ -36,7 +36,17 @@
         "request": "launch",
         "name": "test create-test",
         "skipFiles": ["<node_internals>/**"],
-        "args": ["${workspaceFolder}\\bin/index.js", "create", "test"],
+        "cwd": "${workspaceFolder}",
+        "args": ["${workspaceFolder}\\bin/index.js", "create", "test", "--override"],
+        "preLaunchTask": "tsc: build - tsconfig.json"
+      },
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "test create no name",
+        "skipFiles": ["<node_internals>/**"],
+        "cwd": "${workspaceFolder}",
+        "args": ["${workspaceFolder}\\bin/index.js", "create"],
         "preLaunchTask": "tsc: build - tsconfig.json"
       }
     ]
