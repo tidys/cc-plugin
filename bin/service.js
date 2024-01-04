@@ -38,7 +38,7 @@ const log_1 = require("./log");
 const plugin_mgr_1 = require("./plugin-mgr");
 const create_1 = __importDefault(require("./commands/create"));
 const FsExtra = __importStar(require("fs-extra"));
-const ConfigTypeScript = "cc-plugin.config.ts";
+const const_1 = require("./const");
 const ccpConfigJson = "cc-plugin.json";
 class CocosPluginService {
     constructor(context) {
@@ -83,7 +83,7 @@ class CocosPluginService {
         });
     }
     loadUserOptions() {
-        const configNames = ['./cc-plugin.config.js', `./${ConfigTypeScript}`];
+        const configNames = ['./cc-plugin.config.js', `./${const_1.ConfigTypeScript}`];
         let fileConfigPath = '';
         for (let name of configNames) {
             const fullPath = Path.join(this.context, name);
@@ -234,10 +234,10 @@ class CocosPluginService {
                     dirs.push({ url: cfgProject, source: ccpConfigJson });
                 }
                 if (v2 !== undefined && type === declare_1.PluginType.PluginV2) {
-                    dirs.push({ url: v2, source: ConfigTypeScript });
+                    dirs.push({ url: v2, source: const_1.ConfigTypeScript });
                 }
                 if (v3 !== undefined && type === declare_1.PluginType.PluginV3) {
-                    dirs.push({ url: v3, source: ConfigTypeScript });
+                    dirs.push({ url: v3, source: const_1.ConfigTypeScript });
                 }
                 if (dirs.length <= 0) {
                     log_1.log.red(`未配置options.outputProject`);

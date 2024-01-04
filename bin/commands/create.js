@@ -26,12 +26,13 @@ const log_1 = require("../log");
 const FsExtra = __importStar(require("fs-extra"));
 const tool_1 = require("./tool");
 const declare_1 = require("../declare");
+const const_1 = require("../const");
 class Create extends plugin_api_1.PluginApi {
     apply(api, service) {
         api.registerCommand('create', {
             description: '创建项目',
             arguments: [
-                { name: 'name', desc: '项目名字', required: false, value: "ccp-plugin" }
+                { name: 'name', desc: '项目名字', required: false, value: "ccp-plugin-demo" }
             ],
             options: [
                 { name: '--override', desc: "强制覆盖当前目录" },
@@ -72,7 +73,14 @@ class Create extends plugin_api_1.PluginApi {
             }
             const templateDir = Path.join(service.root, './template/project');
             FsExtra.copySync(templateDir, projectDir);
-            log_1.log.green('生成模板成功');
+            // 替换名字
+            const file = Path.join(projectDir, const_1.ConfigTypeScript);
+            if (Fs.existsSync(file)) {
+                const content = Fs.readFileSync(file, 'utf8')
+                    .replace(/%pkg_name%/g, projectName);
+                Fs.writeFileSync(file, content);
+            }
+            log_1.log.green(`生成模板成功: ${projectDir}`);
             // npmInstall(projectDir)
             tool_1.showWeChatQrCode();
         });
