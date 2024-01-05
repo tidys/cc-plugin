@@ -11,7 +11,9 @@ export class Env extends Base {
     get isWeb() {
         return this._type === PluginType.Web;
     }
-
+    get isChrome() {
+        return this._type === PluginType.Chrome;
+    }
     get isPluginV2() {
         return this._type === PluginType.PluginV2;
     }

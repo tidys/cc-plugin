@@ -29,7 +29,7 @@ export class CocosCreatorPluginRender {
         const { enabled, port } = this.options.server!;
         if (enabled) {
             let hot = () => {
-                if (this.Adaptation.Env.isWeb) {
+                if (this.Adaptation.Env.isWeb || this.Adaptation.Env.isChrome) {
                     console.log('TODO web reload');
                 } else {
                     const ClientSocket = require('./client-socket').default;
@@ -59,7 +59,7 @@ export class CocosCreatorPluginRender {
                 originReady(rootElement, args);
             }
         }
-        if (this.Adaptation.Env.isWeb) {
+        if (this.Adaptation.Env.isWeb || this.Adaptation.Env.isChrome) {
             let el = document.body.querySelector('#app');
             if (el && options.ready) {
                 options.ready(el, null);

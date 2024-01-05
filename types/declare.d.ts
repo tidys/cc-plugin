@@ -45,6 +45,7 @@ export declare const Panel: {
         DockAble: string;
         Simple: string;
         InnerIndex: string;
+        Web: string;
     };
 };
 export interface CocosPluginManifest {
@@ -65,11 +66,39 @@ export interface CocosPluginManifest {
     menus?: MenuOptions[];
     i18n_zh?: string;
     i18n_en?: string;
+    /**
+     * 插件的icon相对路径，暂时只有chrome用到了
+     * chrome默认使用48x48的png格式，其他尺寸我暂时没有用到
+     */
+    icon?: string | {
+        '48': string;
+    };
+    /**
+     * chrome插件
+     */
+    chrome?: {
+        /**
+         * 弹出界面
+         */
+        view_popup: string;
+        /**
+         * 设置界面
+         */
+        view_options: string;
+        /**
+         * devtools界面
+         */
+        view_devtools: string;
+        script_content: string;
+        script_inject: string;
+        script_background: string;
+    };
 }
 export declare enum PluginType {
     PluginV2 = "cp-v2",
     PluginV3 = "cp-v3",
-    Web = "web"
+    Web = "web",
+    Chrome = "chrome"
 }
 export interface CocosPluginOptions {
     server?: {
@@ -84,9 +113,16 @@ export interface CocosPluginOptions {
     outputProject: string | {
         v2?: string;
         v3?: string;
+        /**
+         * 目前仅支持相对路径
+         */
         web?: string;
         vscode?: string;
         electron?: string;
+        /**
+         * 同时支持相对路径和绝对路径
+         */
+        chrome?: string;
     };
     /**
      * 发布文件的最终输出目录，一般用户不需要设置这个字段，是cc-plugin的私有字段
@@ -118,7 +154,7 @@ export interface CocosPluginV2 {
     description?: string;
     main: string;
     author?: string;
-    "main-menu"?: Record<string, {
+    'main-menu'?: Record<string, {
         icon?: string;
         message?: string;
         accelerator?: string;
@@ -174,11 +210,11 @@ export interface PanelOptionsV3 {
         /**
          * 默认宽度
          */
-        'width'?: number;
+        width?: number;
         /**
          * 默认高度
          */
-        'height'?: number;
+        height?: number;
     };
 }
 export interface CocosPluginV3 {

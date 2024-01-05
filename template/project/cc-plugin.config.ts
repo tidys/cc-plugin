@@ -46,8 +46,6 @@ const options: CocosPluginOptions = {
     watchBuild: true,
     outputProject: {
         web: './web',
-        v2: '', // 这里的路径需要替换为指向creator v2的项目
-        v3: '', // 这里的路径需要替换为指向creator v3的项目
     },
 };
 export default { manifest, options };

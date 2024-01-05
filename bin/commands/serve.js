@@ -118,12 +118,14 @@ class Serve extends plugin_api_1.PluginApi {
                 });
                 console.log('build complete');
             }));
-            if (service.isWeb()) {
-                yield this.runWebpackServer(compiler);
+            if (service.isWeb() || service.isChromePlugin()) {
+                // chrome模式不需要这个devServer，但是在web上预览view时非常有帮助
+                // 所以需要增加一个开关
+                yield this.runWebpackServer(compiler, service);
             }
         }));
     }
-    runWebpackServer(compiler) {
+    runWebpackServer(compiler, service) {
         return __awaiter(this, void 0, void 0, function* () {
             const host = yield webpack_dev_server_1.default.internalIP('v4');
             const port = yield portfinder_1.default.getPortPromise();
@@ -137,6 +139,9 @@ class Serve extends plugin_api_1.PluginApi {
                 https: true,
                 port,
                 static: "./dist",
+                devMiddleware: {
+                    writeToDisk: service.isChromePlugin() ? true : false,
+                }
             }, compiler);
             server.startCallback((error) => {
                 if (error) {

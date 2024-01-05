@@ -6,7 +6,7 @@ function getFallback(service) {
     let fallback = {
         fs: false,
     };
-    if (service.isWeb()) {
+    if (service.isWeb() || service.isChromePlugin()) {
         // web情况下： 模块重定向，不需要的设置为false即可
         fallback = Object.assign(fallback, {
             assert: require.resolve("assert"),

@@ -95,17 +95,18 @@ export default class Serve extends PluginApi {
                 })
                 console.log('build complete')
             }));
-            if (service.isWeb()) {
-                await this.runWebpackServer(compiler);
+            if (service.isWeb() || service.isChromePlugin()) {
+                // chrome模式不需要这个devServer，但是在web上预览view时非常有帮助
+                // 所以需要增加一个开关
+                await this.runWebpackServer(compiler, service);
             }
         })
     }
 
-    async runWebpackServer(compiler: webpack.Compiler) {
+    async runWebpackServer(compiler: webpack.Compiler, service: CocosPluginService) {
         const host = await webpackDevSever.internalIP('v4');
         const port = await PortFinder.getPortPromise();
-        const server = new webpackDevSever(
-          {
+        const server = new webpackDevSever({
             // inputFileSystem: FsExtra,
             // outputFileSystem: FsExtra,
             hot: true,
@@ -114,7 +115,10 @@ export default class Serve extends PluginApi {
             host,
             https: true,
             port,
-            static: "./dist",
+            static: "./dist", 
+            devMiddleware: {
+                writeToDisk: service.isChromePlugin() ? true : false,
+            }
           },
           compiler
         );

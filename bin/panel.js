@@ -7,6 +7,8 @@ const declare_1 = require("./declare");
 const path_1 = require("path");
 const fs_extra_1 = require("fs-extra");
 const html_webpack_plugin_1 = __importDefault(require("html-webpack-plugin"));
+const const_1 = require("./chrome/const");
+const log_1 = require("./log");
 class Panel {
     constructor(service, webpackChain) {
         this.service = service;
@@ -43,11 +45,15 @@ class Panel {
         let mainFile = panel.main;
         if (!fs_extra_1.existsSync(mainFile)) {
             mainFile = path_1.join(this.service.context, panel.main);
+            if (!fs_extra_1.existsSync(mainFile)) {
+                log_1.log.red(`source file ${mainFile} not exist, please check your config file`);
+                process.exit(1);
+            }
         }
         if (ejsTemplate && fs_extra_1.existsSync(ejsTemplate) && fs_extra_1.existsSync(mainFile)) {
             let { webpackChain } = this;
             let entryName = 'default';
-            if (this.service.isWeb()) {
+            if (this.service.isWeb() || this.service.isChromePlugin()) {
                 entryName = panel.name;
             }
             if (this.service.isCreatorPlugin()) {
@@ -95,6 +101,73 @@ class Panel {
             }
         }
         return '';
+    }
+    dealChrome() {
+        const { chrome } = this.service.projectConfig.manifest;
+        if (chrome) {
+            // index索引界面
+            const panels = [];
+            const ejsOptions = JSON.stringify([
+                const_1.ChromeConst.html.devtools,
+                const_1.ChromeConst.html.options,
+                const_1.ChromeConst.html.popup,
+            ].map(item => {
+                return {
+                    label: `${item}`,
+                    href: `${item}`,
+                };
+            }));
+            panels.push({
+                name: 'index',
+                title: "index",
+                main: path_1.join(this.service.root, "src/index/index.ts"),
+                ejs: path_1.join(this.service.root, "src/index/index.ejs"),
+                ejsOptions: { panels: ejsOptions },
+                type: declare_1.Panel.Type.InnerIndex,
+            });
+            // 各个界面
+            [
+                { name: const_1.ChromeConst.html.devtools, entry: chrome.view_devtools },
+                { name: const_1.ChromeConst.html.options, entry: chrome.view_options },
+                { name: const_1.ChromeConst.html.popup, entry: chrome.view_popup }
+            ].map(item => {
+                let name = item.name;
+                const suffix = '.html';
+                if (name.endsWith(suffix)) {
+                    name = name.substring(0, name.length - suffix.length);
+                }
+                panels.push({
+                    name: name,
+                    title: name,
+                    main: path_1.join(this.service.context, item.entry),
+                    ejs: path_1.join(this.service.root, './template/web/index.html'),
+                    type: declare_1.Panel.Type.Web,
+                });
+            });
+            const options = this.service.projectConfig.options;
+            // 主要是处理main的字段
+            panels.forEach(panel => {
+                // 需要知道这个面板被哪个HTMLWebpack chunk
+                // creator插件需要知道面板对应的js，其他类型不需要
+                panel.main = this.dealPanel(panel, options);
+            });
+            // 单独的脚本
+            [
+                { name: const_1.ChromeConst.script.content, entry: chrome.script_content },
+                { name: const_1.ChromeConst.script.background, entry: chrome.script_background },
+                { name: const_1.ChromeConst.script.inject, entry: chrome.script_inject },
+            ].map(item => {
+                const fullPath = path_1.join(this.service.context, item.entry);
+                if (!fs_extra_1.existsSync(fullPath)) {
+                    log_1.log.red(`not exist file: ${fullPath}`);
+                    process.exit(0);
+                }
+                const name = path_1.basename(item.name);
+                const ext = path_1.extname(item.name);
+                const entry = name.substring(0, name.length - ext.length);
+                this.webpackChain.entry(entry).add(fullPath);
+            });
+        }
     }
     dealPanels() {
         let panels = this.service.projectConfig.manifest.panels;

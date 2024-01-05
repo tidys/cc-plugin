@@ -65,6 +65,10 @@ export class CocosPluginService {
         const { type } = this.projectConfig;
         return type === PluginType.Web;
     }
+    public isChromePlugin() {
+        const { type } = this.projectConfig;
+        return type === PluginType.Chrome;
+    }
 
     private resolvePlugins() {
         this.plugins.push(new Base())
@@ -155,6 +159,17 @@ export class CocosPluginService {
         userOptions && this.checkUserOptions(userOptions, type);
         this.projectConfig = defaultsDeep(userOptions, this.defaults);
         this.projectConfig.type = type;
+        this.checkConfig();
+
+    }
+    // 校验插件配置
+    private checkConfig() {
+        if (this.projectConfig.type === PluginType.Chrome) {
+            if (!this.projectConfig.manifest.chrome) {
+                log.red('chrome插件需要配置manifest.chrome字段');
+                process.exit(0);
+            }
+        }
     }
 
     public checkIsProjectDir(projDir: string) {
@@ -178,8 +193,13 @@ export class CocosPluginService {
         return isProject;
     }
 
-    private catchOutput(projectDir: string, pluginDir: string, pluginName: string) {
-        // 相对目录
+    private catchOutput(type: PluginType, projectDir: string, pluginDir: string, pluginName: string) {
+        // chrome
+        if (type === PluginType.Chrome) {
+            return projectDir;
+        }
+
+    // creator相对目录
         if (projectDir.startsWith('./')) {
             log.red(`当type为creator插件时，options.outputProject 暂时不支持相对目录的写法：${projectDir}`)
             process.exit(0)
@@ -211,7 +231,7 @@ export class CocosPluginService {
         let projectPath = null;
         const configFile = Path.join(this.context, ccpConfigJson);
         if (FS.existsSync(configFile)) {
-            const cfg: { v2: string, v3: string } = JSON.parse(FS.readFileSync(configFile, 'utf-8'));
+            const cfg: { v2: string, v3: string, chrome: string } = JSON.parse(FS.readFileSync(configFile, 'utf-8'));
             switch (type) {
                 case PluginType.PluginV2: {
                     projectPath = cfg.v2;
@@ -221,10 +241,23 @@ export class CocosPluginService {
                     projectPath = cfg.v3;
                     break;
                 }
+                case PluginType.Web: {
+                    projectPath = cfg.chrome;
+                }
             }
         }
         if (projectPath && FS.existsSync(projectPath)) {
             return projectPath;
+        }
+        return null;
+    }
+    private getFullPath(path: string) {
+        if (path.startsWith('./')) {
+            return Path.join(this.context, path);
+        }
+        // 必须先判断相对路径，因为existsSync会判断相对路径是否存在
+        if (FS.existsSync(path)) {
+            return path;
         }
         return null;
     }
@@ -234,8 +267,8 @@ export class CocosPluginService {
         let { outputProject } = options;
         const pluginDir = this.getPluginDir(type!);
         if (typeof outputProject === 'object') {
-            const { v2, v3, web } = outputProject!;
-            if (type === PluginType.PluginV2 || type === PluginType.PluginV3) {
+            const { v2, v3, web, chrome } = outputProject!;
+            if (type === PluginType.PluginV2 || type === PluginType.PluginV3 || type === PluginType.Chrome) {
                 // 优先支持配置文件
                 const cfgProject = this.getConfigProjectPath(type);
                 let dirs: { url: string, source: string }[] = [];
@@ -248,13 +281,23 @@ export class CocosPluginService {
                 if (v3 !== undefined && type === PluginType.PluginV3) {
                     dirs.push({ url: v3, source: ConfigTypeScript });
                 }
+                if (chrome !== undefined && type === PluginType.Chrome) {
+                    const url = this.getFullPath(chrome);
+                    if (url) {
+                        if (!FS.existsSync(url)) {
+                            log.yellow(`auto create directory: ${url}`);
+                            FsExtra.ensureDirSync(url);
+                        }
+                        dirs.push({ url, source: ConfigTypeScript });
+                    }
+                }
                 if (dirs.length <= 0) {
                     log.red(`未配置options.outputProject`);
                 } else {
                     for (let i = 0; i < dirs.length; i++) {
                         const { url, source } = dirs[i];
                         if (url && FS.existsSync(url)) {
-                            options.output = this.catchOutput(url, pluginDir!, manifest.name);
+                            options.output = this.catchOutput(type, url, pluginDir!, manifest.name);
                             break;
                         } else {
                             log.blue(`[${source}]里面的输出目录无效：${url}`)
@@ -270,10 +313,10 @@ export class CocosPluginService {
                 options.output = fullPath;
             }
         } else {
-            options.output = this.catchOutput(outputProject, pluginDir!, manifest.name);
+            options.output = this.catchOutput(type, outputProject, pluginDir!, manifest.name);
         }
         if (options.output && FS.existsSync(options.output)) {
-            if (type === PluginType.Web) {
+            if (type === PluginType.Web || type === PluginType.Chrome) {
                 // web不会有node_modules目录，所以直接清空
                 FsExtra.emptyDirSync(options.output);
                 log.yellow(`清空目录：${options.output}`);

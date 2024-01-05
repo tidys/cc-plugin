@@ -18,44 +18,50 @@ class AstFinder {
 
 
     findType(type: string) {
-        let ret = this.cur.filter((el: any) => el.type === type);
-        if (ret) {
-            if (type === ExportDefaultDeclaration) {
-                this.cur = ret.declaration;
-            } else if (type === VariableDeclaration) {
-                this.cur = ret;
-            }
-        } else {
-            this.cur = null;
+        if (this.cur) {
+            let ret = this.cur.filter((el: any) => el.type === type);
+            if (ret) {
+                if (type === ExportDefaultDeclaration) {
+                    this.cur = ret.declaration;
+                } else if (type === VariableDeclaration) {
+                    this.cur = ret;
+                }
+            } else {
+                this.cur = null;
+        }
         }
         return this;
     }
     findVar (key:string) {
-        for (let i = 0; i < this.cur.length; i++) {
-            let item = this.cur[i];
-            let ret = item.declarations.find((el:any) => {
-                return el.type === VariableDeclarator && el.id.name === key
-            })
-            if (ret) {
-                this.cur = ret.init;
-                return this;
+        if (this.cur) {
+            for (let i = 0; i < this.cur.length; i++) {
+                let item = this.cur[i];
+                let ret = item.declarations.find((el: any) => {
+                    return el.type === VariableDeclarator && el.id.name === key
+                })
+                if (ret) {
+                    this.cur = ret.init;
+                    return this;
+                }
             }
         }
         this.cur = null;
         return this;
     }
     findProperty(key: string) {
-        let ret = this.cur.find((el: any) => el.key.name === key);
-        if (ret) {
-            this.cur = ret.value;
-        } else {
-            this.cur = null;
+        if (this.cur) {
+            let ret = this.cur.find((el: any) => el.key.name === key);
+            if (ret) {
+                this.cur = ret.value;
+            } else {
+                this.cur = null;
+            }
         }
         return this;
     }
 
     isObject() {
-        if (this.cur.type === ObjectExpression) {
+        if (this.cur && this.cur.type === ObjectExpression) {
             this.cur = this.cur.properties;
         } else {
             this.cur = null;
@@ -64,13 +70,13 @@ class AstFinder {
     }
 
     setBoolean(value: boolean) {
-        if (this.cur.type === BooleanLiteral) {
+        if (this.cur && this.cur.type === BooleanLiteral) {
             this.cur.value = value;
         }
     }
 
     setString(str: string) {
-        if (this.cur.type === StringLiteral) {
+        if (this.cur && this.cur.type === StringLiteral) {
             this.cur.value = str;
         }
     }

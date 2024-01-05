@@ -1,11 +1,12 @@
 import { CocosPluginOptions, PanelOptions, PluginType, Panel as PanelOptionsType } from './declare';
-import { join } from 'path'
-import { existsSync } from 'fs-extra'
+import { basename, extname, join } from 'path'
+import { existsSync, } from 'fs-extra'
 import { CocosPluginService } from './service';
 import Config from 'webpack-chain';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { template } from "lodash";
-
+import { ChromeConst } from './chrome/const';
+import { log } from './log'
 
 export default class Panel {
     private service: CocosPluginService;
@@ -43,13 +44,16 @@ export default class Panel {
         let mainFile = panel.main;
         if (!existsSync(mainFile)) {
             mainFile = join(this.service.context, panel.main);
+            if (!existsSync(mainFile)) {
+                log.red(`source file ${mainFile} not exist, please check your config file`);
+                process.exit(1);
+            }
         }
-
 
         if (ejsTemplate && existsSync(ejsTemplate) && existsSync(mainFile)) {
             let { webpackChain } = this;
             let entryName = 'default';
-            if (this.service.isWeb()) {
+            if (this.service.isWeb() || this.service.isChromePlugin()) {
                 entryName = panel.name;
             }
             if (this.service.isCreatorPlugin()) {
@@ -97,7 +101,75 @@ export default class Panel {
         }
         return '';
     }
+    dealChrome() {
+        const { chrome } = this.service.projectConfig.manifest;
+        if (chrome) {
+            // index索引界面
+            const panels: PanelOptions[] = [];
+            const ejsOptions = JSON.stringify([
+                ChromeConst.html.devtools,
+                ChromeConst.html.options,
+                ChromeConst.html.popup,
+            ].map(item => {
+                return {
+                    label: `${item}`,
+                    href: `${item}`,
+                };
+            }));
+            panels.push({
+                name: 'index',
+                title: "index",
+                main: join(this.service.root, "src/index/index.ts"),
+                ejs: join(this.service.root, "src/index/index.ejs"),
+                ejsOptions: { panels: ejsOptions },
+                type: PanelOptionsType.Type.InnerIndex,
+            });
 
+            // 各个界面
+            [
+                { name: ChromeConst.html.devtools, entry: chrome.view_devtools },
+                { name: ChromeConst.html.options, entry: chrome.view_options },
+                { name: ChromeConst.html.popup, entry: chrome.view_popup }
+            ].map(item => {
+                let name = item.name;
+                const suffix = '.html'
+                if (name.endsWith(suffix)) {
+                    name = name.substring(0, name.length - suffix.length);
+                }
+                panels.push({
+                    name: name,
+                    title: name,
+                    main: join(this.service.context, item.entry),
+                    ejs: join(this.service.root, './template/web/index.html'),
+                    type: PanelOptionsType.Type.Web,
+                })
+            });
+
+            const options: CocosPluginOptions = this.service.projectConfig.options;
+            // 主要是处理main的字段
+            panels.forEach(panel => {
+                // 需要知道这个面板被哪个HTMLWebpack chunk
+                // creator插件需要知道面板对应的js，其他类型不需要
+                panel.main = this.dealPanel(panel, options);
+            });
+            // 单独的脚本
+            [
+                { name: ChromeConst.script.content, entry: chrome.script_content },
+                { name: ChromeConst.script.background, entry: chrome.script_background },
+                { name: ChromeConst.script.inject, entry: chrome.script_inject },
+            ].map(item => {
+                const fullPath = join(this.service.context, item.entry);
+                if (!existsSync(fullPath)) {
+                    log.red(`not exist file: ${fullPath}`);
+                    process.exit(0);
+                }
+                const name = basename(item.name);
+                const ext = extname(item.name);
+                const entry = name.substring(0, name.length - ext.length);
+                this.webpackChain.entry(entry).add(fullPath);
+            });
+        }
+    }
     dealPanels() {
         let panels: PanelOptions[] | undefined = this.service.projectConfig.manifest.panels;
         const options: CocosPluginOptions = this.service.projectConfig.options;

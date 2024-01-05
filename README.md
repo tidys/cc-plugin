@@ -157,6 +157,7 @@ npm i @xuyanfeng/cc-editor -g
 {
     "v2":"xx",
     "v3":"xx",
+    "chrome": "xx"
 }
 ```
 `cc-plugin.json`不建议纳入版本管理，它更像是一个本机配置，满足了不同电脑，配置不同的需求。

@@ -10,6 +10,7 @@ import CssMinimizerPlugin from "css-minimizer-webpack-plugin"
 import Panel from '../panel';
 import NpmInstall from '../plugin/npm-install';
 import CocosPluginPackageJson from '../commands/package.json';
+import { ChromeManifest } from '../chrome/chrome-manifest'
 import { VueLoaderPlugin } from 'vue-loader';
 import requireV3 from '../plugin/require-v3';
 import webpack from 'webpack';
@@ -245,14 +246,19 @@ export default class Base extends PluginApi {
             // })
             // 处理面板
             const panel = new Panel(service, webpackChain);
-            panel.dealPanels();
-
-            // plugins
-            if (service.isCreatorPlugin()) {
-                webpackChain.plugin('npm install')
-                    .use(NpmInstall, [options.output! as string])
-                webpackChain.plugin('cc-plugin-package.json')
-                    .use(CocosPluginPackageJson, [service])
+            if (service.isChromePlugin()) {
+                panel.dealChrome();
+                webpackChain.plugin('chrome-manifest')
+                    .use(ChromeManifest, [service]);
+            } else {
+                panel.dealPanels();
+                // plugins
+                if (service.isCreatorPlugin()) {
+                    webpackChain.plugin('npm install')
+                        .use(NpmInstall, [options.output! as string])
+                    webpackChain.plugin('cc-plugin-package.json')
+                        .use(CocosPluginPackageJson, [service])
+                }  
             }
 
             webpackChain

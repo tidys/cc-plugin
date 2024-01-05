@@ -30,6 +30,7 @@ const css_minimizer_webpack_plugin_1 = __importDefault(require("css-minimizer-we
 const panel_1 = __importDefault(require("../panel"));
 const npm_install_1 = __importDefault(require("../plugin/npm-install"));
 const package_json_1 = __importDefault(require("../commands/package.json"));
+const chrome_manifest_1 = require("../chrome/chrome-manifest");
 const vue_loader_1 = require("vue-loader");
 const require_v3_1 = __importDefault(require("../plugin/require-v3"));
 const webpack_1 = __importDefault(require("webpack"));
@@ -255,13 +256,20 @@ class Base extends plugin_api_1.PluginApi {
             // })
             // 处理面板
             const panel = new panel_1.default(service, webpackChain);
-            panel.dealPanels();
-            // plugins
-            if (service.isCreatorPlugin()) {
-                webpackChain.plugin('npm install')
-                    .use(npm_install_1.default, [options.output]);
-                webpackChain.plugin('cc-plugin-package.json')
-                    .use(package_json_1.default, [service]);
+            if (service.isChromePlugin()) {
+                panel.dealChrome();
+                webpackChain.plugin('chrome-manifest')
+                    .use(chrome_manifest_1.ChromeManifest, [service]);
+            }
+            else {
+                panel.dealPanels();
+                // plugins
+                if (service.isCreatorPlugin()) {
+                    webpackChain.plugin('npm install')
+                        .use(npm_install_1.default, [options.output]);
+                    webpackChain.plugin('cc-plugin-package.json')
+                        .use(package_json_1.default, [service]);
+                }
             }
             webpackChain
                 .plugin('vue')
