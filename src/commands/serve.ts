@@ -104,25 +104,27 @@ export default class Serve extends PluginApi {
     }
 
     async runWebpackServer(compiler: webpack.Compiler, service: CocosPluginService) {
+        const { server } = service.projectConfig.options;
         const host = await webpackDevSever.internalIP('v4');
         const port = await PortFinder.getPortPromise();
-        const server = new webpackDevSever({
+        const webpackDevServerInstance = new webpackDevSever({
             // inputFileSystem: FsExtra,
             // outputFileSystem: FsExtra,
             hot: true,
             allowedHosts: ["all"],
             open: true,
             host,
-            https: true,
+            https: !!(server && server.https),
             port,
             static: "./dist", 
             devMiddleware: {
-                writeToDisk: service.isChromePlugin() ? true : false,
+                //service.isChromePlugin() ? true : false,
+                writeToDisk: !!(server && server.writeToDisk),
             }
           },
           compiler
         );
-        server.startCallback((error) => {
+        webpackDevServerInstance.startCallback((error) => {
             if (error) {
                 console.error(error);
                 return;

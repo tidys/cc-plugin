@@ -127,23 +127,25 @@ class Serve extends plugin_api_1.PluginApi {
     }
     runWebpackServer(compiler, service) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { server } = service.projectConfig.options;
             const host = yield webpack_dev_server_1.default.internalIP('v4');
             const port = yield portfinder_1.default.getPortPromise();
-            const server = new webpack_dev_server_1.default({
+            const webpackDevServerInstance = new webpack_dev_server_1.default({
                 // inputFileSystem: FsExtra,
                 // outputFileSystem: FsExtra,
                 hot: true,
                 allowedHosts: ["all"],
                 open: true,
                 host,
-                https: true,
+                https: !!(server && server.https),
                 port,
                 static: "./dist",
                 devMiddleware: {
-                    writeToDisk: service.isChromePlugin() ? true : false,
+                    //service.isChromePlugin() ? true : false,
+                    writeToDisk: !!(server && server.writeToDisk),
                 }
             }, compiler);
-            server.startCallback((error) => {
+            webpackDevServerInstance.startCallback((error) => {
                 if (error) {
                     console.error(error);
                     return;

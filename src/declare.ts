@@ -79,6 +79,10 @@ export interface CocosPluginManifest {
      */
     chrome?: {
         /**
+         * chrome打包crx的pem
+         */
+        pem?: string;
+        /**
          * 弹出界面
          */
         view_popup: string;
@@ -109,7 +113,18 @@ export interface CocosPluginOptions {
     // hmr server
     server?: {
         enabled?: boolean;
-        port?: number; // 监听端口，需要优化判断下端口是否占用的问题
+        /**
+         * 监听端口，需要优化判断下端口是否占用的问题
+         */
+        port?: number;
+        /**
+         * 使用https协议,默认http协议
+         */
+        https?: boolean;
+        /**
+         * 构建结果是否写入磁盘，默认不写入磁盘，会存储在内存中
+         */
+        writeToDisk?: boolean;
     };
     watchBuild?: boolean; // 监听构建
     /**

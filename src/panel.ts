@@ -28,7 +28,7 @@ export default class Panel {
         }
         return ret;
     }
-    dealPanel(panel: PanelOptions, options: CocosPluginOptions) {
+    dealPanel(panel: PanelOptions, pluginOptions: CocosPluginOptions) {
         let ejsTemplate = null;
         if (panel.ejs && existsSync(panel.ejs)) {
             ejsTemplate = panel.ejs;
@@ -85,7 +85,14 @@ export default class Panel {
                         }
                     })
                 } else {
+                    let meta = '';
+                    if (pluginOptions.server?.https) {
+                        meta = `<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">`;
+                    }
                     options = Object.assign(options, {
+                        ccPlugin: {
+                            meta,
+                        },
                         inject: true,
                         filename: `${entryName}.html`
                     });
@@ -116,6 +123,7 @@ export default class Panel {
                     href: `${item}`,
                 };
             }));
+            // TODO: 未处理https，不过影响不大
             panels.push({
                 name: 'index',
                 title: "index",

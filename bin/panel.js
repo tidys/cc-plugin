@@ -27,7 +27,8 @@ class Panel {
         }
         return ret;
     }
-    dealPanel(panel, options) {
+    dealPanel(panel, pluginOptions) {
+        var _a;
         let ejsTemplate = null;
         if (panel.ejs && fs_extra_1.existsSync(panel.ejs)) {
             ejsTemplate = panel.ejs;
@@ -86,7 +87,14 @@ class Panel {
                     });
                 }
                 else {
+                    let meta = '';
+                    if ((_a = pluginOptions.server) === null || _a === void 0 ? void 0 : _a.https) {
+                        meta = `<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">`;
+                    }
                     options = Object.assign(options, {
+                        ccPlugin: {
+                            meta,
+                        },
                         inject: true,
                         filename: `${entryName}.html`
                     });
