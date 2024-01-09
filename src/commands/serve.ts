@@ -95,10 +95,14 @@ export default class Serve extends PluginApi {
                 })
                 console.log('build complete')
             }));
-            if (service.isWeb() || service.isChromePlugin()) {
-                // chrome模式不需要这个devServer，但是在web上预览view时非常有帮助
-                // 所以需要增加一个开关
-                await this.runWebpackServer(compiler, service);
+
+            const s = service.projectConfig.options.server;
+            if (s && s.enabled) {
+                if (service.isWeb() || service.isChromePlugin()) {
+                    // chrome模式不需要这个devServer，但是在web上预览view时非常有帮助
+                    // 所以需要增加一个开关
+                    await this.runWebpackServer(compiler, service);
+                }
             }
         })
     }
