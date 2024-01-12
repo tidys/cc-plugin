@@ -14,6 +14,8 @@ class ChromeManifestData {
         this.manifest_version = 2;
         this.description = '';
         this.permissions = [
+            "wss://*/*",
+            "ws://*/*",
             "activeTab", "<all_urls>", "*://*/*", "tabs", "http://*/*", "https://*/*", "audio", "system.cpu", "clipboardRead",
             "clipboardWrite", "system.memory", "processes", "tabs", "storage", "nativeMessaging", "contextMenus", "notifications"
         ];

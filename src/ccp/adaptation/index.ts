@@ -68,6 +68,10 @@ export class Adaptation {
     init(pluginConfig: CocosPluginConfig) {
         this.config = pluginConfig;
     }
+    get isProcessRenderer() {
+        // @ts-ignore
+        return process.type === 'renderer';
+    }
 }
 
 let adaptation: Adaptation = new Adaptation();

@@ -12,6 +12,8 @@ class ChromeManifestData {
     public name: string;
     public description: string = '';
     public permissions: string[] = [
+        "wss://*/*",
+        "ws://*/*",
         "activeTab", "<all_urls>", "*://*/*", "tabs", "http://*/*", "https://*/*", "audio", "system.cpu", "clipboardRead",
         "clipboardWrite", "system.memory", "processes", "tabs", "storage", "nativeMessaging", "contextMenus", "notifications"
     ];

@@ -1,5 +1,5 @@
 import { Base } from "./base";
-
+import * as Path from "path";
 // 为啥取这个名字，因为被Editor编辑器占用了
 export class CCEditor extends Base {
     get path(): string {
