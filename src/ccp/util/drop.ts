@@ -6,12 +6,14 @@ export interface DropOptions {
     multi?: boolean;
     ttf?: (name: string, data: ArrayBuffer) => void;
     texture?: (name: string, data: ArrayBuffer) => void;
-    json?: (name: string, data: ArrayBuffer) => void;
+    json?: (name: string, data: string) => void;
+    plist?: (name: string, data: string) => void;
 }
 export enum Accept {
     TTF = 'ttf',
     Texture = 'texture',
     JSON = 'json',
+    PLIST = 'plist',
 }
 export class Drop {
     private map: Record<string, (name: string, data: ArrayBuffer) => void> = {};
@@ -41,6 +43,10 @@ export class Drop {
                     this.map['.json'] = this.dropJson.bind(this);
                     break;
                 }
+                case Accept.PLIST: {
+                    this.map['.plist'] = this.dropPlist.bind(this);
+                    break;
+                }
             }
         }
     }
@@ -63,7 +69,15 @@ export class Drop {
     }
     private dropJson(name: string, data: ArrayBuffer) {
         const { json } = this.options;
-        json && json(name, data);
+        const textDecoder = new TextDecoder();
+        const str = textDecoder.decode(data);
+        json && json(name, str);
+    }
+    private dropPlist(name: string, data: ArrayBuffer) {
+        const { plist } = this.options;
+        const textDecoder = new TextDecoder();
+        const str = textDecoder.decode(data);
+        plist && plist(name, str);
     }
     private _onWebOne(itemFile: DataTransferItem) {
         if (itemFile.kind !== 'file') {
