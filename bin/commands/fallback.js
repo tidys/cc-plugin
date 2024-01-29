@@ -27,7 +27,8 @@ function getFallback(service) {
             express: false,
             electron: false,
             async_hooks: false,
-            string_decoder: false
+            string_decoder: false,
+            'fs-extra': false,
         });
     }
     return fallback;

@@ -66,7 +66,7 @@ export class Panel extends Base {
      * @param args 参数
      * @returns 
      */
-    sendToMain(plugin: string, functionName: string, args: string | number | object | Array<any>, callback?: (arg1: any, arg2: any) => void): boolean {
+    sendToMain(plugin: string, functionName: string, args: string | number | object | boolean | Array<any>, callback?: (arg1: any, arg2: any) => void): boolean {
         if (typeof args === 'function') {
             return false;
         }
