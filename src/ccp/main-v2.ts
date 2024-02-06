@@ -39,6 +39,8 @@ export const unload = (() => {
     Editor.Builder.on(EventBeforeChangeFiles, onBeforeBuildFinish);
 });
 // 供参考的数据格式
+// 从 v2.4 开始，options 中不再提供 buildResults，而是提供了一个 bundles 数组。
+// https://docs.cocos.com/creator/2.4/manual/zh/publish/custom-project-build-template.html#%E8%8E%B7%E5%8F%96%E6%9E%84%E5%BB%BA%E7%BB%93%E6%9E%9C
 const testOptions = {
     "title": "hot-update",
     "packageName": "org.cocos2d.demo",
@@ -131,6 +133,7 @@ export const messages = Object.assign(CCP.wrapper?.messages || {}, {
             CCP.wrapper.builder.onBeforeBuild(param);
         }
     },
+    // TODO: 从1.9开始，不建议使用了，命令行构建不会触发这个事件，推荐使用Editor.Builder
     'editor:build-finished'(event: any, options: any) {
         const { platform, md5Cache, dest } = options;
         const param: BuilderOptions = {

@@ -29,10 +29,11 @@ export class Util extends Base {
             ? Path.join(result.hostname, result.pathname)
             : Path.join(result.hostname);
         if (this.adaptation.Env.isPluginV2) {
+            // const { uuidToUrl, uuidToFspath, urlToFspath, fspathToUuid } = Editor.remote.AssetDB.assetdb;
             throw new Error('没有实现的接口')
         } else if (this.adaptation.Env.isWeb) {
             if (result.protocol === 'packages:') {
-                const pluginName = this.adaptation.config.manifest.name;
+                const pluginName = this.adaptation.config!.manifest.name;
                 if (r1.startsWith('/')) {
                     r1 = r1.substring(1, r1.length)
                 }
