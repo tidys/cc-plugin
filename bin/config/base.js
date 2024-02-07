@@ -38,6 +38,7 @@ const log_1 = require("../log");
 const FsExtra = __importStar(require("fs-extra"));
 // @ts-ignore
 const webpack_filter_warnings_plugin_1 = __importDefault(require("webpack-filter-warnings-plugin"));
+const const_1 = require("../const");
 class Base extends plugin_api_1.PluginApi {
     getExternal(dir, defaultModules = []) {
         let map = {};
@@ -317,6 +318,23 @@ class Base extends plugin_api_1.PluginApi {
             webpackChain
                 .plugin('CriticalDependency')
                 .use(webpack_filter_warnings_plugin_1.default, [{ exclude: [/Critical dependency/] }]);
+            const userPlugins = service.userWebpackConfig.plugins || [];
+            if (userPlugins.length) {
+                // webpackChain.plugin('provide-process/browser').use(webpack.ProvidePlugin, [{
+                //     process: 'process/browser',
+                // }]);
+                for (let i = 0; i < userPlugins.length; i++) {
+                    const plugin = userPlugins[i];
+                    if (plugin) {
+                        // @ts-ignore
+                        const name = plugin['name'] || plugin.constructor.name || `user-plugin-${i}`;
+                        webpackChain.plugin(name).use(plugin);
+                    }
+                    else {
+                        console.warn(`invalid webpack plugin in ${const_1.ConfigTypeScript}`);
+                    }
+                }
+            }
         });
     }
 }

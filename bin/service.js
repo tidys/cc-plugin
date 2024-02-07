@@ -45,6 +45,7 @@ class CocosPluginService {
         this.webpackChainFns = [];
         this.plugins = [];
         this.projectConfig = this.defaults;
+        this.userWebpackConfig = { plugins: [] };
         this.pluginMgr = new plugin_mgr_1.PluginMgr(this);
         this.context = context || process.cwd();
         this.root = Path.join(__dirname, '..');
@@ -86,8 +87,25 @@ class CocosPluginService {
             }
         });
     }
+    loadUserWebpackConfig() {
+        var _a;
+        const configNames = [`./${const_1.ConfigWebpack}`];
+        const ret = this._loadCode(configNames);
+        if (ret) {
+            const webpackCfg = ret;
+            if (webpackCfg) {
+                (_a = webpackCfg.plugins) === null || _a === void 0 ? void 0 : _a.forEach(plugin => {
+                    var _a;
+                    (_a = this.userWebpackConfig.plugins) === null || _a === void 0 ? void 0 : _a.push(plugin);
+                });
+            }
+        }
+    }
     loadUserOptions() {
         const configNames = ['./cc-plugin.config.js', `./${const_1.ConfigTypeScript}`];
+        return this._loadCode(configNames);
+    }
+    _loadCode(configNames) {
         let fileConfigPath = '';
         for (let name of configNames) {
             const fullPath = Path.join(this.context, name);
@@ -154,6 +172,7 @@ class CocosPluginService {
         userOptions && this.checkUserOptions(userOptions, type);
         this.projectConfig = lodash_1.defaultsDeep(userOptions, this.defaults);
         this.projectConfig.type = type;
+        this.loadUserWebpackConfig();
         this.checkConfig();
     }
     // 校验插件配置

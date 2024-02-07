@@ -21,5 +21,6 @@
     ".bin": true,
     "bin": true
   },
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "cSpell.words": ["Fspath"]
 }
