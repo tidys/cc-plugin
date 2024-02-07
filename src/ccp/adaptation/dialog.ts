@@ -143,6 +143,7 @@ export class Dialog extends Base {
                     '.jpeg': this.readAsArrayBuffer,
                     '.ttf': this.readAsArrayBuffer,
                     '.js': this.readAsArrayBuffer,
+                    '.jsc': this.readAsArrayBuffer,
                 };
                 if (options.filters?.length) {
                     let accept: string[] = [];
