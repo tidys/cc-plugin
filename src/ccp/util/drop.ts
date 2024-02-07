@@ -8,12 +8,18 @@ export interface DropOptions {
     texture?: (name: string, data: ArrayBuffer) => void;
     json?: (name: string, data: string) => void;
     plist?: (name: string, data: string) => void;
+    jsc?: (name: string, data: ArrayBuffer) => void;
+    js?: (name: string, data: string) => void;
+    ts?: (name: string, data: string) => void;
 }
 export enum Accept {
     TTF = 'ttf',
     Texture = 'texture',
     JSON = 'json',
     PLIST = 'plist',
+    JSC = 'jsc',
+    JS = 'js',
+    TS = 'ts',
 }
 export class Drop {
     private map: Record<string, (name: string, data: ArrayBuffer) => void> = {};
@@ -47,6 +53,18 @@ export class Drop {
                     this.map['.plist'] = this.dropPlist.bind(this);
                     break;
                 }
+                case Accept.JSC: {
+                    this.map['.jsc'] = this.dropJSC.bind(this);
+                    break;
+                }
+                case Accept.JS: {
+                    this.map['.js'] = this.dropJS.bind(this);
+                    break;
+                }
+                case Accept.TS: {
+                    this.map['.ts'] = this.dropTS.bind(this);
+                }
+
             }
         }
     }
@@ -66,6 +84,22 @@ export class Drop {
     private dropTexture(name: string, data: ArrayBuffer) {
         const { texture } = this.options;
         texture && texture(name, data);
+    }
+    private dropJSC(name: string, data: ArrayBuffer) {
+        const { jsc } = this.options;
+        jsc && jsc(name, data);
+    }
+    private dropJS(name: string, data: ArrayBuffer) {
+        const { js } = this.options;
+        const textDecoder = new TextDecoder();
+        const str = textDecoder.decode(data);
+        js && js(name, str);
+    }
+    private dropTS(name: string, data: ArrayBuffer) {
+        const { ts } = this.options;
+        const textDecoder = new TextDecoder();
+        const str = textDecoder.decode(data);
+        ts && ts(name, str);
     }
     private dropJson(name: string, data: ArrayBuffer) {
         const { json } = this.options;

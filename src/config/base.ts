@@ -307,9 +307,9 @@ export default class Base extends PluginApi {
 
             const userPlugins = service.userWebpackConfig.plugins || [];
             if (userPlugins.length) {
-                webpackChain.plugin('provide-process/browser').use(webpack.ProvidePlugin, [{
-                    process: 'process/browser',
-                }]);
+                // webpackChain.plugin('provide-process/browser').use(webpack.ProvidePlugin, [{
+                //     process: 'process/browser',
+                // }]);
                 for (let i = 0; i < userPlugins.length; i++) {
                     const plugin = userPlugins[i];
                     if (plugin) {

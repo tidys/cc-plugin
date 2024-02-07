@@ -37,7 +37,14 @@ const DefaultDialogMessageOptions: DialogMessageOptions = {
     noLink: true,
 }
 interface FileFilter {
+    /**
+     * 过滤文件后缀, 
+     * 例如: ['png', '.png']都可以，底层会自动添加 .
+     */
     extensions: string[];
+    /**
+     * 过滤名称
+     */
     name: string;
 }
 
@@ -46,9 +53,19 @@ export interface SelectDialogOptions {
     path?: string;
     type?: 'directory' | 'file';
     button?: string;
+    /**
+     * 是否可以选择多个文件
+     */
     multi?: boolean;
+    /**
+     * 过滤选项
+     */
     filters?: FileFilter[];
     extensions?: string;
+    /**
+     * 是否将读取到的ArrayBuffer数据填充到返回值的value里面
+     * 默认值为true，填充
+     */
     fillData?: boolean;
 }
 const Electron = require('electron');
@@ -125,6 +142,7 @@ export class Dialog extends Base {
                     '.jpg': this.readAsArrayBuffer,
                     '.jpeg': this.readAsArrayBuffer,
                     '.ttf': this.readAsArrayBuffer,
+                    '.js': this.readAsArrayBuffer,
                 };
                 if (options.filters?.length) {
                     let accept: string[] = [];
@@ -151,14 +169,14 @@ export class Dialog extends Base {
                         const file: File = inputEl.files![i];
                         if (fillData) {
                             const type = extname(file.name).toLocaleLowerCase();
-                            const readerFunction = typeReader[type];
-                            if (readerFunction) {
-                                const data: ArrayBuffer = await readerFunction(file);
-                                if (data) {
-                                    ret[file.name.toString()] = data;
-                                }
-                            } else {
-                                console.warn(`${file.name} no reader`);
+                            let readerFunction = typeReader[type];
+                            if (!readerFunction) {
+                                console.warn(`${file.name} no reader, use arraybuffer reader`);
+                                readerFunction = this.readAsArrayBuffer;
+                            }
+                            const data: ArrayBuffer = await readerFunction(file);
+                            if (data) {
+                                ret[file.name.toString()] = data;
                             }
                         } else {
                             ret[file.name.toString()] = '';
