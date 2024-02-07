@@ -3,3 +3,4 @@ export const CreatorV3Limit = {
     minHeight: 580,
 }
 export const ConfigTypeScript = "cc-plugin.config.ts";
+export const ConfigWebpack = "cc-plugin.webpack.ts";

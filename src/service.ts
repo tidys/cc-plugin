@@ -21,7 +21,8 @@ import { log } from './log';
 import { PluginMgr } from './plugin-mgr';
 import Create from './commands/create';
 import * as FsExtra from 'fs-extra'
-import { ConfigTypeScript } from './const';
+import { ConfigTypeScript, ConfigWebpack } from './const';
+import type * as webpack from 'webpack'
 
 export interface ProjectConfig {
     manifest: CocosPluginManifest,
@@ -30,7 +31,15 @@ export interface ProjectConfig {
 }
 
 const ccpConfigJson = "cc-plugin.json";
-
+/**
+ * 对应的webpack配置
+ */
+interface UserWebpackConfig {
+    /**
+    * 用户自定义的webpack 插件
+    */
+    plugins?: Array<webpack.ProvidePlugin | webpack.WebpackPluginInstance>;
+}
 export class CocosPluginService {
     public webpackChainFns: Function[] = [];
     public plugins: PluginApi[] = [];
@@ -38,6 +47,7 @@ export class CocosPluginService {
     public root: string;
     public projectConfig: ProjectConfig = this.defaults;
     public pluginMgr: PluginMgr;
+    public userWebpackConfig: UserWebpackConfig = { plugins: [] };
 
     constructor(context: string) {
         this.pluginMgr = new PluginMgr(this);
@@ -88,9 +98,23 @@ export class CocosPluginService {
             }
         })
     }
-
+    private loadUserWebpackConfig() {
+        const configNames = [`./${ConfigWebpack}`];
+        const ret = this._loadCode(configNames);
+        if (ret) {
+            const webpackCfg: UserWebpackConfig = ret as UserWebpackConfig;
+            if (webpackCfg) {
+                webpackCfg.plugins?.forEach(plugin => {
+                    this.userWebpackConfig.plugins?.push(plugin)
+                })
+            }
+        }
+    }
     private loadUserOptions(): CocosPluginConfig | null {
         const configNames = ['./cc-plugin.config.js', `./${ConfigTypeScript}`];
+        return this._loadCode(configNames);
+    }
+    private _loadCode(configNames: string[]) {
         let fileConfigPath = '';
         for (let name of configNames) {
             const fullPath = Path.join(this.context, name)
@@ -159,6 +183,7 @@ export class CocosPluginService {
         userOptions && this.checkUserOptions(userOptions, type);
         this.projectConfig = defaultsDeep(userOptions, this.defaults);
         this.projectConfig.type = type;
+        this.loadUserWebpackConfig();
         this.checkConfig();
 
     }
@@ -199,7 +224,7 @@ export class CocosPluginService {
             return projectDir;
         }
 
-    // creator相对目录
+        // creator相对目录
         if (projectDir.startsWith('./')) {
             log.red(`当type为creator插件时，options.outputProject 暂时不支持相对目录的写法：${projectDir}`)
             process.exit(0)

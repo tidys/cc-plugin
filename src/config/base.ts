@@ -18,6 +18,7 @@ import { log } from '../log';
 import * as FsExtra from 'fs-extra';
 // @ts-ignore
 import filter from 'webpack-filter-warnings-plugin'
+import { ConfigTypeScript } from '../const';
 
 export default class Base extends PluginApi {
     getExternal(dir: string, defaultModules: string[] = []) {
@@ -258,7 +259,7 @@ export default class Base extends PluginApi {
                         .use(NpmInstall, [options.output! as string])
                     webpackChain.plugin('cc-plugin-package.json')
                         .use(CocosPluginPackageJson, [service])
-                }  
+                }
             }
 
             webpackChain
@@ -293,16 +294,33 @@ export default class Base extends PluginApi {
             if (OS) envCopy['OS'] = OS
             if (LANG) envCopy['LANG'] = LANG
             if (PROCESSOR_LEVEL) envCopy['PROCESSOR_LEVEL'] = PROCESSOR_LEVEL
-            if (NUMBER_OF_PROCESSORS) envCopy['NUMBER_OF_PROCESSORS'] = NUMBER_OF_PROCESSORS; 
+            if (NUMBER_OF_PROCESSORS) envCopy['NUMBER_OF_PROCESSORS'] = NUMBER_OF_PROCESSORS;
             webpackChain.plugin("process_define")
                 .use(webpack.DefinePlugin, [{
                     // 这里不能使用'process.env': JSON.stringify({}), 会被替换为{}.Debug, 这个是有语法问题的
                     // 'process.env': {} 替换的结果为 ({}).DEBUG , 是正常的
-                    'process.env': {} 
+                    'process.env': {}
                 }]);
             webpackChain
                 .plugin('CriticalDependency')
                 .use(filter, [{ exclude: [/Critical dependency/] }])
+
+            const userPlugins = service.userWebpackConfig.plugins || [];
+            if (userPlugins.length) {
+                webpackChain.plugin('provide-process/browser').use(webpack.ProvidePlugin, [{
+                    process: 'process/browser',
+                }]);
+                for (let i = 0; i < userPlugins.length; i++) {
+                    const plugin = userPlugins[i];
+                    if (plugin) {
+                        // @ts-ignore
+                        const name = plugin['name'] || plugin.constructor.name || `user-plugin-${i}`;
+                        webpackChain.plugin(name).use(plugin);
+                    } else {
+                        console.warn(`invalid webpack plugin in ${ConfigTypeScript}`);
+                    }
+                }
+            }
         })
     }
 }
