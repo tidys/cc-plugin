@@ -27,6 +27,13 @@ export default class Pack extends PluginApi {
             (type, options: OptionValues) => {
                 checkBuildType(type, true);
                 cocosPluginService.init(type as PluginType);
+                // 打包前，再次清理output目录，可能会清理2次，但是关系不大
+                const { output } = cocosPluginService.projectConfig.options;
+                if (output && existsSync(output)) {
+                    emptyDirSync(output);
+                    log.yellow(`清空目录：${output}`);
+                }
+
                 api.chainWebpack(async (webpackChain: Config) => {
                     webpackChain.mode('production')
                     webpackChain.devtool(false);

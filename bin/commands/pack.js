@@ -51,6 +51,12 @@ class Pack extends plugin_api_1.PluginApi {
         api.registerCommand('pack', commonOptions_1.getBuildOptions("打包插件"), (type, options) => {
             commonOptions_1.checkBuildType(type, true);
             service_1.cocosPluginService.init(type);
+            // 打包前，再次清理output目录，可能会清理2次，但是关系不大
+            const { output } = service_1.cocosPluginService.projectConfig.options;
+            if (output && fs_1.existsSync(output)) {
+                fs_extra_1.emptyDirSync(output);
+                log_1.log.yellow(`清空目录：${output}`);
+            }
             api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
                 webpackChain.mode('production');
                 webpackChain.devtool(false);
