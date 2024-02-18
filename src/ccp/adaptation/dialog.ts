@@ -220,7 +220,7 @@ export class Dialog extends Base {
             const ret: Record<string, any> = {};
             (result || []).forEach((e: string) => {
                 if (options.type === 'file') {
-                    ret[e] = Fs.readFileSync(e).buffer;
+                    ret[e] = Fs.readFileSync(e);
                 } else {
                     ret[e] = null;
                 }
