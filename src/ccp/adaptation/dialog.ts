@@ -144,6 +144,7 @@ export class Dialog extends Base {
                     '.ttf': this.readAsArrayBuffer,
                     '.js': this.readAsArrayBuffer,
                     '.jsc': this.readAsArrayBuffer,
+                    '.so': this.readAsArrayBuffer,
                 };
                 if (options.filters?.length) {
                     let accept: string[] = [];
