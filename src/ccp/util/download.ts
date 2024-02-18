@@ -1,3 +1,4 @@
+// TODO: 需要适配native逻辑
 export class Download {
     public static downloadFile(fileName: string, data: string, base64: boolean = false) {
         let blob: Blob | null = null;

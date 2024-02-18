@@ -200,8 +200,17 @@ export class Dialog extends Base {
                 dialogOptions.properties = ['openDirectory'];
             } else if (options.type === 'file') {
                 dialogOptions.properties = ['openFile'];
+                const filter: FileFilter[] = options.filters || [];
+                filter.forEach(item => {
+                    item.extensions = item.extensions.map(ext => {
+                        if (ext.startsWith('.')) {
+                            return ext.substring(1, ext.length);
+                        }
+                        return ext;
+                    })
+                })
                 // @ts-ignore
-                dialogOptions.filters = options.filters || [];
+                dialogOptions.filters = filter;
             }
             //@ts-ignore
             const result = Editor.Dialog.openFile(dialogOptions);
