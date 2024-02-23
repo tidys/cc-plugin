@@ -6,3 +6,4 @@
 template/.DS_Store
 .yalc/
 bin/**/*.map
+test.js

@@ -6,62 +6,37 @@ import { ChromeConst } from './const';
 import { existsSync } from 'fs';
 import { log } from '../log';
 
-class ChromeManifestData {
-    public manifest_version: number = 2;
+interface IAction {
+    default_popup: string,
+    default_icon: {
+        "48": string,
+    },
+    default_title: string,
+}
+
+class ChromeManifestDataBase {
+    public manifest_version: number = 0;
     public version: string;
+
     public name: string;
     public description: string = '';
-    public permissions: string[] = [
-        "wss://*/*",
-        "ws://*/*",
-        "activeTab", "<all_urls>", "*://*/*", "tabs", "http://*/*", "https://*/*", "audio", "system.cpu", "clipboardRead",
-        "clipboardWrite", "system.memory", "processes", "tabs", "storage", "nativeMessaging", "contextMenus", "notifications"
-    ];
-    private icons = { "48": "" }
-    private devtools_page: string = "";
-    private background: {
-        scripts: string[],
-        persistent: boolean,
-    } = {
-            scripts: [],
-            persistent: false,
-        };
-    private content_scripts: Array<{
+    public icons = { "48": "" }
+    public devtools_page: string = "";
+    public content_scripts: Array<{
         matches: string[],
         js: string[],
         run_at: string | "document_start" | "document_end",
         all_frames: boolean,
     }> = [];
-    private options_ui: {
-        page: string,
-        browser_style: boolean,
-    } = {
-            page: "",
-            browser_style: true,
-        };
-    private browser_action: {
-        default_popup: string,
-        default_icon: {
-            "48": string,
-        },
-        default_title: string,
-    } = {
-            default_popup: "",
-            default_icon: {
-                "48": "",
-            },
-            default_title: "",
-        };
-    public web_accessible_resources: string[] = ["*/*", "*"];
-    public content_security_policy: string = "script-src 'self' ;  object-src 'self'";
+    public options_ui: { page: string, browser_style: boolean, } = {
+        page: "",
+        browser_style: true,
+    };
+
     constructor(name: string, version: string, description: string = "") {
         this.name = name;
         this.version = version;
         this.description = description;
-    }
-    addBackgroundScript(script: string) {
-        this.background.scripts.push(script);
-        return this;
     }
     addContentScript(script: string) {
         this.content_scripts.push({
@@ -76,6 +51,72 @@ class ChromeManifestData {
         this.options_ui.page = page;
         return this;
     }
+    setDevtoolsPage(page: string) {
+        this.devtools_page = page;
+        return this;
+    }
+}
+const permissions = [
+    "wss://*/*",
+    "ws://*/*",
+    "activeTab", "<all_urls>", "*://*/*", "tabs", "http://*/*", "https://*/*", "audio", "system.cpu", "clipboardRead",
+    "clipboardWrite", "system.memory", "processes", "tabs", "storage", "nativeMessaging", "contextMenus", "notifications"
+];
+class ChromeManifestDataV3 extends ChromeManifestDataBase {
+    private host_permissions: string[] = permissions;
+    private action: IAction = {
+        default_popup: "",
+        default_icon: {
+            "48": "",
+        },
+        default_title: "",
+    };
+    private background: { service_worker: string, type: "module" | string } = {
+        "service_worker": "",
+        "type": "module"
+    };
+    constructor(name: string, version: string, description: string = "") {
+        super(name, version, description);
+        this.manifest_version = 3;
+    }
+    addBackgroundScript(script: string) {
+        this.background.service_worker = script;
+        this.background.type = "module";
+        return this;
+    }
+
+    setPopupPage(page: string, title: string) {
+        this.action.default_popup = page;
+        this.action.default_title = title;
+        return this;
+    }
+    setIcon(icon: string) {
+        this.icons["48"] = icon;
+        this.action.default_icon["48"] = icon;
+        return this;
+    }
+}
+
+class ChromeManifestDataV2 extends ChromeManifestDataBase {
+    private browser_action: IAction = {
+        default_popup: "",
+        default_icon: {
+            "48": "",
+        },
+        default_title: "",
+    };
+    private permissions: string[] = permissions;
+    private background: { scripts: string[], persistent: boolean, } = { scripts: [], persistent: false };
+    private web_accessible_resources: string[] = ["*/*", "*"];
+    private content_security_policy: string = "script-src 'self' ;  object-src 'self'";
+    constructor(name: string, version: string, description: string = "") {
+        super(name, version, description);
+        this.manifest_version = 2;
+    }
+    addBackgroundScript(script: string) {
+        this.background.scripts.push(script);
+        return this;
+    }
     setPopupPage(page: string, title: string) {
         this.browser_action.default_popup = page;
         this.browser_action.default_title = title;
@@ -84,10 +125,6 @@ class ChromeManifestData {
     setIcon(icon: string) {
         this.icons["48"] = icon;
         this.browser_action.default_icon["48"] = icon;
-        return this;
-    }
-    setDevtoolsPage(page: string) {
-        this.devtools_page = page;
         return this;
     }
 }
@@ -135,7 +172,8 @@ export class ChromeManifest {
     }
     buildManifestFile() {
         const { type, manifest } = this.service.projectConfig;
-        const data = new ChromeManifestData(manifest.name, manifest.version, manifest.description);
+        const ctor = manifest.chrome?.version === 3 ? ChromeManifestDataV3 : ChromeManifestDataV2;
+        const data = new ctor(manifest.name, manifest.version, manifest.description);
         // 处理icon
         const icon = this.dealIcon();
         if (icon) {
@@ -149,7 +187,7 @@ export class ChromeManifest {
         data.setDevtoolsPage(ChromeConst.html.devtools);
         this.saveManifestFile(data);
     }
-    private saveManifestFile(data: ChromeManifestData) {
+    private saveManifestFile(data: ChromeManifestDataV2 | ChromeManifestDataV3) {
         const options = this.service.projectConfig.options!;
         const packageJsonFile = join(options.output! as string, 'manifest.json');
         let spaces = options.min ? 0 : 4;

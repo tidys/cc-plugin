@@ -120,13 +120,13 @@ export default class Serve extends PluginApi {
             host,
             https: !!(server && server.https),
             port,
-            static: "./dist", 
+            static: "./dist",
             devMiddleware: {
                 //service.isChromePlugin() ? true : false,
                 writeToDisk: !!(server && server.writeToDisk),
             }
-          },
-          compiler
+        },
+            compiler
         );
         webpackDevServerInstance.startCallback((error) => {
             if (error) {
