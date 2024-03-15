@@ -970,6 +970,11 @@
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
+"@xuyanfeng/express-browserify@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@xuyanfeng/express-browserify/-/express-browserify-1.0.0.tgz#55eef8697650c5d279e39ce4218f8075c63d9e0b"
+  integrity sha512-5dY4DVbULBMMu0sUM17IJio9JVdL+NHbTvulmwHNOVtNMOx03SMAdGzRmiDbEXv2AUApqgpoEmuBZ01LSJyACw==
+
 JSONStream@^1.0.3:
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/JSONStream/-/JSONStream-1.3.5.tgz#3208c1f08d3a4d99261ab64f92302bc15e111ca0"

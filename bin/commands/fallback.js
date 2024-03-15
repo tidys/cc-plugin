@@ -25,7 +25,7 @@ function getFallback(service) {
             https: require.resolve("https-browserify"),
             vm: require.resolve("vm-browserify"),
             tls: false,
-            express: false,
+            express: require.resolve("@xuyanfeng/express-browserify"),
             electron: false,
             async_hooks: false,
             string_decoder: false,

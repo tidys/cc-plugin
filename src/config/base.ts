@@ -83,7 +83,7 @@ export default class Base extends PluginApi {
             // webpackChain.resolve.alias.set('vue', vuePath).end();
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json').add('.glsl').end();
 
-            // 排除模块
+            // 排除模块 https://webpack.docschina.org/configuration/externals#externals
             if (service.isCreatorPlugin()) {
                 let externals = this.getExternal(service.context, ['electron', 'fs-extra', 'express'])
                 webpackChain.externals(externals)

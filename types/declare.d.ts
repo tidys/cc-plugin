@@ -78,6 +78,10 @@ export interface CocosPluginManifest {
      */
     chrome?: {
         /**
+         * chrome插件的版本
+         */
+        version: 2 | 3;
+        /**
          * chrome打包crx的pem
          */
         pem?: string;

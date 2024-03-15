@@ -58,6 +58,7 @@
     "stream-http": "^3.2.0",
     "style-loader": "^3.3.1",
     "svg-url-loader": "^7.1.1",
+    "@xuyanfeng/express-browserify": "^1.0.0",
     "tiny-emitter": "^2.1.0",
     "tinycolor2": "^1.4.2",
     "ts-loader": "6.2.2",
@@ -121,5 +122,5 @@
     "yalc-push": "npm run clean-bin-dir && npm run sync-version && npm run types && tsc && yalc push"
   },
   "types": "./types/declare.d.ts",
-  "version": "2.1.34"
+  "version": "2.1.35"
 }

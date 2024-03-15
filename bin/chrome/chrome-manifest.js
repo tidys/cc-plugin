@@ -9,43 +9,20 @@ const fs_extra_1 = __importDefault(require("fs-extra"));
 const const_1 = require("./const");
 const fs_1 = require("fs");
 const log_1 = require("../log");
-class ChromeManifestData {
+class ChromeManifestDataBase {
     constructor(name, version, description = "") {
-        this.manifest_version = 2;
+        this.manifest_version = 0;
         this.description = '';
-        this.permissions = [
-            "wss://*/*",
-            "ws://*/*",
-            "activeTab", "<all_urls>", "*://*/*", "tabs", "http://*/*", "https://*/*", "audio", "system.cpu", "clipboardRead",
-            "clipboardWrite", "system.memory", "processes", "tabs", "storage", "nativeMessaging", "contextMenus", "notifications"
-        ];
         this.icons = { "48": "" };
         this.devtools_page = "";
-        this.background = {
-            scripts: [],
-            persistent: false,
-        };
         this.content_scripts = [];
         this.options_ui = {
             page: "",
             browser_style: true,
         };
-        this.browser_action = {
-            default_popup: "",
-            default_icon: {
-                "48": "",
-            },
-            default_title: "",
-        };
-        this.web_accessible_resources = ["*/*", "*"];
-        this.content_security_policy = "script-src 'self' ;  object-src 'self'";
         this.name = name;
         this.version = version;
         this.description = description;
-    }
-    addBackgroundScript(script) {
-        this.background.scripts.push(script);
-        return this;
     }
     addContentScript(script) {
         this.content_scripts.push({
@@ -60,6 +37,70 @@ class ChromeManifestData {
         this.options_ui.page = page;
         return this;
     }
+    setDevtoolsPage(page) {
+        this.devtools_page = page;
+        return this;
+    }
+}
+const permissions = [
+    "wss://*/*",
+    "ws://*/*",
+    "activeTab", "<all_urls>", "*://*/*", "tabs", "http://*/*", "https://*/*", "audio", "system.cpu", "clipboardRead",
+    "clipboardWrite", "system.memory", "processes", "tabs", "storage", "nativeMessaging", "contextMenus", "notifications"
+];
+class ChromeManifestDataV3 extends ChromeManifestDataBase {
+    constructor(name, version, description = "") {
+        super(name, version, description);
+        this.host_permissions = permissions;
+        this.action = {
+            default_popup: "",
+            default_icon: {
+                "48": "",
+            },
+            default_title: "",
+        };
+        this.background = {
+            "service_worker": "",
+            "type": "module"
+        };
+        this.manifest_version = 3;
+    }
+    addBackgroundScript(script) {
+        this.background.service_worker = script;
+        this.background.type = "module";
+        return this;
+    }
+    setPopupPage(page, title) {
+        this.action.default_popup = page;
+        this.action.default_title = title;
+        return this;
+    }
+    setIcon(icon) {
+        this.icons["48"] = icon;
+        this.action.default_icon["48"] = icon;
+        return this;
+    }
+}
+class ChromeManifestDataV2 extends ChromeManifestDataBase {
+    constructor(name, version, description = "") {
+        super(name, version, description);
+        this.browser_action = {
+            default_popup: "",
+            default_icon: {
+                "48": "",
+            },
+            default_title: "",
+        };
+        this.permissions = permissions;
+        this.background = { scripts: [], persistent: false };
+        this.web_accessible_resources = ["*/*", "*"];
+        this.content_security_policy = "script-src 'self' ;  object-src 'self'";
+        this.manifest_version = 2;
+    }
+    addBackgroundScript(script) {
+        this.background.scripts.push(script);
+        return this;
+    }
     setPopupPage(page, title) {
         this.browser_action.default_popup = page;
         this.browser_action.default_title = title;
@@ -68,10 +109,6 @@ class ChromeManifestData {
     setIcon(icon) {
         this.icons["48"] = icon;
         this.browser_action.default_icon["48"] = icon;
-        return this;
-    }
-    setDevtoolsPage(page) {
-        this.devtools_page = page;
         return this;
     }
 }
@@ -118,8 +155,10 @@ class ChromeManifest {
         return icon_res;
     }
     buildManifestFile() {
+        var _a;
         const { type, manifest } = this.service.projectConfig;
-        const data = new ChromeManifestData(manifest.name, manifest.version, manifest.description);
+        const ctor = ((_a = manifest.chrome) === null || _a === void 0 ? void 0 : _a.version) === 3 ? ChromeManifestDataV3 : ChromeManifestDataV2;
+        const data = new ctor(manifest.name, manifest.version, manifest.description);
         // 处理icon
         const icon = this.dealIcon();
         if (icon) {
