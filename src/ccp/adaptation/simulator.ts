@@ -18,13 +18,15 @@ export class Simulator extends Base {
 
     get remoteAssetDir() {
         const macFixPath = 'Contents/Resources/remote-asset'
-        if (this.adaptation.Env.isPluginV2) {
+        if (this.adaptation.Env.isWeb) {
+            return '';
+        } else if (this.adaptation.Env.isPluginV2) {
             if (this.adaptation.Env.isWin) {
                 return Path.join(this.path, 'win32/remote-asset');
             } else if (this.adaptation.Env.isMac) {
                 return Path.join(this.path, 'mac/Simulator.app/', macFixPath);
             }
-        } else {
+        } else if (this.adaptation.Env.isPluginV3) {
             if (this.adaptation.Env.isWin) {
                 throw new Error('没有适配')
             } else if (this.adaptation.Env.isMac) {
