@@ -187,3 +187,25 @@ if (!!__VALID_CODE__) {
 ```
 
 执行`cc-plugin pack web --validCode=true`，validCode选项直接决定了`__VALID_CODE__`的值，当为false时，pack后就会将相关的逻辑剔除掉。
+
+## 关于一些native能力的package
+
+比如nodejs的`fs`模块，当你的插件中使用到了`fs`模块，一般我们都会如下这么使用
+```ts
+import {readFileSync} from 'fs'
+```
+如果你的插件要发布web版本，cc-plugin会自动将`fs`模块替换为`fs-browserify`模块，`fs-browserify`对`fs`的大部分接口进行了空实现，这样的好处是你`无需改动代码`，也能编译出可以运行的web版本，再也不用像以下这样麻烦的适配:
+
+```ts
+if(!isWeb){
+  const {readFileSync} = require('fs')
+}
+```
+
+需要注意的是，`fs`的一些操作，我们还是需要`isWeb`的判断，不过一般我们都是将这些逻辑放在一个专有函数，并且有些功能能否在web环境正常运行，我们开发的时候就是非常明确的，我们只需要做好类似的判断处理即可。
+
+我自己已经实现的空的`browserify`有:
+
+- [express-browserify](https://www.npmjs.com/package/@xuyanfeng/express-browserify)
+- [fs-extra-browserify](https://www.npmjs.com/package/@xuyanfeng/fs-extra-browserify)
+- [fs-browserify](https://www.npmjs.com/package/@xuyanfeng/fs-browserify)

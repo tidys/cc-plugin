@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getFallback = void 0;
 function getFallback(service) {
+    // 当正常解析失败时，重定向模块请求。
     // https://webpack.docschina.org/configuration/resolve/#resolvefallback
     let fallback = {
         fs: false,
@@ -26,10 +27,11 @@ function getFallback(service) {
             vm: require.resolve("vm-browserify"),
             tls: false,
             express: require.resolve("@xuyanfeng/express-browserify"),
+            fs: require.resolve("@xuyanfeng/fs-browserify"),
             electron: false,
             async_hooks: false,
             string_decoder: false,
-            'fs-extra': false,
+            'fs-extra': require.resolve("@xuyanfeng/fs-extra-browserify"),
         });
     }
     return fallback;
