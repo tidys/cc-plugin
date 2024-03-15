@@ -103,6 +103,7 @@ class Base extends plugin_api_1.PluginApi {
                     .set('express', '@xuyanfeng/express-browserify')
                     .set('fs-extra', '@xuyanfeng/fs-extra-browserify')
                     .set('fs', '@xuyanfeng/fs-browserify')
+                    .set('globby', '@xuyanfeng/globby-browserify')
                     .end();
             }
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json').add('.glsl').end();

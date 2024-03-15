@@ -15,6 +15,7 @@
     "@xuyanfeng/express-browserify": "^1.0.0",
     "@xuyanfeng/fs-browserify": "^1.0.0",
     "@xuyanfeng/fs-extra-browserify": "^1.0.0",
+    "@xuyanfeng/globby-browserify": "^1.0.0",
     "assert": "^2.0.0",
     "axios": "^0.26.1",
     "browserify-buffer": "^1.1.2",
@@ -124,5 +125,5 @@
     "yalc-push": "npm run clean-bin-dir && npm run sync-version && npm run types && tsc && yalc push"
   },
   "types": "./types/declare.d.ts",
-  "version": "2.1.36"
+  "version": "2.1.37"
 }
