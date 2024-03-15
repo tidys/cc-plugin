@@ -1,6 +1,7 @@
 import { CocosPluginService } from '../service';
 
 export function getFallback(service: CocosPluginService) {
+    // 当正常解析失败时，重定向模块请求。
     // https://webpack.docschina.org/configuration/resolve/#resolvefallback
     let fallback: Record<string, string | boolean> = {
         fs: false,
@@ -25,10 +26,11 @@ export function getFallback(service: CocosPluginService) {
             vm: require.resolve("vm-browserify"),
             tls: false,
             express: require.resolve("@xuyanfeng/express-browserify"),
+            fs: require.resolve("@xuyanfeng/fs-browserify"),
             electron: false,
             async_hooks: false,
             string_decoder: false,
-            'fs-extra': false,
+            'fs-extra': require.resolve("@xuyanfeng/fs-extra-browserify"),
         });
     }
     return fallback;

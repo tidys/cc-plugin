@@ -79,8 +79,16 @@ export default class Base extends PluginApi {
                     webpackChain.target('node');
                 }
             }
-            const vuePath = Path.resolve(service.root, './node_modules/vue');
-            // webpackChain.resolve.alias.set('vue', vuePath).end();
+            // https://webpack.docschina.org/configuration/resolve#resolvealias
+            if (service.isWeb()) {
+                const vuePath = Path.resolve(service.root, './node_modules/vue');
+                // webpackChain.resolve.alias.set('vue', vuePath).end();
+                webpackChain.resolve.alias
+                    .set('express', '@xuyanfeng/express-browserify')
+                    .set('fs-extra', '@xuyanfeng/fs-extra-browserify')
+                    .set('fs', '@xuyanfeng/fs-browserify')
+                    .end();
+            }
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json').add('.glsl').end();
 
             // 排除模块 https://webpack.docschina.org/configuration/externals#externals
