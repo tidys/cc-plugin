@@ -1,15 +1,15 @@
-import * as Fs from 'fs';
+import { existsSync, statSync } from 'fs';
 import * as OS from 'os';
 import { Base } from './base';
-const Path = require('path');
+import { dirname, sep } from 'path';
 const Electron = require('electron');
 export class Shell extends Base {
     private _getCmd(path: string): string {
-        if (!Fs.existsSync(path)) {
+        if (!existsSync(path)) {
             return '';
         }
-        if (Fs.statSync(path).isFile()) {
-            path = Path.dirname(path)
+        if (statSync(path).isFile()) {
+            path = dirname(path)
         }
         let cmd = '';
         switch (OS.platform()) {
@@ -26,13 +26,22 @@ export class Shell extends Base {
         return cmd;
     }
     showItem(path: string) {
+        if (this.adaptation.Env.isWeb) {
+            return;
+        }
+        if (!existsSync(path)) {
+            return;
+        }
+        if (statSync(path).isFile()) {
+            path = dirname(path)
+        }
+        path = path.replace(/\//g, sep);
         if (this.adaptation.Env.isPluginV2) {
             // @ts-ignore
             Electron.remote?.shell?.showItemInFolder(path);
         } else if (this.adaptation.Env.isPluginV3) {
             // @ts-ignore
             Electron.remote?.shell?.showItemInFolder(path);
-        } else if (this.adaptation.Env.isWeb) {
         }
     }
 
