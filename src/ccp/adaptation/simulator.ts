@@ -6,12 +6,14 @@ export class Simulator extends Base {
     get path(): string {
         if (this.adaptation.Env.isPluginV2) {
             return Path.join(this.adaptation.CCEditor.path, 'cocos2d-x/simulator/');
-        } else {
+        } else if (this.adaptation.Env.isPluginV3) {
             if (this.adaptation.Env.isWin) {
-                throw new Error('没有适配')
+                return Path.join(this.adaptation.CCEditor.path, 'resources/resources/3d/engine/native/simulator/Release')
             } else if (this.adaptation.Env.isMac) {
                 return Path.join(this.adaptation.CCEditor.path, 'resources/3d/engine-native/simulator/Debug/')
             }
+        } else {
+            throw new Error('not support env');
         }
         return '';
     }
@@ -28,7 +30,7 @@ export class Simulator extends Base {
             }
         } else if (this.adaptation.Env.isPluginV3) {
             if (this.adaptation.Env.isWin) {
-                throw new Error('没有适配')
+                return Path.join(this.path, 'remote-asset')
             } else if (this.adaptation.Env.isMac) {
                 return Path.join(this.path, 'SimulatorApp-Mac.app', macFixPath);
             }
