@@ -30,10 +30,30 @@ export class Util extends Base {
         }
         return ''
     }
+    fspathToUuid(fspath: string): string {
+        if (this.adaptation.Env.isPluginV2) {
+            if (this.adaptation.isProcessRenderer) {
+                // @ts-ignore
+                return Editor.assetdb.remote.fspathToUuid(fspath) || ''
+            } else {
+                // @ts-ignore
+                return Editor.assetdb.fspathToUuid(fspath) || ''
+            }
+        } else {
+
+        }
+        return ''
+    }
     fspathToUrl(fspath: string): string | null {
         if (this.adaptation.Env.isPluginV2) {
-            // @ts-ignore
-            return Editor.assetdb.remote.fspathToUrl(fspath);
+            if (this.adaptation.isProcessRenderer) {
+                // @ts-ignore
+                return Editor.assetdb.remote.fspathToUrl(fspath) || "";
+
+            } else {
+                // @ts-ignore
+                return Editor.assetdb.fspathToUrl(fspath) || "";
+            }
         } else {
             // 暂时不想使用编辑器的接口
             // Editor.Message.request("asset-db",'query-uuid',url);
@@ -49,7 +69,20 @@ export class Util extends Base {
             }
         }
     }
+    urlToUuid(url: string): string {
+        if (this.adaptation.Env.isPluginV2) {
+            if (this.adaptation.isProcessRenderer) {
+                // @ts-ignore
+                return Editor.assetdb.remote.urlToUuid(url) || ''
+            } else {
+                // @ts-ignore
+                return Editor.assetdb.urlToUuid(url) || ''
+            }
+        } else {
 
+        }
+        return ''
+    }
     urlToFspath(url: string) {
         let result = URL.parse(url);
         let r1 = result.pathname
