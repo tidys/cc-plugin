@@ -3,6 +3,33 @@ const Path = require('path'); // 为了适配浏览器
 const URL = require('url')
 
 export class Util extends Base {
+    /**
+     * 将长ID 压缩为 短ID
+     */
+    compressUuid(longUUID: string) {
+        if (this.adaptation.Env.isPluginV2) {
+            // @ts-ignore
+            const uuid = Editor.Utils.UuidUtils.compressUuid(longUUID);
+            return uuid;
+        } else {
+
+        }
+        return ""
+    }
+
+    /**
+     * 将短ID 解压为 长ID
+     */
+    decompressUuid(shortUUID: string) {
+        if (this.adaptation.Env.isPluginV2) {
+            // @ts-ignore
+            const uuid = Editor.Utils.UuidUtils.decompressUuid(shortUUID);
+            return uuid;
+        } else {
+
+        }
+        return ''
+    }
     fspathToUrl(fspath: string): string | null {
         if (this.adaptation.Env.isPluginV2) {
             // @ts-ignore

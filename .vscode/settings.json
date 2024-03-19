@@ -22,5 +22,6 @@
     "bin": true
   },
   "git.ignoreLimitWarning": true,
-  "cSpell.words": ["Fspath"]
+  "cSpell.words": ["Fspath"],
+  "emmet.includeLanguages": { "ejs": "html" }
 }

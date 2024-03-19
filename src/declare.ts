@@ -288,6 +288,12 @@ export interface BuilderOptions {
     outputPath: string; // 当前平台输出的目录： build/web-mobile
     platform: string; // web-mobile
     md5Cache: boolean;
+    /**
+     * 所有的资源
+     * pathBuild后的输出路径
+     * bundle资源所在的bundle
+     */
+    assets?: { [key: string]: { path: string, bundle: string } };
 }
 
 export const Platform = {

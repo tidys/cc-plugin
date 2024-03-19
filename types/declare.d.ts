@@ -277,6 +277,17 @@ export interface BuilderOptions {
     outputPath: string;
     platform: string;
     md5Cache: boolean;
+    /**
+     * 所有的资源
+     * pathBuild后的输出路径
+     * bundle资源所在的bundle
+     */
+    assets?: {
+        [key: string]: {
+            path: string;
+            bundle: string;
+        };
+    };
 }
 export declare const Platform: {
     WebMobile: string;

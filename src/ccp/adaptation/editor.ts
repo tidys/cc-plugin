@@ -20,11 +20,30 @@ export class CCEditor extends Base {
         }
         if (this.adaptation.Env.isPluginV2) {
             // @ts-ignore
-            this._version = Editor.remote.App.version;
+            if (process.type === 'browser') {
+                // @ts-ignore
+                this._version = Editor.App.version;
+            } else {
+            // @ts-ignore
+                this._version = Editor.remote.App.version;
+            }
         } else {
             // @ts-ignore
             this._version = Editor.App.version;
         }
         return this._version;
+    }
+    isVersionLess(version: string) {
+        const targetVersion = version.split('.');
+        const currentVersion = this.version.split('.');
+        const min = Math.min(targetVersion.length, currentVersion.length)
+        for (let i = 0; i < min; i++) {
+            const target = parseInt(targetVersion[i]);
+            const current = parseInt(currentVersion[i]);
+            if (current > target) {
+                return false;
+            }
+        }
+        return true;
     }
 }

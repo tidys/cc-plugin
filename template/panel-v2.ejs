@@ -1,53 +1,46 @@
 <% const jsLength = htmlWebpackPlugin.files.js.length; %>
 <% for (let i = 0; i < jsLength; i++) { %>
-    const panel = Editor.require('<%= htmlWebpackPlugin.files.js[i] %>');
+const panel = Editor.require('<%= htmlWebpackPlugin.files.js[i] %>');
 <% } %>
 
 function loadCss (parent, cssPaths) {
-if (!parent) return
-if (!Array.isArray(cssPaths)) {
-cssPaths = [cssPaths];
+    if (!parent) return
+    if (!Array.isArray(cssPaths)) {
+        cssPaths = [cssPaths];
+    }
+    cssPaths.forEach((cssPath) => {
+        const id = CSS.escape(cssPath);
+        const hasLoaded = parent.querySelector(`#${id}`)
+        if (!hasLoaded) {
+            const link = document.createElement('link')
+            link.rel = 'stylesheet';
+            link.href = cssPath;
+            link.id = id;
+            parent.appendChild(link);
+        }
+    })
 }
-cssPaths.forEach((cssPath) => {
-const id = CSS.escape(cssPath);
-const hasLoaded = parent.querySelector(`#${id}`)
-if (!hasLoaded) {
-const link = document.createElement('link')
-link.rel = 'stylesheet';
-link.href = cssPath;
-link.id = id;
-parent.appendChild(link);
-}
-})
-}
-Editor.Panel.extend({
-template:`<%= htmlWebpackPlugin.options.ccPlugin.template %>`,
-messages:{},
-ready(...args){
-
-<% const cssLength = htmlWebpackPlugin.files.css.length; %>
-<% for(let i = 0;i < cssLength;i++){ %>
-    loadCss(this.shadowRoot,'<%= htmlWebpackPlugin.files.css[i] %>')
-    loadCss(document.head,'<%= htmlWebpackPlugin.files.css[i] %>')
-<% } %>
-
 let panelInstance = panel;
 if (panel && panel.default) {
-panelInstance = panel.default;
+    panelInstance = panel.default;
 }
 
 let targetPanel = panelInstance;
 if (typeof panelInstance === 'function') {
-targetPanel = new panelInstance();
+    targetPanel = new panelInstance();
 }
-
-if (targetPanel.hasOwnProperty('ready') &&
-typeof targetPanel.ready === 'function') {
-const appDiv = this.shadowRoot.getElementById('app')
-targetPanel.ready(appDiv||this.shadowRoot, args);
-}
-
-
-}
+Editor.Panel.extend({
+    template: `<%= htmlWebpackPlugin.options.ccPlugin.template %>`,
+    messages: targetPanel.messages||{},
+    ready(...args) {
+        <% const cssLength = htmlWebpackPlugin.files.css.length; %>
+        <% for (let i = 0; i < cssLength; i++) { %>
+            loadCss(this.shadowRoot, '<%= htmlWebpackPlugin.files.css[i] %>')
+            loadCss(document.head, '<%= htmlWebpackPlugin.files.css[i] %>')
+        <% } %>
+        if (targetPanel.hasOwnProperty('ready') && typeof targetPanel.ready === 'function') {
+            const appDiv = this.shadowRoot.getElementById('app')
+            targetPanel.ready(appDiv || this.shadowRoot, args);
+        }
+    }
 })
-

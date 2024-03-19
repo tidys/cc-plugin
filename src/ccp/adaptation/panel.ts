@@ -39,7 +39,7 @@ export class Panel extends Base {
      * @param functionName 定义在messages里面的函数名
      * @param args 参数
      */
-    private send(panel: string, functionName: string, ...args: any): boolean {
+    public send(panel: string, functionName: string, ...args: any): boolean {
         if (typeof args === 'function') {
             return false;
         }

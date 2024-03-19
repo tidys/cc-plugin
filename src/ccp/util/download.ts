@@ -14,6 +14,11 @@ export class Download {
         }
         this.downloadBlobFile(fileName, blob);
     }
+    /**
+     * @example 下载zip的buffer
+        const buffer = await zip.generateAsync({ type: "blob", streamFiles: true });
+        Download.downloadBlobFile(`${this.options!.version}.zip`, buffer);
+     */
     public static downloadBlobFile(fileName: string, blob: Blob) {
         let aLink = document.createElement('a');
         let evt = document.createEvent('HTMLEvents');

@@ -11,6 +11,10 @@ import profile from './profile';
 
 interface PanelOptions {
     ready: (rootElement: any, args: any) => void;
+    /**
+     * 插件面板接受的主进程消息
+     */
+    messages?: Record<string, (event: any, data: any) => void>;
 }
 
 export class CocosCreatorPluginRender {
