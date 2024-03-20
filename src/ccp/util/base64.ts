@@ -69,7 +69,6 @@ export class Base64 {
     public static async convertToImageData(data: string): Promise<HTMLImageElement | null> {
         return new Promise<HTMLImageElement | null>((resolve, reject) => {
             if (!this.invalid(data)) {
-                debugger;
                 return reject(null);
             }
             const md5 = md5Data(data);
@@ -85,7 +84,6 @@ export class Base64 {
                 };
                 image.onerror = (e) => {
                     // TODO: 使用生成的图片ArrayBuffer的md5有时还不一样，不知道为啥
-                    debugger;
                     reject(null);
                 };
             }

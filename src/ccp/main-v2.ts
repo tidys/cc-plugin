@@ -7,7 +7,6 @@ const EventAfterBuild = 'build-finished'
 const EventBuildChangeFiles = 'before-change-files'
 
 function onBeforeBuild(options, callback) {
-    debugger
     const { platform, md5Cache, dest } = options;
     const assets = {};
 
@@ -24,7 +23,7 @@ function onBeforeBuild(options, callback) {
     callback && callback()
 }
 function onAfterBuild(options: any, callback: Function) {
-    debugger
+
     const { platform, md5Cache, dest, bundles } = options;
     const assets: { [key: string]: { path: string, bundle: string } } = {};
     if (bundles) {

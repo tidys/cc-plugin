@@ -11,6 +11,7 @@ export interface DropOptions {
     jsc?: (name: string, data: ArrayBuffer) => void;
     js?: (name: string, data: string) => void;
     ts?: (name: string, data: string) => void;
+    atlas?: (name: string, data: string) => void;
 }
 export enum Accept {
     TTF = 'ttf',
@@ -20,6 +21,7 @@ export enum Accept {
     JSC = 'jsc',
     JS = 'js',
     TS = 'ts',
+    ATLAS = 'atlas',
 }
 export class Drop {
     private map: Record<string, (name: string, data: ArrayBuffer) => void> = {};
@@ -64,7 +66,10 @@ export class Drop {
                 case Accept.TS: {
                     this.map['.ts'] = this.dropTS.bind(this);
                 }
-
+                case Accept.ATLAS: {
+                    this.map['.atlas'] = this.dropAtlas.bind(this);
+                    break;
+                }
             }
         }
     }
@@ -106,6 +111,12 @@ export class Drop {
         const textDecoder = new TextDecoder();
         const str = textDecoder.decode(data);
         json && json(name, str);
+    }
+    private dropAtlas(name: string, data: ArrayBuffer) {
+        const { atlas } = this.options;
+        const textDecoder = new TextDecoder();
+        const str = textDecoder.decode(data);
+        atlas && atlas(name, str);
     }
     private dropPlist(name: string, data: ArrayBuffer) {
         const { plist } = this.options;
