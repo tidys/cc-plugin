@@ -64,6 +64,7 @@ export class Download extends Base {
             const fullPath = join(filePath, fileName);
             try {
                 writeFileSync(fullPath, Buffer.from(await blob.arrayBuffer()));
+                this.adaptation.Shell.showItem(fullPath);
                 return true;
             } catch (e) {
                 console.log(e);
