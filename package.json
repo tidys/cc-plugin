@@ -125,5 +125,5 @@
     "yalc-push": "npm run clean-bin-dir && npm run sync-version && npm run types && tsc && yalc push"
   },
   "types": "./types/declare.d.ts",
-  "version": "2.1.40"
+  "version": "2.1.41"
 }

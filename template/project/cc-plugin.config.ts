@@ -3,11 +3,6 @@ import { CocosPluginManifest, CocosPluginOptions, Panel, PluginType } from 'cc-p
 
 const pkgName = '%pkg_name%';
 
-
-function i18n(key: string) {
-    return `i18n:${pkgName}.${key}`;
-}
-
 const manifest: CocosPluginManifest = {
     name: pkgName,
     version: '1.0.0',
@@ -28,7 +23,7 @@ const manifest: CocosPluginManifest = {
     ],
     menus: [
         {
-            path: `%pkg_name%/${i18n('title')}`,
+            path: `i18n.title`,
             message: {
                 name: 'showPanel',
             },

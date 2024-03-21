@@ -12,7 +12,7 @@ import { Dialog } from './dialog';
 import { Builder } from './builder';
 import { Log } from './log';
 import { Menu } from './menu';
-
+import { Download } from './download';
 export class Adaptation {
     public config: CocosPluginConfig | null = null;
     public options: PanelOptions | null = null;
@@ -29,6 +29,7 @@ export class Adaptation {
     public Builder = new Builder(this);
     public Log = new Log(this);
     public Menu = new Menu(this);
+    public Download = new Download(this);
     constructor() {
         this.Env.init();
     }
