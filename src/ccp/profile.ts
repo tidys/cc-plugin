@@ -68,7 +68,12 @@ export class Profile {
     private _write() {
         const str = JSON.stringify(this.data, null, this.format ? 4 : 0);
         if (CCP.Adaptation.Env.isWeb) {
-            localStorage.setItem(this.Key, str);
+            try {
+            // Setting the value exceeded the quota.
+                localStorage.setItem(this.Key, str);
+            } catch (e) {
+                console.log(e);
+            }
         } else {
             Fs.writeFileSync(this.nativeFile, str, 'utf-8')
         }
