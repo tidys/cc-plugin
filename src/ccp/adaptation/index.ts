@@ -13,6 +13,7 @@ import { Builder } from './builder';
 import { Log } from './log';
 import { Menu } from './menu';
 import { Download } from './download';
+import { IP } from './ip';
 export class Adaptation {
     public config: CocosPluginConfig | null = null;
     public options: PanelOptions | null = null;
@@ -30,6 +31,7 @@ export class Adaptation {
     public Log = new Log(this);
     public Menu = new Menu(this);
     public Download = new Download(this);
+    public IP = new IP(this);
     constructor() {
         this.Env.init();
     }
