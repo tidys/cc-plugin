@@ -105,6 +105,9 @@
     "doc": "doc",
     "test": "test"
   },
+  "files": [
+    "template/project/.gitignore"
+  ],
   "homepage": "https://github.com/tidys/cc-plugin#readme",
   "license": "ISC",
   "main": "index.js",
@@ -120,8 +123,8 @@
     "install-force": "yarn install --force",
     "sync-version": "node ./tools/sync-version.js",
     "test-create": "tsc && node ./bin/index.js create test --override",
-    "tsc-build--watch": "tsc --watch",
     "tsc-build": "tsc",
+    "tsc-build--watch": "tsc --watch",
     "types": "tsc -p tsconfig.declare.json",
     "yalc-push": "npm run clean-bin-dir && npm run sync-version && npm run types && tsc && yalc push"
   },

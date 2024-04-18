@@ -56,7 +56,7 @@ export default class Create extends PluginApi {
                 }
             }
             const templateDir = Path.join(service.root, './template/project')
-            FsExtra.copySync(templateDir, projectDir);
+            FsExtra.copySync(templateDir, projectDir, { recursive: true });
             // 替换名字
             const file = Path.join(projectDir, ConfigTypeScript);
             if (Fs.existsSync(file)) {

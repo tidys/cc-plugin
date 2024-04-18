@@ -3,3 +3,5 @@ node_modules/
 cc-plugin.json
 yalc.lock
 yarn-error.log
+dist/
+test/
