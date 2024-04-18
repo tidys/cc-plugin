@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -83,7 +87,7 @@ class CocosPluginService {
             const file = Path.resolve(dir, '.env');
             if (FS.existsSync(file)) {
                 const env = dotenv_1.default.config({ path: file });
-                dotenv_expand_1.default(env);
+                (0, dotenv_expand_1.default)(env);
             }
         });
     }
@@ -121,7 +125,7 @@ class CocosPluginService {
     }
     loadModule(file) {
         // 从当前package的node_modules中找依赖
-        rechoir_1.prepare(interpret_1.extensions, file, this.root);
+        (0, rechoir_1.prepare)(interpret_1.extensions, file, this.root);
         const module = require(file);
         if (module.hasOwnProperty('default')) {
             return module.default;
@@ -170,7 +174,7 @@ class CocosPluginService {
         this.loadEnv();
         const userOptions = this.loadUserOptions();
         userOptions && this.checkUserOptions(userOptions, type);
-        this.projectConfig = lodash_1.defaultsDeep(userOptions, this.defaults);
+        this.projectConfig = (0, lodash_1.defaultsDeep)(userOptions, this.defaults);
         this.projectConfig.type = type;
         this.loadUserWebpackConfig();
         this.checkConfig();

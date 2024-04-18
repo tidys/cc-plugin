@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const loader_utils_1 = require("loader-utils");
 function default_1(source, map) {
     // @ts-ignore fixme 类型对不上
-    const opts = loader_utils_1.getOptions(this) || {};
+    const opts = (0, loader_utils_1.getOptions)(this) || {};
     let isESM = true;
     if (typeof opts.esModule !== "undefined") {
         isESM = !!opts.esModule;

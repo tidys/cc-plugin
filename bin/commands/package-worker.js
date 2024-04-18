@@ -49,7 +49,7 @@ class PackageV2 extends PackageInterface {
         const { name } = menu.message;
         const panel = menu.message.panel || this.config.manifest.name;
         const menuReal = utils_1.default.menuPackage(menu.path);
-        menus[lodash_1.trim(menuReal, '/')] = { message: `${panel}:${name}` };
+        menus[(0, lodash_1.trim)(menuReal, '/')] = { message: `${panel}:${name}` };
     }
     panelReady() {
         super.panelReady();
@@ -83,7 +83,7 @@ class PackageV3 extends PackageInterface {
         this.packageData = packageData;
         this.packageData.package_version = 2;
         this.packageData.contributions = {
-            builder: './builder.js',
+            builder: './builder.js', // todo 目前这里是写死的，需要后续优化下
             messages: {},
             menu: [],
             shortcuts: [],
@@ -137,7 +137,7 @@ class PackageV3 extends PackageInterface {
      */
     dealPath(path) {
         let newPath = '', newLabel = '';
-        path = lodash_1.trim(path, '/');
+        path = (0, lodash_1.trim)(path, '/');
         const items = path.split('/');
         if (items.length >= 2) {
             for (let i = 0; i < items.length; i++) {
@@ -157,8 +157,8 @@ class PackageV3 extends PackageInterface {
             }
             log_1.log.yellow(`没有以/分割菜单，默认配置为`);
         }
-        newPath = lodash_1.trim(newPath, '/');
-        newLabel = lodash_1.trim(newLabel, '/');
+        newPath = (0, lodash_1.trim)(newPath, '/');
+        newLabel = (0, lodash_1.trim)(newLabel, '/');
         return { newLabel, newPath };
     }
     addMessageToContributions(msgKey, methodName) {

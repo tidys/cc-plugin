@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -48,20 +52,20 @@ class Pack extends plugin_api_1.PluginApi {
         process.exit(0);
     }
     apply(api, service) {
-        api.registerCommand('pack', commonOptions_1.getBuildOptions("打包插件"), (type, options) => {
-            commonOptions_1.checkBuildType(type, true);
+        api.registerCommand('pack', (0, commonOptions_1.getBuildOptions)("打包插件"), (type, options) => {
+            (0, commonOptions_1.checkBuildType)(type, true);
             service_1.cocosPluginService.init(type);
             // 打包前，再次清理output目录，可能会清理2次，但是关系不大
             const { output } = service_1.cocosPluginService.projectConfig.options;
-            if (output && fs_1.existsSync(output)) {
-                fs_extra_1.emptyDirSync(output);
+            if (output && (0, fs_1.existsSync)(output)) {
+                (0, fs_extra_1.emptyDirSync)(output);
                 log_1.log.yellow(`清空目录：${output}`);
             }
             api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
                 webpackChain.mode('production');
                 webpackChain.devtool(false);
                 // 传递变量给项目，用于代码剔除
-                commonOptions_1.parseBuildOptions(webpackChain, type, options);
+                (0, commonOptions_1.parseBuildOptions)(webpackChain, type, options);
                 webpackChain.optimization.minimizer('TerserPlugin').use(terser_webpack_plugin_1.default, [
                     // @ts-ignore 不输出license.txt
                     {
@@ -97,15 +101,15 @@ class Pack extends plugin_api_1.PluginApi {
             const { cleanBeforeBuildWithPack } = service.projectConfig.options;
             if (cleanBeforeBuildWithPack) {
                 const { output } = service.projectConfig.options;
-                if (output && fs_1.existsSync(output)) {
-                    fs_extra_1.emptyDirSync(output);
+                if (output && (0, fs_1.existsSync)(output)) {
+                    (0, fs_extra_1.emptyDirSync)(output);
                     console.log(`clean output:${output}`);
                 }
             }
             let webpackConfig = api.resolveChainWebpackConfig();
-            let fallback = fallback_1.getFallback(service);
-            webpackConfig = lodash_1.merge(webpackConfig, { resolve: { fallback } });
-            webpack_1.default(webpackConfig, ((err, stats) => {
+            let fallback = (0, fallback_1.getFallback)(service);
+            webpackConfig = (0, lodash_1.merge)(webpackConfig, { resolve: { fallback } });
+            (0, webpack_1.default)(webpackConfig, ((err, stats) => {
                 if (err) {
                     return this.exit();
                 }

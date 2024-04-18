@@ -140,14 +140,14 @@ class ChromeManifest {
         }
         if (icon_res) {
             const distDir = this.service.projectConfig.options.output;
-            const icon_src_path = path_1.join(this.service.context, icon_res);
-            if (!fs_1.existsSync(icon_src_path)) {
+            const icon_src_path = (0, path_1.join)(this.service.context, icon_res);
+            if (!(0, fs_1.existsSync)(icon_src_path)) {
                 icon_res = "";
                 log_1.log.red(`icon file not found: ${icon_src_path}`);
                 process.exit(0);
             }
             else {
-                const dest = path_1.join(distDir, icon_res);
+                const dest = (0, path_1.join)(distDir, icon_res);
                 fs_extra_1.default.ensureFileSync(dest);
                 fs_extra_1.default.copyFileSync(icon_src_path, dest);
             }
@@ -173,7 +173,7 @@ class ChromeManifest {
     }
     saveManifestFile(data) {
         const options = this.service.projectConfig.options;
-        const packageJsonFile = path_1.join(options.output, 'manifest.json');
+        const packageJsonFile = (0, path_1.join)(options.output, 'manifest.json');
         let spaces = options.min ? 0 : 4;
         if (this.bProduction) {
             spaces = 0;

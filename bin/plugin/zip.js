@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -30,29 +34,6 @@ const OS = __importStar(require("os"));
 const jszip_1 = __importDefault(require("jszip"));
 const declare_1 = require("../declare");
 class Zip {
-    constructor(service) {
-        this.fileName = '';
-        this.version = '';
-        this.outDir = '';
-        const zipOutput = service.projectConfig.options.zipOutput || './dist';
-        let outDir = "";
-        if (zipOutput.startsWith("./")) {
-            outDir = Path.join(service.context, zipOutput);
-        }
-        else {
-            outDir = zipOutput;
-        }
-        let { name, version } = service.projectConfig.manifest;
-        const { type } = service.projectConfig;
-        const typeName = this.getPluginTypeName(type);
-        if (typeName && typeName.length > 0) {
-            name = `${name}_${typeName}`;
-        }
-        this.fileName = name;
-        this.version = version;
-        this.outDir = outDir;
-        this.projectConfig = service.projectConfig;
-    }
     _packageDir(rootPath, zip) {
         let dir = Fs.readdirSync(rootPath);
         for (let i = 0; i < dir.length; i++) {
@@ -158,7 +139,7 @@ class Zip {
         }
         if (cmd) {
             console.log('😂[CMD] ' + cmd);
-            child_process_1.exec(cmd, (error, stdout, stderr) => {
+            (0, child_process_1.exec)(cmd, (error, stdout, stderr) => {
                 if (error) {
                     console.log(stderr);
                 }
@@ -167,6 +148,29 @@ class Zip {
                 }
             });
         }
+    }
+    constructor(service) {
+        this.fileName = '';
+        this.version = '';
+        this.outDir = '';
+        const zipOutput = service.projectConfig.options.zipOutput || './dist';
+        let outDir = "";
+        if (zipOutput.startsWith("./")) {
+            outDir = Path.join(service.context, zipOutput);
+        }
+        else {
+            outDir = zipOutput;
+        }
+        let { name, version } = service.projectConfig.manifest;
+        const { type } = service.projectConfig;
+        const typeName = this.getPluginTypeName(type);
+        if (typeName && typeName.length > 0) {
+            name = `${name}_${typeName}`;
+        }
+        this.fileName = name;
+        this.version = version;
+        this.outDir = outDir;
+        this.projectConfig = service.projectConfig;
     }
     getPluginTypeName(type) {
         switch (type) {

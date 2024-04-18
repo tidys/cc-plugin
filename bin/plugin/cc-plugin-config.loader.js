@@ -82,7 +82,7 @@ class AstFinder {
     }
 }
 function loader(source) {
-    const ast = parser_1.parse(source, { sourceType: 'module', plugins: ['typescript'] });
+    const ast = (0, parser_1.parse)(source, { sourceType: 'module', plugins: ['typescript'] });
     new AstFinder(ast)
         .findType(VariableDeclaration)
         .findVar('options').isObject()
@@ -102,7 +102,7 @@ function loader(source) {
         .findVar('options').isObject()
         .findProperty('outputProject').isObject()
         .findProperty('v3').setString('');
-    const newSource = generator_1.default(ast).code;
+    const newSource = (0, generator_1.default)(ast).code;
     return newSource;
 }
 exports.default = loader;

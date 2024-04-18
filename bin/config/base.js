@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -143,7 +147,7 @@ class Base extends plugin_api_1.PluginApi {
             // out
             let output = options.output;
             let resolvePath = path_1.default.resolve(service.context, output);
-            if (fs_1.existsSync(resolvePath)) {
+            if ((0, fs_1.existsSync)(resolvePath)) {
                 // 处理相对路径
                 output = resolvePath;
             }
@@ -191,7 +195,7 @@ class Base extends plugin_api_1.PluginApi {
                     },
                 }
             }).end();
-            const packageSource = path_1.resolve(service.root, 'src');
+            const packageSource = (0, path_1.resolve)(service.root, 'src');
             webpackChain.module
                 .rule('ts')
                 .test(/\.ts(x?)$/)
@@ -226,12 +230,12 @@ class Base extends plugin_api_1.PluginApi {
                 .use('url-loader')
                 .loader('url-loader')
                 .options({
-                limit: 800 * 1024,
+                limit: 800 * 1024, // 800k以内都以base64内联
                 name: 'images/[name].[ext]'
             });
             // TODO 增加plugin的搜索路径，但是对于glsl-loader没有效果
             webpackChain.resolve.modules
-                .add(path_1.join(__dirname, "../plugin"))
+                .add((0, path_1.join)(__dirname, "../plugin"))
                 // .add(join(service.context, 'node_modules')) // 优先从当前目录下找，会导致process的问题
                 .add("node_modules") // 最后再从全局目录下找
             ;
@@ -239,7 +243,7 @@ class Base extends plugin_api_1.PluginApi {
             webpackChain.module.rule('glsl-loader')
                 .test(/\.(glsl)$/)
                 .use("glsl-loader")
-                .loader(path_1.join(__dirname, "../plugin/glsl-loader.js"));
+                .loader((0, path_1.join)(__dirname, "../plugin/glsl-loader.js"));
             webpackChain.module
                 .rule('svg')
                 .test(/\.(svg)$/)

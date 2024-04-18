@@ -103,9 +103,9 @@ export interface CocosPluginManifest {
     };
 }
 export declare enum PluginType {
-    PluginV2 = "cp-v2",
-    PluginV3 = "cp-v3",
-    Web = "web",
+    PluginV2 = "cp-v2",// cocos creator 插件v2版本
+    PluginV3 = "cp-v3",// cocos creator 插件v3版本
+    Web = "web",// web页面
     Chrome = "chrome"
 }
 export interface CocosPluginOptions {

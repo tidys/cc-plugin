@@ -9,7 +9,7 @@ const net_1 = __importDefault(require("net"));
 class DevServer {
     constructor(port) {
         this.clients = [];
-        this.app = express_1.default();
+        this.app = (0, express_1.default)();
         this.httpServer = this.createHttpServer();
         this.createSocketServer(port);
         // this.listen(port)

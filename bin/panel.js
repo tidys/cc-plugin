@@ -30,28 +30,28 @@ class Panel {
     dealPanel(panel, pluginOptions) {
         var _a;
         let ejsTemplate = null;
-        if (panel.ejs && fs_extra_1.existsSync(panel.ejs)) {
+        if (panel.ejs && (0, fs_extra_1.existsSync)(panel.ejs)) {
             ejsTemplate = panel.ejs;
         }
         else if (this.service.isCreatorPluginV3()) {
-            ejsTemplate = path_1.join(__dirname, '../template/panel-v3.ejs');
+            ejsTemplate = (0, path_1.join)(__dirname, '../template/panel-v3.ejs');
         }
         else if (this.service.isCreatorPluginV2()) {
-            ejsTemplate = path_1.join(__dirname, '../template/panel-v2.ejs');
+            ejsTemplate = (0, path_1.join)(__dirname, '../template/panel-v2.ejs');
         }
         else if (this.service.isWeb()) {
-            ejsTemplate = path_1.join(this.service.root, './template/web/index.html');
+            ejsTemplate = (0, path_1.join)(this.service.root, './template/web/index.html');
         }
         // let panelMain = panel.main.endsWith(".ts") ? panel.main : `${panel.main}.ts`;
         let mainFile = panel.main;
-        if (!fs_extra_1.existsSync(mainFile)) {
-            mainFile = path_1.join(this.service.context, panel.main);
-            if (!fs_extra_1.existsSync(mainFile)) {
+        if (!(0, fs_extra_1.existsSync)(mainFile)) {
+            mainFile = (0, path_1.join)(this.service.context, panel.main);
+            if (!(0, fs_extra_1.existsSync)(mainFile)) {
                 log_1.log.red(`source file ${mainFile} not exist, please check your config file`);
                 process.exit(1);
             }
         }
-        if (ejsTemplate && fs_extra_1.existsSync(ejsTemplate) && fs_extra_1.existsSync(mainFile)) {
+        if (ejsTemplate && (0, fs_extra_1.existsSync)(ejsTemplate) && (0, fs_extra_1.existsSync)(mainFile)) {
             let { webpackChain } = this;
             let entryName = 'default';
             if (this.service.isWeb() || this.service.isChromePlugin()) {
@@ -102,7 +102,7 @@ class Panel {
                 if (panel.type === declare_1.Panel.Type.InnerIndex && panel.ejsOptions) {
                     options = Object.assign(options, panel.ejsOptions);
                 }
-                const hotFile = path_1.join(this.service.root, './src/ccp/client-socket.ts');
+                const hotFile = (0, path_1.join)(this.service.root, './src/ccp/client-socket.ts');
                 webpackChain.entry(entryName).add(mainFile);
                 webpackChain.plugin(entryName).use(html_webpack_plugin_1.default, [options]);
                 return `${filename}`;
@@ -129,8 +129,8 @@ class Panel {
             panels.push({
                 name: 'index',
                 title: "index",
-                main: path_1.join(this.service.root, "src/index/index.ts"),
-                ejs: path_1.join(this.service.root, "src/index/index.ejs"),
+                main: (0, path_1.join)(this.service.root, "src/index/index.ts"),
+                ejs: (0, path_1.join)(this.service.root, "src/index/index.ejs"),
                 ejsOptions: { panels: ejsOptions },
                 type: declare_1.Panel.Type.InnerIndex,
             });
@@ -148,8 +148,8 @@ class Panel {
                 panels.push({
                     name: name,
                     title: name,
-                    main: path_1.join(this.service.context, item.entry),
-                    ejs: path_1.join(this.service.root, './template/web/index.html'),
+                    main: (0, path_1.join)(this.service.context, item.entry),
+                    ejs: (0, path_1.join)(this.service.root, './template/web/index.html'),
                     type: declare_1.Panel.Type.Web,
                 });
             });
@@ -166,13 +166,13 @@ class Panel {
                 { name: const_1.ChromeConst.script.background, entry: chrome.script_background },
                 { name: const_1.ChromeConst.script.inject, entry: chrome.script_inject },
             ].map(item => {
-                const fullPath = path_1.join(this.service.context, item.entry);
-                if (!fs_extra_1.existsSync(fullPath)) {
+                const fullPath = (0, path_1.join)(this.service.context, item.entry);
+                if (!(0, fs_extra_1.existsSync)(fullPath)) {
                     log_1.log.red(`not exist file: ${fullPath}`);
                     process.exit(0);
                 }
-                const name = path_1.basename(item.name);
-                const ext = path_1.extname(item.name);
+                const name = (0, path_1.basename)(item.name);
+                const ext = (0, path_1.extname)(item.name);
                 const entry = name.substring(0, name.length - ext.length);
                 this.webpackChain.entry(entry).add(fullPath);
             });
@@ -193,8 +193,8 @@ class Panel {
                 panels.push({
                     name: 'index',
                     title: "index",
-                    main: path_1.join(this.service.root, "src/index/index.ts"),
-                    ejs: path_1.join(this.service.root, "src/index/index.ejs"),
+                    main: (0, path_1.join)(this.service.root, "src/index/index.ts"),
+                    ejs: (0, path_1.join)(this.service.root, "src/index/index.ejs"),
                     ejsOptions: { panels: optionsPanels },
                     type: declare_1.Panel.Type.InnerIndex,
                 });

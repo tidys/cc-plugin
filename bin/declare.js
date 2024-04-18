@@ -17,7 +17,7 @@ var PluginType;
     PluginType["Chrome"] = "chrome";
     // Electron="electron", // 桌面应用
     // Vscode="vscode", // vscode插件
-})(PluginType = exports.PluginType || (exports.PluginType = {}));
+})(PluginType || (exports.PluginType = PluginType = {}));
 // 一些默认值
 exports.DefaultCocosPluginOptions = {
     outputProject: './',

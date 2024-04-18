@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -46,25 +50,26 @@ const log_1 = require("../log");
 const lodash_1 = require("lodash");
 const fallback_1 = require("./fallback");
 const commonOptions_1 = require("./commonOptions");
+const webpack_mkcert_1 = __importDefault(require("webpack-mkcert"));
 portfinder_1.default.basePort = 9087;
 function buildTargetNode(service) {
     let config = new webpack_chain_1.default();
     config.target('node').devtool(false).mode('development').resolve.extensions.add('.ts');
     let cfg = config.toConfig();
-    webpack_1.default(cfg, (error, status) => {
+    (0, webpack_1.default)(cfg, (error, status) => {
     });
 }
 class Serve extends plugin_api_1.PluginApi {
     apply(api, service) {
-        api.registerCommand('serve', commonOptions_1.getBuildOptions('开发插件'), (type, opts) => __awaiter(this, void 0, void 0, function* () {
+        api.registerCommand('serve', (0, commonOptions_1.getBuildOptions)('开发插件'), (type, opts) => __awaiter(this, void 0, void 0, function* () {
             var _a;
-            commonOptions_1.checkBuildType(type, true);
+            (0, commonOptions_1.checkBuildType)(type, true);
             service_1.cocosPluginService.init(type);
-            log_1.log.blue(printf_1.default('%-20s %s', 'service root:    ', service.root));
-            log_1.log.blue(printf_1.default('%-20s %s', 'service context: ', service.context));
+            log_1.log.blue((0, printf_1.default)('%-20s %s', 'service root:    ', service.root));
+            log_1.log.blue((0, printf_1.default)('%-20s %s', 'service context: ', service.context));
             const { output } = service.projectConfig.options;
             if (service.isCreatorPlugin() && output) {
-                log_1.log.blue(printf_1.default('%-20s %s', 'plugin dir:      ', output));
+                log_1.log.blue((0, printf_1.default)('%-20s %s', 'plugin dir:      ', output));
             }
             const { options, manifest } = service.projectConfig;
             api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
@@ -74,7 +79,7 @@ class Serve extends plugin_api_1.PluginApi {
                 webpackChain.mode('development');
                 webpackChain.devtool('source-map');
                 // 传递变量给项目，用于代码剔除
-                commonOptions_1.parseBuildOptions(webpackChain, type, opts);
+                (0, commonOptions_1.parseBuildOptions)(webpackChain, type, opts);
                 webpackChain
                     .plugin('clean')
                     .use(clean_webpack_plugin_1.CleanWebpackPlugin, [{
@@ -90,7 +95,7 @@ class Serve extends plugin_api_1.PluginApi {
                         .end();
                 }
             }));
-            let fallback = fallback_1.getFallback(service);
+            let fallback = (0, fallback_1.getFallback)(service);
             let webpackConfig = api.resolveChainWebpackConfig();
             // 加载用户自定义的配置
             const file = Path.join(service.context, 'webpack.config.js');
@@ -100,8 +105,8 @@ class Serve extends plugin_api_1.PluginApi {
                     webpackConfig.plugins = (_a = webpackConfig.plugins) === null || _a === void 0 ? void 0 : _a.concat(data.plugins);
                 }
             }
-            webpackConfig = lodash_1.merge(webpackConfig, { resolve: { fallback } });
-            const compiler = webpack_1.default(webpackConfig, ((err, stats) => {
+            webpackConfig = (0, lodash_1.merge)(webpackConfig, { resolve: { fallback } });
+            const compiler = (0, webpack_1.default)(webpackConfig, ((err, stats) => {
                 if (err) {
                     return console.error(err);
                 }
@@ -133,6 +138,15 @@ class Serve extends plugin_api_1.PluginApi {
             const { server } = service.projectConfig.options;
             const host = yield webpack_dev_server_1.default.internalIP('v4');
             const port = yield portfinder_1.default.getPortPromise();
+            const useHttps = !!(server && server.https);
+            let httpOptions = useHttps;
+            if (useHttps) {
+                const { cert, key } = yield (0, webpack_mkcert_1.default)({
+                    source: 'coding',
+                    hosts: ['localhost', '127.0.0.1', host]
+                });
+                httpOptions = { cert, key };
+            }
             const webpackDevServerInstance = new webpack_dev_server_1.default({
                 // inputFileSystem: FsExtra,
                 // outputFileSystem: FsExtra,
@@ -140,7 +154,7 @@ class Serve extends plugin_api_1.PluginApi {
                 allowedHosts: ["all"],
                 open: true,
                 host,
-                https: !!(server && server.https),
+                https: httpOptions,
                 port,
                 static: "./dist",
                 devMiddleware: {
