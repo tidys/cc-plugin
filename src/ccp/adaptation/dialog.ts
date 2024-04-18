@@ -127,6 +127,7 @@ export class Dialog extends Base {
         }
     }
     async select(options: SelectDialogOptions): Promise<Record<string, ArrayBuffer | null>> {
+        options = Object.assign({ fillData: true }, options);
         if (this.adaptation.Env.isWeb) {
             return new Promise((resolve, reject) => {
                 const inputEl: HTMLInputElement = document.createElement('input');
@@ -219,7 +220,7 @@ export class Dialog extends Base {
             }
             const ret: Record<string, any> = {};
             (result || []).forEach((e: string) => {
-                if (options.type === 'file') {
+                if (options.type === 'file' && options.fillData) {
                     ret[e] = Fs.readFileSync(e);
                 } else {
                     ret[e] = null;
@@ -231,7 +232,7 @@ export class Dialog extends Base {
             // @ts-ignore
             const result = await Editor.Dialog.select(options);
             (result.filePaths || []).forEach((e: string) => {
-                if (options.type === 'file') {
+                if (options.type === 'file' && options.fillData) {
                     ret[e] = Fs.readFileSync(e).buffer;
                 } else {
                     ret[e] = null;
