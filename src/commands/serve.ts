@@ -17,6 +17,7 @@ import { getFallback } from './fallback';
 import { checkBuildType, getBuildOptions, parseBuildOptions } from './commonOptions';
 import { OptionValues } from 'commander';
 import { PluginType } from 'declare';
+import mkcert from 'webpack-mkcert'
 import { showWeChatQrCode } from './tool';
 
 PortFinder.basePort = 9087;
@@ -64,6 +65,7 @@ export default class Serve extends PluginApi {
                         .use(DevServer, [port!])
                         .end();
                 }
+
             });
             let fallback = getFallback(service);
 
@@ -111,6 +113,15 @@ export default class Serve extends PluginApi {
         const { server } = service.projectConfig.options;
         const host = await webpackDevSever.internalIP('v4');
         const port = await PortFinder.getPortPromise();
+        const useHttps = !!(server && server.https)
+        let httpOptions: any = useHttps;
+        if (useHttps) {
+            const { cert, key } = await mkcert({
+                source: 'coding',
+                hosts: ['localhost', '127.0.0.1', host]
+            })
+            httpOptions = { cert, key };
+        }
         const webpackDevServerInstance = new webpackDevSever({
             // inputFileSystem: FsExtra,
             // outputFileSystem: FsExtra,
@@ -118,16 +129,14 @@ export default class Serve extends PluginApi {
             allowedHosts: ["all"],
             open: true,
             host,
-            https: !!(server && server.https),
+            https: httpOptions,
             port,
             static: "./dist",
             devMiddleware: {
                 //service.isChromePlugin() ? true : false,
                 writeToDisk: !!(server && server.writeToDisk),
             }
-        },
-            compiler
-        );
+        }, compiler);
         webpackDevServerInstance.startCallback((error) => {
             if (error) {
                 console.error(error);
