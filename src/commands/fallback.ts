@@ -27,6 +27,7 @@ export function getFallback(service: CocosPluginService) {
             tls: false,
             express: require.resolve("@xuyanfeng/express-browserify"),
             fs: require.resolve("@xuyanfeng/fs-browserify"),
+            sharp: require.resolve("@xuyanfeng/sharp-browserify"),
             electron: false,
             async_hooks: false,
             string_decoder: false,
