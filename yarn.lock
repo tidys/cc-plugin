@@ -1111,6 +1111,11 @@
   resolved "https://registry.yarnpkg.com/@xuyanfeng/globby-browserify/-/globby-browserify-1.0.0.tgz#65c7287e3c5297a38db3ef057a1066236774c220"
   integrity sha512-l60NSdfMRKPToML8Q23be+K8Ggw8tgk46O8+KKbmCXGD0Pgm5uWdvqYvm/xfLI87ugnFN91Hp1G81kLaLpoakQ==
 
+"@xuyanfeng/sharp-browserify@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@xuyanfeng/sharp-browserify/-/sharp-browserify-1.0.0.tgz#f81570150093f7624304f30652a1ef9030f06e46"
+  integrity sha512-jXOsZlqcaVsBcfRanrp+IVWFFkgU/UJIpB3PVFH6CZI9ADrN9mXHonqTHWvL3F3GMqHOi91WYoDolbvgGs350A==
+
 JSONStream@^1.0.3:
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/JSONStream/-/JSONStream-1.3.5.tgz#3208c1f08d3a4d99261ab64f92302bc15e111ca0"
