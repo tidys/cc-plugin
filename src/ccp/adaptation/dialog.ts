@@ -122,7 +122,8 @@ export class Dialog extends Base {
                 Electron.shell.showItemInFolder(path)
                 Electron.shell.beep();
             } else {
-
+                Electron.shell.showItemInFolder(path)
+                Electron.shell.beep();
             }
         }
     }
