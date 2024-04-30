@@ -1,13 +1,15 @@
 import { Socket } from 'net';
 
-export default class ClientSocket {
+export class ClientSocket {
     private client: Socket;
     private isConn = false;
     private reloadCallback: Function | null = null;
 
     constructor() {
         const client = new Socket();
-
+        client.setTimeout(1000, () => {
+            console.error('connect timeout')
+        });
         client.on('data', (data) => {
             const msg = data.toString();
             console.log(msg);
