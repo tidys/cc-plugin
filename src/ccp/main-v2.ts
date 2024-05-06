@@ -1,5 +1,5 @@
 import CCP, { CocosCreatorPluginMain } from './entry-main'
-import ClientSocket from './client-socket';
+import { ClientSocket } from './client-socket';
 import { BuilderOptions } from '../declare';
 import * as Path from 'path';
 const EventBeforeBuild = 'build-start';
