@@ -71,13 +71,10 @@ export default class Base extends PluginApi {
             const { options, manifest } = service.projectConfig;
             const pluginName = manifest.name;
             // target
-            {
-                if (service.isWeb()) {
-                    webpackChain.target('web');
-                }
-                if (service.isCreatorPlugin()) {
-                    webpackChain.target('node');
-                }
+            if (service.isWeb()) {
+                webpackChain.target('web');
+            } else if (service.isCreatorPlugin()) {
+                webpackChain.target('node');
             }
             // https://webpack.docschina.org/configuration/resolve#resolvealias
             if (service.isWeb()) {
@@ -304,12 +301,18 @@ export default class Base extends PluginApi {
             if (LANG) envCopy['LANG'] = LANG
             if (PROCESSOR_LEVEL) envCopy['PROCESSOR_LEVEL'] = PROCESSOR_LEVEL
             if (NUMBER_OF_PROCESSORS) envCopy['NUMBER_OF_PROCESSORS'] = NUMBER_OF_PROCESSORS;
-            webpackChain.plugin("process_define")
+            webpackChain.plugin("process_define_env")
                 .use(webpack.DefinePlugin, [{
                     // 这里不能使用'process.env': JSON.stringify({}), 会被替换为{}.Debug, 这个是有语法问题的
                     // 'process.env': {} 替换的结果为 ({}).DEBUG , 是正常的
                     'process.env': {}
                 }]);
+            if (service.isWeb()) {
+                webpackChain.plugin('process_define_browser')
+                    .use(webpack.DefinePlugin, [{
+                        'process.browser': true
+                    }]);
+            }
             webpackChain
                 .plugin('CriticalDependency')
                 .use(filter, [{ exclude: [/Critical dependency/] }])
