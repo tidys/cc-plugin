@@ -118,6 +118,10 @@ export interface CocosPluginOptions {
     server?: {
         enabled?: boolean;
         /**
+         * 是否启用creator的hmr，默认不开启，现在开启刷新遇到很多问题
+         */
+        creatorHMR?: boolean;
+        /**
          * 监听端口，需要优化判断下端口是否占用的问题
          */
         port?: number;
@@ -130,6 +134,9 @@ export interface CocosPluginOptions {
          */
         writeToDisk?: boolean;
     };
+    /**
+     * webpack的监听模式，一般都需要开启
+     */
     watchBuild?: boolean; // 监听构建
     /**
      * 配置的不同类型的输出目录，支持相对路径和绝对路径

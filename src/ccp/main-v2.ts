@@ -59,8 +59,8 @@ const less_v_1_9 = CCP.Adaptation.CCEditor.isVersionLess('1.9');
 export const load = (() => {
     if (CCP.options && CCP.options.server) {
         // 发布后的不再进行watch
-        const { enabled, port } = CCP.options.server;
-        if (!!enabled) {
+        const { enabled, port, creatorHMR } = CCP.options.server;
+        if (!!enabled && creatorHMR) {
             let client = new ClientSocket();
             client.setReloadCallback(() => {
                 const { name } = CCP.manifest!;

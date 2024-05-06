@@ -31,8 +31,8 @@ export class CocosCreatorPluginRender {
         this.manifest = config.manifest;
         this.options = Object.assign(DefaultCocosPluginOptions, config.options);
         profile.init({}, config);
-        const { enabled, port } = this.options.server!;
-        if (enabled) {
+        const { enabled, port, creatorHMR } = this.options.server!;
+        if (enabled && creatorHMR) {
             let hot = () => {
                 if (this.Adaptation.Env.isWeb || this.Adaptation.Env.isChrome) {
                     console.log('TODO web reload');
