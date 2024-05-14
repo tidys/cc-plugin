@@ -6,9 +6,11 @@ export class CCEditor extends Base {
         if (this.adaptation.Env.isPluginV2) {
             //@ts-ignore
             return Path.dirname(Editor.appPath);
-        } else {
+        } else if (this.adaptation.Env.isPluginV3) {
             //@ts-ignore
             return Path.dirname(Editor.App.path);
+        } else {
+            return ""
         }
     }
 
@@ -24,10 +26,10 @@ export class CCEditor extends Base {
                 // @ts-ignore
                 this._version = Editor.App.version;
             } else {
-            // @ts-ignore
+                // @ts-ignore
                 this._version = Editor.remote.App.version;
             }
-        } else {
+        } else if (this.adaptation.Env.isPluginV3) {
             // @ts-ignore
             this._version = Editor.App.version;
         }

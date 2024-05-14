@@ -12,6 +12,8 @@ export interface DropOptions {
     js?: (name: string, data: string) => void;
     ts?: (name: string, data: string) => void;
     atlas?: (name: string, data: string) => void;
+    pvr?: (name: string, data: ArrayBuffer) => void;
+    etc?: (name: string, data: ArrayBuffer) => void;
 }
 export enum Accept {
     TTF = 'ttf',
@@ -22,6 +24,8 @@ export enum Accept {
     JS = 'js',
     TS = 'ts',
     ATLAS = 'atlas',
+    PVR = 'pvr',
+    ETC = 'pkm'
 }
 export class Drop {
     private map: Record<string, (name: string, data: ArrayBuffer) => void> = {};
@@ -65,9 +69,18 @@ export class Drop {
                 }
                 case Accept.TS: {
                     this.map['.ts'] = this.dropTS.bind(this);
+                    break;
                 }
                 case Accept.ATLAS: {
                     this.map['.atlas'] = this.dropAtlas.bind(this);
+                    break;
+                }
+                case Accept.ETC: {
+                    this.map['.pkm'] = this.dropEtc.bind(this);
+                    break;
+                }
+                case Accept.PVR: {
+                    this.map['.pvr'] = this.dropPvr.bind(this);
                     break;
                 }
             }
@@ -124,6 +137,15 @@ export class Drop {
         const str = textDecoder.decode(data);
         plist && plist(name, str);
     }
+    private dropPvr(name: string, data: ArrayBuffer) {
+        const { pvr } = this.options;
+        pvr && pvr(name, data)
+    }
+
+    private dropEtc(name: string, data: ArrayBuffer) {
+        const { etc } = this.options;
+        etc && etc(name, data)
+    }
     private _onWebOne(itemFile: DataTransferItem) {
         if (itemFile.kind !== 'file') {
             return;
@@ -140,6 +162,7 @@ export class Drop {
         if (!ext) {
             return;
         }
+        // 依靠callback知道是否支持文件类型，其实不太好
         const cb = this.map[ext.toLocaleLowerCase()];
         if (!cb) {
             this.tipsNotSupported(name);

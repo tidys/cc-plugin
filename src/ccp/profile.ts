@@ -10,7 +10,7 @@ export class Profile {
     private nativeFile: string = '';// electron环境使用的
     pluginConfig: CocosPluginConfig | null = null;
     public format: boolean = false;
-
+    public formatIndent: number = 4;
     init(data: Record<string, any>, cfg: CocosPluginConfig) {
         this.defaultData = data;
         this.pluginConfig = cfg;
@@ -29,6 +29,8 @@ export class Profile {
         if (this.pluginConfig) {
             const data = this._read(fileName);
             this.data = Object.assign(this.defaultData, data);// merge default data
+        } else {
+            console.log('profile need init');
         }
         return this.data;
     }
@@ -66,10 +68,10 @@ export class Profile {
     }
 
     private _write() {
-        const str = JSON.stringify(this.data, null, this.format ? 4 : 0);
+        const str = JSON.stringify(this.data, null, this.format ? (this.formatIndent || 4) : 0);
         if (CCP.Adaptation.Env.isWeb) {
             try {
-            // Setting the value exceeded the quota.
+                // Setting the value exceeded the quota.
                 localStorage.setItem(this.Key, str);
             } catch (e) {
                 console.log(e);
