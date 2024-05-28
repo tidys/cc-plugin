@@ -5,7 +5,7 @@ const { V246, V247, V248, V249, V2410, V2411 } = Versions;
 
 export class Project extends Base {
     public isValid(projPath: string) { }
-    _path: string = '';
+    private _path: string = '';
     set path(value: string) {
         if (this.adaptation.Env.isWeb) {
             this._path = value;
