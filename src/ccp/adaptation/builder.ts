@@ -2,9 +2,79 @@ import { Base } from "./base";
 import { BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType } from '../../declare';
 const Path = require('path'); // 为了适配浏览器
 import * as Fs from 'fs';
+import { Local_Builder_Json, Settings_Builder_Json } from "../types/plugin-v2";
 
 export class Builder extends Base {
-    public isNativePlatform(platform: string) {
+    private getV2SettingsBuildData(): Settings_Builder_Json | null {
+        const buildCfgFile = Path.join(this.adaptation.Project.path, "settings/builder.json");
+        if (!Fs.existsSync(buildCfgFile)) {
+            return null
+        }
+        let data: Settings_Builder_Json | null = null;
+        try {
+            data = JSON.parse(Fs.readFileSync(buildCfgFile, 'utf-8'))
+        } catch (e: any) {
+            data = null;
+        }
+        return data;
+    }
+    getEncryptInfo(): { key: string, encrypt: boolean, zip: boolean } {
+        const ret = { key: "", encrypt: false, zip: false }
+        if (this.adaptation.Env.isPluginV2) {
+            const data = this.getV2SettingsBuildData();
+            if (data) {
+                ret.encrypt = data.encryptJs;
+                ret.key = data.xxteaKey;
+                ret.zip = data.zipCompressJs;
+            }
+        }
+        return ret;
+    }
+    /**
+     * native 平台在v2版本，只会索引到build/jsb-link/，也就是assets所在的目录
+     */
+    getLatestBuildDirectory(): string {
+        if (this.adaptation.Env.isPluginV2) {
+            const buildCfgFile = Path.join(this.adaptation.Project.path, 'local/builder.json');
+            if (!Fs.existsSync(buildCfgFile)) {
+                return ""
+            }
+            let data: Local_Builder_Json | null = null;
+            try {
+                data = JSON.parse(Fs.readFileSync(buildCfgFile, 'utf-8'))
+            } catch (e: any) {
+                data = null;
+            }
+            if (!data) {
+                return ""
+            }
+            if (!data.buildPath) {
+                return ""
+            }
+            data.buildPath = Path.join(this.adaptation.Project.path, data.buildPath);
+            if (!Fs.existsSync(data.buildPath)) {
+                return ""
+            }
+            if (!data.actualPlatform) {
+                return ""
+            }
+            let dir = null;
+            if ([Platform.Android, Platform.Ios, Platform.Win32].includes(data.actualPlatform as Platform)) {
+                dir = Path.join(data.buildPath, `jsb-${data.template}`)
+            } else {
+                dir = Path.join(data.buildPath, data.actualPlatform);
+            }
+            if (!dir || !Fs.existsSync(dir)) {
+                return ""
+            }
+            return dir;
+        }
+        return ""
+    }
+    getLatestBuildPlatform(): Platform {
+        return Platform.Unknown;
+    }
+    public isNativePlatform(platform: Platform) {
         return !![Platform.Android, Platform.Ios, Platform.Mac, Platform.Win32].includes(platform);
     }
 
@@ -17,7 +87,7 @@ export class Builder extends Base {
                 const buildData: { template: string, buildPath: string, platform: string } = JSON.parse(Fs.readFileSync(buildCfgFile, 'utf-8'))
                 const buildPath = Path.join(this.adaptation.Project.path, buildData.buildPath)
 
-                if (this.isNativePlatform(buildData.platform)) {
+                if (this.isNativePlatform(buildData.platform as Platform)) {
                     // native平台使用的是jsb-xxx目录
                     let outputPath = Path.join(buildPath, `jsb-${buildData.template}`)
                     ret.push({

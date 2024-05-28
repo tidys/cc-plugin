@@ -303,11 +303,12 @@ export interface BuilderOptions {
     assets?: { [key: string]: { path: string, bundle: string } };
 }
 
-export const Platform = {
-    WebMobile: 'web-mobile',
-    WebDesktop: 'web-desktop',
-    Android: 'android',
-    Ios: 'ios',
-    Mac: 'mac',
-    Win32: 'win32',
+export enum Platform {
+    Unknown = 'unknown',
+    WebMobile = 'web-mobile',
+    WebDesktop = 'web-desktop',
+    Android = 'android',
+    Ios = 'ios',
+    Mac = 'mac',
+    Win32 = 'win32',
 };
