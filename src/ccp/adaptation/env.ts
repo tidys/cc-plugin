@@ -7,7 +7,12 @@ export class Env extends Base {
         console.log(__PLUGIN_TYPE__);
         this._type = __PLUGIN_TYPE__ as PluginType;
     }
-
+    /**
+     * 是否为开发环境
+     */
+    get isDev() {
+        return !!__DEV__;
+    }
     get isWeb() {
         return this._type === PluginType.Web;
     }

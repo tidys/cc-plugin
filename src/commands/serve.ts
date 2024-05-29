@@ -14,7 +14,7 @@ import { log } from '../log'
 import { PluginMgr } from '../plugin-mgr';
 import { merge } from 'lodash';
 import { getFallback } from './fallback';
-import { checkBuildType, getBuildOptions, parseBuildOptions } from './commonOptions';
+import { checkBuildType, getBuildOptions, parseBuildOptions, defineVar } from './commonOptions';
 import { OptionValues } from 'commander';
 import { PluginType } from 'declare';
 import mkcert from 'webpack-mkcert'
@@ -50,6 +50,7 @@ export default class Serve extends PluginApi {
                 webpackChain.devtool('source-map');
                 // 传递变量给项目，用于代码剔除
                 parseBuildOptions(webpackChain, type, opts);
+                defineVar(webpackChain, true, service.context);
                 webpackChain
                     .plugin('clean')
                     .use(CleanWebpackPlugin, [{

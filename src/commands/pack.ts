@@ -14,7 +14,7 @@ import { getFallback } from './fallback';
 import { existsSync } from 'fs';
 import { emptyDirSync } from 'fs-extra';
 import { Option, OptionValues } from 'commander';
-import { checkBuildType, getBuildOptions, parseBuildOptions } from './commonOptions';
+import { checkBuildType, getBuildOptions, parseBuildOptions, defineVar } from './commonOptions';
 import { showWeChatQrCode } from './tool';
 
 export default class Pack extends PluginApi {
@@ -39,6 +39,7 @@ export default class Pack extends PluginApi {
                     webpackChain.devtool(false);
                     // 传递变量给项目，用于代码剔除
                     parseBuildOptions(webpackChain, type, options);
+                    defineVar(webpackChain, false);
                     webpackChain.optimization.minimizer('TerserPlugin').use(TerserPlugin, [
                         // @ts-ignore 不输出license.txt
                         {

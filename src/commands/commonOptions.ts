@@ -37,6 +37,14 @@ export function parseBuildOptions(webpackChain: Config, type: string, options: O
             __PLUGIN_TYPE__: JSON.stringify(type),
         }]);
 }
+export function defineVar(webpackChain: Config, dev: boolean = false, workspaceDir: string = "") {
+    const dir = `"${workspaceDir.replace(/\\/g, '/')}"`
+    webpackChain.plugin("build_dev_variables",)
+        .use(webpack.DefinePlugin, [{
+            __DEV__: !!dev,
+            __DEV_WORKSPACE__: dir,
+        }]);
+}
 
 export function checkBuildType(type: string, exit: boolean = false) {
     if (type === PluginType.PluginV2 ||

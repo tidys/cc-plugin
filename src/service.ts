@@ -43,7 +43,13 @@ interface UserWebpackConfig {
 export class CocosPluginService {
     public webpackChainFns: Function[] = [];
     public plugins: PluginApi[] = [];
+    /**
+     * 执行cc-plugin所在的目录，也就是cc-plugin.config.ts所在的目录
+     */
     public context: string;
+    /**
+     * cc-plugin源码所在的目录，也就是cc-plugin的安装目录
+     */
     public root: string;
     public projectConfig: ProjectConfig = this.defaults;
     public pluginMgr: PluginMgr;

@@ -84,13 +84,21 @@ export class Util extends Base {
         return ''
     }
     urlToFspath(url: string) {
+        // FIXME: creator有时安装插件的目录名字并不一定是做插件名字
         let result = URL.parse(url);
         let r1 = result.pathname
             ? Path.join(result.hostname, result.pathname)
             : Path.join(result.hostname);
         if (this.adaptation.Env.isPluginV2) {
             // const { uuidToUrl, uuidToFspath, urlToFspath, fspathToUuid } = Editor.remote.AssetDB.assetdb;
-            throw new Error('没有实现的接口')
+            if (result.protocol === 'packages:') {
+                return Path.join(this.adaptation.Project.path, 'packages', r1)
+            } else if (result.protocol === 'db:') {
+                return Path.join(this.adaptation.Project.path, r1)
+            } else if (result.protocol === 'project:') {
+                return Path.join(this.adaptation.Project.path, r1)
+            }
+            return null;
         } else if (this.adaptation.Env.isWeb) {
             if (result.protocol === 'packages:') {
                 const pluginName = this.adaptation.config!.manifest.name;

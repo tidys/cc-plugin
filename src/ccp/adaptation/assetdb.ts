@@ -1,5 +1,7 @@
+import { existsSync } from "fs";
 import { Base } from "./base";
 import axios from 'axios';
+import { join } from "path";
 
 const Path = require('path'); // 为了适配浏览器
 export enum AssetsType {
@@ -79,6 +81,40 @@ export class AssetDB extends Base {
             }
         }
         return ''
+    }
+    getWorkspaceDirectory() {
+        return __DEV_WORKSPACE__;
+    }
+    /**
+     * 获取静态文件的全路径，默认不会校验文件是否存在
+     * @param file 如果你在静态目录下有个a.png文件，那么这个参数就是a.png
+     * @param [check=false] 如果你想校验文件是否存在，那么这个参数设置为true
+     */
+    getStaticFile(file: string, check: boolean = false) {
+        const staticFileDirectory = this.adaptation.config?.options.staticFileDirectory;
+        if (!staticFileDirectory) {
+            return ""
+        }
+        let ret: string = "";
+        if (this.adaptation.Env.isDev) {
+            const workspaceDir = this.getWorkspaceDirectory();
+            ret = join(workspaceDir, staticFileDirectory, file);
+        } else {
+            // TODO: check
+            const pluginName = this.adaptation.config!.manifest.name;
+            const url = `packages://${pluginName}/${staticFileDirectory}/${file}`;
+            ret = this.adaptation.Util.urlToFspath(url) || "";
+        }
+
+        if (check) {
+            if (!existsSync(ret)) {
+                return "";
+            } else {
+                return ret;
+            }
+        } else {
+            return ret;
+        }
     }
 }
 

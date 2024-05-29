@@ -2,6 +2,9 @@ import { Base } from "./base";
 import * as Path from "path";
 // 为啥取这个名字，因为被Editor编辑器占用了
 export class CCEditor extends Base {
+    /**
+     * 指向的是resources目录
+     */
     get path(): string {
         if (this.adaptation.Env.isPluginV2) {
             //@ts-ignore
