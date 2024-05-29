@@ -30,21 +30,57 @@ export class Builder extends Base {
         }
         return ret;
     }
+    public getAndroidInfo(): { package: string, orientation: string } {
+        const ret = {
+            package: "",
+            orientation: "",
+        }
+        if (this.adaptation.Env.isPluginV2) {
+            const data = this.getV2SettingsBuildData();
+            if (data && data.android) {
+                ret.package = data.android.packageName || "";
+
+                const { landscapeLeft, landscapeRight, portrait, upsideDown } = data.orientation
+                if (landscapeLeft && landscapeRight && portrait && upsideDown) {
+                    ret.orientation = "fullSensor"
+                } else if (!landscapeLeft && !landscapeRight && !portrait && !upsideDown) {
+                    ret.orientation = "unspecified"
+                } else if (landscapeLeft && landscapeRight) {
+                    ret.orientation = "sensorLandscape"
+                } else if (landscapeLeft) {
+                    ret.orientation = "reverseLandscape"
+                } else if (landscapeRight) {
+                    ret.orientation = "landscape"
+                } else if (upsideDown) {
+                    ret.orientation = "sensorPortrait"
+                } else if (portrait) {
+                    ret.orientation = "portrait"
+                } else {
+                    ret.orientation = "unspecified"
+                }
+            }
+        }
+        return ret;
+    }
+    private getV2LocalBuilderJson(): Local_Builder_Json | null {
+        const buildCfgFile = Path.join(this.adaptation.Project.path, 'local/builder.json');
+        if (!Fs.existsSync(buildCfgFile)) {
+            return null;
+        }
+        let data: Local_Builder_Json | null = null;
+        try {
+            data = JSON.parse(Fs.readFileSync(buildCfgFile, 'utf-8'))
+        } catch (e: any) {
+            data = null;
+        }
+        return data;
+    }
     /**
      * native 平台在v2版本，只会索引到build/jsb-link/，也就是assets所在的目录
      */
     getLatestBuildDirectory(): string {
         if (this.adaptation.Env.isPluginV2) {
-            const buildCfgFile = Path.join(this.adaptation.Project.path, 'local/builder.json');
-            if (!Fs.existsSync(buildCfgFile)) {
-                return ""
-            }
-            let data: Local_Builder_Json | null = null;
-            try {
-                data = JSON.parse(Fs.readFileSync(buildCfgFile, 'utf-8'))
-            } catch (e: any) {
-                data = null;
-            }
+            const data: Local_Builder_Json | null = this.getV2LocalBuilderJson();
             if (!data) {
                 return ""
             }
@@ -72,6 +108,13 @@ export class Builder extends Base {
         return ""
     }
     getLatestBuildPlatform(): Platform {
+        if (this.adaptation.Env.isPluginV2) {
+            const data: Local_Builder_Json | null = this.getV2LocalBuilderJson();
+            if (!data) {
+                return Platform.Unknown
+            }
+            return (data.platform as Platform) || Platform.Unknown;
+        }
         return Platform.Unknown;
     }
     public isNativePlatform(platform: Platform) {

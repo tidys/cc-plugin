@@ -91,7 +91,7 @@ export default class Base extends PluginApi {
 
             // 排除模块 https://webpack.docschina.org/configuration/externals#externals
             if (service.isCreatorPlugin()) {
-                let externals = this.getExternal(service.context, ['electron', 'sharp', 'fs-extra', 'express'])
+                let externals = this.getExternal(service.context, ['electron', 'sharp', 'fs-extra', 'express', 'glob'])
                 webpackChain.externals(externals)
             }
             if (service.isCreatorPlugin()) {
