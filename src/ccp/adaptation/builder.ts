@@ -30,16 +30,17 @@ export class Builder extends Base {
         }
         return ret;
     }
-    public getAndroidInfo(): { package: string, orientation: string } {
+    public getAndroidInfo(): { package: string, orientation: string, name: string } {
         const ret = {
             package: "",
             orientation: "",
+            name: "",
         }
         if (this.adaptation.Env.isPluginV2) {
             const data = this.getV2SettingsBuildData();
             if (data && data.android) {
                 ret.package = data.android.packageName || "";
-
+                ret.name = data.title || "";
                 const { landscapeLeft, landscapeRight, portrait, upsideDown } = data.orientation
                 if (landscapeLeft && landscapeRight && portrait && upsideDown) {
                     ret.orientation = "fullSensor"
