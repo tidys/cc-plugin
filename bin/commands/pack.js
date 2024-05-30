@@ -66,6 +66,7 @@ class Pack extends plugin_api_1.PluginApi {
                 webpackChain.devtool(false);
                 // 传递变量给项目，用于代码剔除
                 (0, commonOptions_1.parseBuildOptions)(webpackChain, type, options);
+                (0, commonOptions_1.defineVar)(webpackChain, false);
                 webpackChain.optimization.minimizer('TerserPlugin').use(terser_webpack_plugin_1.default, [
                     // @ts-ignore 不输出license.txt
                     {
@@ -121,10 +122,37 @@ class Pack extends plugin_api_1.PluginApi {
                     });
                     return this.exit();
                 }
+                this.dealStaticFiles(service);
                 log_1.log.green('构建成功');
                 // showWeChatQrCode();
             }));
         });
+    }
+    dealStaticFiles(service) {
+        debugger;
+        let dir = service.projectConfig.options.staticFileDirectory;
+        if (!dir) {
+            return;
+        }
+        if (dir.startsWith('.')) {
+            dir = Path.join(service.context, dir);
+        }
+        if (!(0, fs_1.existsSync)(dir)) {
+            log_1.log.yellow(`静态文件目录不存在：${dir}`);
+            return;
+        }
+        const dest = service.projectConfig.options.output;
+        if (!dest) {
+            return;
+        }
+        if (!(0, fs_1.existsSync)(dest)) {
+            return;
+        }
+        const base = Path.basename(dir);
+        const destDir = Path.join(dest, base);
+        (0, fs_extra_1.ensureDirSync)(destDir);
+        (0, fs_extra_1.copySync)(dir, destDir, { overwrite: true });
+        log_1.log.green(`静态文件拷贝成功：${dir} => ${dest}`);
     }
 }
 exports.default = Pack;

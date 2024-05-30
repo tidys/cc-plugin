@@ -1,6 +1,11 @@
 declare global {
     const __VALID_CODE__: boolean;
     const __PLUGIN_TYPE__: string;
+    const __DEV__: boolean;
+    /**
+     * 开发模式下的工作目录，也就是cc-plugin.config.ts所在的目录
+     */
+    const __DEV_WORKSPACE__: string;
 }
 export interface MenuOptions {
     /**
@@ -112,6 +117,10 @@ export interface CocosPluginOptions {
     server?: {
         enabled?: boolean;
         /**
+         * 是否启用creator的hmr，默认不开启，现在开启刷新遇到很多问题
+         */
+        creatorHMR?: boolean;
+        /**
          * 监听端口，需要优化判断下端口是否占用的问题
          */
         port?: number;
@@ -124,6 +133,9 @@ export interface CocosPluginOptions {
          */
         writeToDisk?: boolean;
     };
+    /**
+     * webpack的监听模式，一般都需要开启
+     */
     watchBuild?: boolean;
     /**
      * 配置的不同类型的输出目录，支持相对路径和绝对路径
@@ -152,7 +164,7 @@ export interface CocosPluginOptions {
      */
     zipOutput?: string;
     /**
-     * pack模式下是否清理上次的输出目录结果
+     * pack打包模式下是否清理上次的输出目录结果
      */
     cleanBeforeBuildWithPack?: boolean;
     cwd?: string;
@@ -161,6 +173,13 @@ export interface CocosPluginOptions {
      */
     min?: boolean;
     treeShaking?: boolean;
+    /**
+     * 静态文件目录，支持绝对路径和相对路径（相对于cc-plugin.config.ts所在目录）
+     * 可以把插件依赖的静态文件放在该目录下，在发布插件时，会将该目录随着插件一起发布
+     * 调试时为了避免大量的重复复制文件，该目录下的文件并不会同步到插件所在的目录下
+     * 要获取该目录下的文件，请统一使用接口：CCP.Adaptation.AssetDB.getStaticFile("1.exe")
+     */
+    staticFileDirectory?: string;
 }
 export declare const DefaultCocosPluginOptions: CocosPluginOptions;
 export interface CocosPluginConfig {
@@ -289,11 +308,12 @@ export interface BuilderOptions {
         };
     };
 }
-export declare const Platform: {
-    WebMobile: string;
-    WebDesktop: string;
-    Android: string;
-    Ios: string;
-    Mac: string;
-    Win32: string;
-};
+export declare enum Platform {
+    Unknown = "unknown",
+    WebMobile = "web-mobile",
+    WebDesktop = "web-desktop",
+    Android = "android",
+    Ios = "ios",
+    Mac = "mac",
+    Win32 = "win32"
+}

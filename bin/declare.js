@@ -29,12 +29,15 @@ exports.DefaultCocosPluginOptions = {
     watchBuild: false,
     min: false,
 };
-exports.Platform = {
-    WebMobile: 'web-mobile',
-    WebDesktop: 'web-desktop',
-    Android: 'android',
-    Ios: 'ios',
-    Mac: 'mac',
-    Win32: 'win32',
-};
+var Platform;
+(function (Platform) {
+    Platform["Unknown"] = "unknown";
+    Platform["WebMobile"] = "web-mobile";
+    Platform["WebDesktop"] = "web-desktop";
+    Platform["Android"] = "android";
+    Platform["Ios"] = "ios";
+    Platform["Mac"] = "mac";
+    Platform["Win32"] = "win32";
+})(Platform || (exports.Platform = Platform = {}));
+;
 //# sourceMappingURL=declare.js.map

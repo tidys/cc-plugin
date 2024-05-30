@@ -80,6 +80,7 @@ class Serve extends plugin_api_1.PluginApi {
                 webpackChain.devtool('source-map');
                 // 传递变量给项目，用于代码剔除
                 (0, commonOptions_1.parseBuildOptions)(webpackChain, type, opts);
+                (0, commonOptions_1.defineVar)(webpackChain, true, service.context);
                 webpackChain
                     .plugin('clean')
                     .use(clean_webpack_plugin_1.CleanWebpackPlugin, [{

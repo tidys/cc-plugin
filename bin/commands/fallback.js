@@ -11,7 +11,7 @@ function getFallback(service) {
         // web情况下： 模块重定向，不需要的设置为false即可
         fallback = Object.assign(fallback, {
             assert: require.resolve("assert"),
-            net: require.resolve("net-browserify"),
+            net: require.resolve("net-browserify/browser.js"),
             path: require.resolve("path-browserify"),
             zlib: require.resolve("browserify-zlib"),
             stream: require.resolve("stream-browserify"),
@@ -19,6 +19,7 @@ function getFallback(service) {
             buffer: require.resolve("browserify-buffer"),
             crypto: require.resolve("crypto-browserify"),
             os: require.resolve("os-browserify/browser"),
+            timers: require.resolve("timers-browserify"),
             constants: require.resolve("constants-browserify"),
             process: require.resolve("process/browser"),
             querystring: require.resolve("querystring-es3"),
@@ -28,9 +29,11 @@ function getFallback(service) {
             tls: false,
             express: require.resolve("@xuyanfeng/express-browserify"),
             fs: require.resolve("@xuyanfeng/fs-browserify"),
+            sharp: require.resolve("@xuyanfeng/sharp-browserify"),
             electron: false,
             async_hooks: false,
             string_decoder: false,
+            child_process: require.resolve("child_process-browserify"),
             'fs-extra': require.resolve("@xuyanfeng/fs-extra-browserify"),
         });
     }

@@ -22,9 +22,11 @@ class DevServer {
                 console.log('data', data.toString());
             });
             socket.on("close", data => {
-                const index = this.clients.findIndex(el => el === socket);
-                this.clients.splice(index, 1);
                 console.log('client close');
+                const index = this.clients.findIndex(el => el === socket);
+                if (index !== -1) {
+                    this.clients = this.clients.splice(index, 1);
+                }
             });
             this.clients.push(socket);
         });

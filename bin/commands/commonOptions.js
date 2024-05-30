@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkBuildType = exports.parseBuildOptions = exports.BuildOptions = exports.getBuildOptions = void 0;
+exports.checkBuildType = exports.defineVar = exports.parseBuildOptions = exports.BuildOptions = exports.getBuildOptions = void 0;
 const webpack_1 = __importDefault(require("webpack"));
 const declare_1 = require("../declare");
 function getBuildOptions(name) {
@@ -42,6 +42,15 @@ function parseBuildOptions(webpackChain, type, options) {
         }]);
 }
 exports.parseBuildOptions = parseBuildOptions;
+function defineVar(webpackChain, dev = false, workspaceDir = "") {
+    const dir = `"${workspaceDir.replace(/\\/g, '/')}"`;
+    webpackChain.plugin("build_dev_variables")
+        .use(webpack_1.default.DefinePlugin, [{
+            __DEV__: !!dev,
+            __DEV_WORKSPACE__: dir,
+        }]);
+}
+exports.defineVar = defineVar;
 function checkBuildType(type, exit = false) {
     if (type === declare_1.PluginType.PluginV2 ||
         type === declare_1.PluginType.PluginV3 ||

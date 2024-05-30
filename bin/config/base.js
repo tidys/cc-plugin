@@ -91,13 +91,11 @@ class Base extends plugin_api_1.PluginApi {
             const { options, manifest } = service.projectConfig;
             const pluginName = manifest.name;
             // target
-            {
-                if (service.isWeb()) {
-                    webpackChain.target('web');
-                }
-                if (service.isCreatorPlugin()) {
-                    webpackChain.target('node');
-                }
+            if (service.isWeb()) {
+                webpackChain.target('web');
+            }
+            else if (service.isCreatorPlugin()) {
+                webpackChain.target('node');
             }
             // https://webpack.docschina.org/configuration/resolve#resolvealias
             if (service.isWeb()) {
@@ -113,7 +111,7 @@ class Base extends plugin_api_1.PluginApi {
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json').add('.glsl').end();
             // 排除模块 https://webpack.docschina.org/configuration/externals#externals
             if (service.isCreatorPlugin()) {
-                let externals = this.getExternal(service.context, ['electron', 'fs-extra', 'express']);
+                let externals = this.getExternal(service.context, ['electron', 'sharp', 'fs-extra', 'express', 'glob']);
                 webpackChain.externals(externals);
             }
             if (service.isCreatorPlugin()) {
@@ -326,7 +324,8 @@ class Base extends plugin_api_1.PluginApi {
                 .use(webpack_1.default.DefinePlugin, [{
                     // 这里不能使用'process.env': JSON.stringify({}), 会被替换为{}.Debug, 这个是有语法问题的
                     // 'process.env': {} 替换的结果为 ({}).DEBUG , 是正常的
-                    'process.env': {}
+                    'process.env': {},
+                    'process.browser': !!service.isWeb(),
                 }]);
             webpackChain
                 .plugin('CriticalDependency')

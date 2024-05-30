@@ -76,7 +76,8 @@ class Create extends plugin_api_1.PluginApi {
                 }
             }
             const templateDir = Path.join(service.root, './template/project');
-            FsExtra.copySync(templateDir, projectDir);
+            FsExtra.copySync(templateDir, projectDir, { recursive: true });
+            this.dealIgnoreFile(templateDir, projectDir);
             // 替换名字
             const file = Path.join(projectDir, const_1.ConfigTypeScript);
             if (Fs.existsSync(file)) {
@@ -88,6 +89,19 @@ class Create extends plugin_api_1.PluginApi {
             // npmInstall(projectDir)
             (0, tool_1.showWeChatQrCode)();
         });
+    }
+    dealIgnoreFile(templateDir, projectDir) {
+        // 确认.gitignore文件，因为npm会自动忽略这个文件，如果使用files字段，会导致其他文件也需要在files中声明
+        const sourceIgnoreFile = Path.join(templateDir, ".gitignore-shadow");
+        if (Fs.existsSync(sourceIgnoreFile)) {
+            const gitIgnoreData = Fs.readFileSync(sourceIgnoreFile, 'utf-8');
+            const destIgnoreFile = Path.join(projectDir, '.gitignore');
+            Fs.writeFileSync(destIgnoreFile, gitIgnoreData);
+            const ignoreShadow = Path.join(projectDir, ".gitignore-shadow");
+            if (Fs.existsSync(ignoreShadow)) {
+                FsExtra.removeSync(ignoreShadow);
+            }
+        }
     }
 }
 exports.default = Create;
