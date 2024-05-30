@@ -2,7 +2,8 @@ import { CocosPluginConfig, PluginType } from "../declare";
 import CCP from "./entry-render";
 import * as Path from "path";
 import * as Fs from "fs";
-
+import { homedir } from "os"
+import { ensureFileSync } from "fs-extra";
 
 export class Profile {
     private Key = 'profile';
@@ -11,6 +12,13 @@ export class Profile {
     pluginConfig: CocosPluginConfig | null = null;
     public format: boolean = false;
     public formatIndent: number = 4;
+    /**
+     * 配置文件是否放在全局
+     */
+    private global: boolean = false;
+    constructor(global: boolean = false) {
+        this.global = global;
+    }
     init(data: Record<string, any>, cfg: CocosPluginConfig) {
         this.defaultData = data;
         this.pluginConfig = cfg;
@@ -34,7 +42,13 @@ export class Profile {
         }
         return this.data;
     }
-
+    private getLocalStoreFile() {
+        if (this.global) {
+            return Path.join(homedir(), '.ccp', 'profile', this.Key);
+        } else {
+            return Path.join(CCP.Adaptation.Project.path, 'settings', this.Key);
+        }
+    }
     public _read(fileName: string) {
         this.Key = fileName;
         let retData: Record<string, any> = {}
@@ -50,9 +64,10 @@ export class Profile {
             }
         } else {
             // 不再调用编辑器接口,设置统一放在项目目录下
-            const filePath = Path.join(CCP.Adaptation.Project.path, 'settings', fileName);
+            const filePath = this.getLocalStoreFile();
             this.nativeFile = filePath;
             if (!Fs.existsSync(filePath)) {
+                ensureFileSync(filePath);
                 Fs.writeFileSync(filePath, JSON.stringify(this.defaultData), 'utf-8');
                 retData = this.defaultData;
             } else {
