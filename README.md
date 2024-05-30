@@ -162,6 +162,11 @@ npm i @xuyanfeng/cc-editor -g
 ```
 `cc-plugin.json`不建议纳入版本管理，它更像是一个本机配置，满足了不同电脑，配置不同的需求。
 `cc-plugin`检索`outputProject`时会优先从`cc-plugin.json`中读取配置。
+
+## `__DEV__` / `__DEV_WORKSPACE__`
+- `__DEV__`: 用于判断是否为ccp的serve环境
+- `__DEV_WORKSPACE__`：serve环境下的工作空间路径
+
 ## `__VALID_CODE__`
 
 有时我们希望某些代码不出现在打包后的项目中，比如导出生成最终的产出文件，发布为creator插件我们是必须有的，但是web的引流体验版本我们是不能携带的，原因大家懂得。
