@@ -12,7 +12,7 @@ import { PluginType } from '../declare';
 import { merge } from 'lodash';
 import { getFallback } from './fallback';
 import { existsSync } from 'fs';
-import { emptyDirSync } from 'fs-extra';
+import { copyFileSync, copySync, emptyDirSync, ensureDirSync } from 'fs-extra';
 import { Option, OptionValues } from 'commander';
 import { checkBuildType, getBuildOptions, parseBuildOptions, defineVar } from './commonOptions';
 import { showWeChatQrCode } from './tool';
@@ -101,11 +101,37 @@ export default class Pack extends PluginApi {
                         })
                         return this.exit();
                     }
+                    this.dealStaticFiles(service);
                     log.green('构建成功')
                     // showWeChatQrCode();
                 }))
             }
         )
     }
-
+    private dealStaticFiles(service: CocosPluginService) {
+        let dir = service.projectConfig.options.staticFileDirectory;
+        if (!dir) {
+            return;
+        }
+        if (dir.startsWith('.')) {
+            dir = Path.join(service.context, dir)
+        }
+        if (!existsSync(dir)) {
+            log.yellow(`静态文件目录不存在：${dir}`)
+            return;
+        }
+        const dest = service.projectConfig.options.output;
+        if (!dest) {
+            log.yellow(`请配置output目录`)
+            return;
+        }
+        if (!existsSync(dest)) {
+            return;
+        }
+        const base = Path.basename(dir)
+        const destDir = Path.join(dest, base)
+        ensureDirSync(destDir)
+        copySync(dir, destDir, { overwrite: true })
+        log.green(`静态文件拷贝成功：${dir} => ${dest}`)
+    }
 }
