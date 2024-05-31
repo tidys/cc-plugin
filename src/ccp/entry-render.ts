@@ -9,7 +9,7 @@ import {
 import adaptation, { Adaptation } from './adaptation/index';
 import profile from './profile';
 import { ClientSocket } from './client-socket';
-
+import { flag } from '../common'
 interface PanelOptions {
     ready: (rootElement: any, args: any) => void;
     /**
@@ -24,9 +24,9 @@ export class CocosCreatorPluginRender {
     public Adaptation: Adaptation = adaptation;
 
     /**
-     * 调用来自插件
+     * 调用来自插件, export的正好是PanelOptions，和creator插件对上了
      */
-    public init(config: CocosPluginConfig, options: PanelOptions) {
+    public init(config: CocosPluginConfig, options: PanelOptions): PanelOptions {
         this.Adaptation.init(config);
         this.manifest = config.manifest;
         this.options = Object.assign(DefaultCocosPluginOptions, config.options);
@@ -69,6 +69,23 @@ export class CocosCreatorPluginRender {
                 options.ready(el, null);
             }
         }
+        if (this.Adaptation.Env.isPluginV3) {
+            if (!options.messages) {
+                options.messages = {}
+            }
+            if (options.messages.hasOwnProperty(flag)) {
+                console.error(`don't define ${flag} in messages`);
+            }
+            options.messages[flag] = (functionName: string, data: any) => {
+                if (options.messages) {
+                    const func = options.messages[functionName];
+                    if (func) {
+                        func(null, data);
+                    }
+                }
+            };
+        }
+
         return options;
     }
 

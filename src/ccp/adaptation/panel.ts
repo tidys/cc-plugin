@@ -1,5 +1,5 @@
 import { Base } from "./base";
-
+import { getV3MethodFunctionName, getV3PanelRecvMessageFunctionName } from '../../common'
 export class Panel extends Base {
     private getPanelKey(panel: string): string | null {
         const array = panel.split('.');
@@ -38,6 +38,8 @@ export class Panel extends Base {
      * @param panel 主进程接受消息的面板名字，如：self.panelID，也可以是其他插件的面板，格式为 pluginName.panelID
      * @param functionName 定义在messages里面的函数名
      * @param args 参数
+     * 
+     * 在V3中， function作为了参数发送到了面板
      */
     public send(panel: string, functionName: string, ...args: any): boolean {
         if (typeof args === 'function') {
@@ -50,8 +52,10 @@ export class Panel extends Base {
                 Editor.Ipc.sendToPanel(panelKey, functionName, ...args);
                 return true;
             } else if (this.adaptation.Env.isPluginV3) {
+                const [pluginID, panelName] = panelKey.split(".");
+                const messageKey = getV3PanelRecvMessageFunctionName(panelName);
                 // @ts-ignore
-                Editor.Message.send(panelKey, functionName, ...args);
+                Editor.Message.send(pluginID, messageKey, functionName, ...args);
                 return true;
             }
         }

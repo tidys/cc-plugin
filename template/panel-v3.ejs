@@ -56,36 +56,33 @@ parent.appendChild(link);
 }
 
 
-
-exports.template=`<%= htmlWebpackPlugin.options.ccPlugin.template %>`;
-exports.$={app:'#app'};
-exports.ready=function(...args){
-// 加载css
-<% const cssLength = htmlWebpackPlugin.files.css.length; %>
-<% for(let i = 0;i < cssLength;i++){ %>
-loadCss(this.$.app.parentNode,'<%= htmlWebpackPlugin.files.css[i] %>')
-loadCss(document.head,'<%= htmlWebpackPlugin.files.css[i] %>')
-<% } %>
-
-
 let panelInstance = panel;
 if (panel && panel.default) {
-panelInstance = panel.default;
+    panelInstance = panel.default;
 }
 
 let targetPanel = panelInstance;
 if (typeof panelInstance === 'function') {
-targetPanel = new panelInstance();
+    targetPanel = new panelInstance();
 }
 
-if (targetPanel.hasOwnProperty('ready') &&
-typeof targetPanel.ready === 'function') {
-targetPanel.ready(this.$.app, args);
+exports.template=`<%= htmlWebpackPlugin.options.ccPlugin.template %>`;
+exports.$={app:'#app'};
+exports.ready=function(...args){
+    // 加载css
+    <% const cssLength = htmlWebpackPlugin.files.css.length; %>
+    <% for(let i = 0;i < cssLength;i++){ %>
+    loadCss(this.$.app.parentNode,'<%= htmlWebpackPlugin.files.css[i] %>')
+    loadCss(document.head,'<%= htmlWebpackPlugin.files.css[i] %>')
+    <% } %>
+
+    if (targetPanel.hasOwnProperty('ready') &&
+        typeof targetPanel.ready === 'function') {
+        targetPanel.ready(this.$.app, args);
+    }
 }
 
-}
-
-exports.close=function(){
-
+exports.close = function(){
 
 }
+exports.methods = panelInstance.messages || {};

@@ -4,6 +4,7 @@ import { trim } from 'lodash'
 import utils from "../utils"
 import { ProjectConfig } from 'service';
 import { CreatorV3Limit } from '../const';
+import { getV3MethodFunctionName, getV3PanelRecvMessageFunctionName } from '../common';
 export abstract class PackageInterface {
     protected config: CocosPluginConfig;
 
@@ -93,13 +94,24 @@ export class PackageV3 extends PackageInterface {
             menu: [],
             shortcuts: [],
         };
-        this.addMessageToContributions('onBuilder', 'onBuilder');
+        this.addMessageToContributions('onBuilder', 'onBuilder'); // 预定义的事件
     }
 
 
     panelReady() {
         super.panelReady();
         this.packageData!.panels = {}
+        // 预定义发送到面板的message
+        this.config.manifest.panels?.forEach(panel => {
+            /** 对应package.json的contributions.messages
+             * "panelID-recv_entry": {
+             *      "methods": ["panelID.recv_entry"]
+             * }
+             */
+            const key = getV3PanelRecvMessageFunctionName(panel.name);
+            const method = getV3MethodFunctionName(panel.name);
+            this.addMessageToContributions(key, method)
+        });
     }
 
     panelBuild(panel: PanelOptions) {
@@ -128,7 +140,7 @@ export class PackageV3 extends PackageInterface {
         let menu = this.packageData!.contributions!.menu!;
         let msgKey = this.addMessage(menuOpts);
         const menuReal = utils.menuPackage(menuOpts.path);
-      let { newLabel, newPath } = this.dealPath(menuReal);
+        let { newLabel, newPath } = this.dealPath(menuReal); 
         menu.push({
             path: newPath,
             label: newLabel,
