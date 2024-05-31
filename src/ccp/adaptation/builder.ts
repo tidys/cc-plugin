@@ -8,7 +8,7 @@ import * as dayjs from 'dayjs'
 import { Dayjs } from 'dayjs'
 import { join } from "path";
 export class Builder extends Base {
-    getEncryptInfo(): { key: string, encrypt: boolean, zip: boolean } {
+    getEncryptInfo(): null | { key: string, encrypt: boolean, zip: boolean } {
         const ret = { key: "", encrypt: false, zip: false }
         if (this.adaptation.Env.isPluginV2) {
             const data = getV2SettingsBuildData(this.adaptation.Project.path);
@@ -17,6 +17,18 @@ export class Builder extends Base {
                 ret.key = data.xxteaKey;
                 ret.zip = data.zipCompressJs;
             }
+        } else if (this.adaptation.Env.isPluginV3) {
+            const task: Task | null = this.getLatestBuildTask();
+            if (!task) {
+                return null;
+            }
+            const taskMap = getNativeItem(this.adaptation.Project.path, task.id);
+            if (!taskMap) {
+                return null;
+            }
+            ret.encrypt = taskMap.encrypted;
+            ret.key = taskMap.xxteaKey;
+            ret.zip = taskMap.compressZip;
         }
         return ret;
     }
@@ -143,9 +155,7 @@ export class Builder extends Base {
                     if (task.dirty) {
                         continue;
                     }
-                    if (task.options?.platform === Platform.Android) {
-                        taskArray.push(task);
-                    }
+                    taskArray.push(task);
                 }
                 if (taskArray.length) {
                     taskArray.sort((a: Task, b: Task) => {
