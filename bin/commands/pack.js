@@ -129,7 +129,6 @@ class Pack extends plugin_api_1.PluginApi {
         });
     }
     dealStaticFiles(service) {
-        debugger;
         let dir = service.projectConfig.options.staticFileDirectory;
         if (!dir) {
             return;
@@ -143,6 +142,7 @@ class Pack extends plugin_api_1.PluginApi {
         }
         const dest = service.projectConfig.options.output;
         if (!dest) {
+            log_1.log.yellow(`请配置output目录`);
             return;
         }
         if (!(0, fs_1.existsSync)(dest)) {

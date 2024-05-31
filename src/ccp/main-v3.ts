@@ -2,6 +2,7 @@ import CCP from './entry-main'
 import { ClientSocket } from './client-socket';
 import { BuilderOptions } from '../declare';
 import * as Path from 'path';
+import { BuildInfo } from './builder/type';
 
 export function load() {
     if (CCP.options && CCP.options.server) {
@@ -27,9 +28,8 @@ export const methods = Object.assign(
     CCP.wrapper?.messages || {},
     {
         // 接收来自builder的消息，wrapper中不能含有这个key
-        onBuilder(options: any) {
-            const { type, data } = options;
-            const { buildPath, name, outputName, platform, md5Cache } = data;
+        onBuilder(options: BuildInfo) {
+            const { buildPath, name, outputName, platform, md5Cache } = options.data;
             const buildFsPath = CCP.Adaptation.Util.urlToFspath(buildPath);
             const param: BuilderOptions = {
                 buildPath: buildFsPath,
@@ -38,11 +38,11 @@ export const methods = Object.assign(
                 md5Cache,
             }
 
-            if (type === 'onAfterBuild') {
+            if ('onAfterBuild' === options.type) {
                 if (CCP && CCP.wrapper && CCP.wrapper.builder && CCP.wrapper.builder.onAfterBuild) {
                     CCP.wrapper?.builder?.onAfterBuild(param);
                 }
             }
-        }
+        },
     }
 )

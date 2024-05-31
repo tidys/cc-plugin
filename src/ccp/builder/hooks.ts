@@ -23,7 +23,6 @@ function getPackageName() {
 
 // 运行在单独的构建面板中，可以通过构建面的渲染进程，打开 资源构建 进程调试 工具
 export function onAfterBuild(buildOptions: any, buildResult: any) {
-    debugger
     const pkgName = getPackageName();
     if (!pkgName) {
         console.error('无法获取插件名称')
