@@ -257,3 +257,13 @@ export interface Local_Builder_Json {
      */
     "buildScriptsOnly": boolean
 }
+
+import { parseJsonFile } from './util'
+
+export function getV2LocalBuilderJson(project: string): Local_Builder_Json | null {
+    return parseJsonFile(project, 'local/builder.json');
+}
+
+export function getV2SettingsBuildData(project: string): Settings_Builder_Json | null {
+    return parseJsonFile(project, "settings/builder.json");
+}

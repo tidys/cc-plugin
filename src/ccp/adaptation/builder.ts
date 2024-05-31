@@ -2,26 +2,16 @@ import { Base } from "./base";
 import { BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType } from '../../declare';
 const Path = require('path'); // 为了适配浏览器
 import * as Fs from 'fs';
-import { Local_Builder_Json, Settings_Builder_Json } from "../types/plugin-v2";
-
+import { Local_Builder_Json, Settings_Builder_Json, getV2LocalBuilderJson, getV2SettingsBuildData } from "../types/plugin-v2";
+import { Task, getAndroidTaskMap, getNativeItem, getV3AndroidJson, getV3BuilderJson, getV3NativeJson } from "../types/plugin-v3";
+import * as dayjs from 'dayjs'
+import { Dayjs } from 'dayjs'
+import { join } from "path";
 export class Builder extends Base {
-    private getV2SettingsBuildData(): Settings_Builder_Json | null {
-        const buildCfgFile = Path.join(this.adaptation.Project.path, "settings/builder.json");
-        if (!Fs.existsSync(buildCfgFile)) {
-            return null
-        }
-        let data: Settings_Builder_Json | null = null;
-        try {
-            data = JSON.parse(Fs.readFileSync(buildCfgFile, 'utf-8'))
-        } catch (e: any) {
-            data = null;
-        }
-        return data;
-    }
     getEncryptInfo(): { key: string, encrypt: boolean, zip: boolean } {
         const ret = { key: "", encrypt: false, zip: false }
         if (this.adaptation.Env.isPluginV2) {
-            const data = this.getV2SettingsBuildData();
+            const data = getV2SettingsBuildData(this.adaptation.Project.path);
             if (data) {
                 ret.encrypt = data.encryptJs;
                 ret.key = data.xxteaKey;
@@ -30,58 +20,66 @@ export class Builder extends Base {
         }
         return ret;
     }
-    public getAndroidInfo(): { package: string, orientation: string, name: string } {
+    public getAndroidInfo(): null | { package: string, orientation: string, name: string } {
         const ret = {
             package: "",
             orientation: "",
             name: "",
         }
+        function updateOrientation(landscapeLeft: boolean, landscapeRight: boolean, portrait: boolean, upsideDown: boolean) {
+            if (landscapeLeft && landscapeRight && portrait && upsideDown) {
+                ret.orientation = "fullSensor"
+            } else if (!landscapeLeft && !landscapeRight && !portrait && !upsideDown) {
+                ret.orientation = "unspecified"
+            } else if (landscapeLeft && landscapeRight) {
+                ret.orientation = "sensorLandscape"
+            } else if (landscapeLeft) {
+                ret.orientation = "reverseLandscape"
+            } else if (landscapeRight) {
+                ret.orientation = "landscape"
+            } else if (upsideDown) {
+                ret.orientation = "sensorPortrait"
+            } else if (portrait) {
+                ret.orientation = "portrait"
+            } else {
+                ret.orientation = "unspecified"
+            }
+        }
         if (this.adaptation.Env.isPluginV2) {
-            const data = this.getV2SettingsBuildData();
+            const data = getV2SettingsBuildData(this.adaptation.Project.path);
             if (data && data.android) {
                 ret.package = data.android.packageName || "";
                 ret.name = data.title || "";
                 const { landscapeLeft, landscapeRight, portrait, upsideDown } = data.orientation
-                if (landscapeLeft && landscapeRight && portrait && upsideDown) {
-                    ret.orientation = "fullSensor"
-                } else if (!landscapeLeft && !landscapeRight && !portrait && !upsideDown) {
-                    ret.orientation = "unspecified"
-                } else if (landscapeLeft && landscapeRight) {
-                    ret.orientation = "sensorLandscape"
-                } else if (landscapeLeft) {
-                    ret.orientation = "reverseLandscape"
-                } else if (landscapeRight) {
-                    ret.orientation = "landscape"
-                } else if (upsideDown) {
-                    ret.orientation = "sensorPortrait"
-                } else if (portrait) {
-                    ret.orientation = "portrait"
-                } else {
-                    ret.orientation = "unspecified"
-                }
+                updateOrientation(landscapeLeft, landscapeRight, portrait, upsideDown)
             }
+        } else if (this.adaptation.Env.isPluginV3) {
+            const task: Task | null = this.getLatestBuildTask();
+            if (!task) {
+                return null;
+            }
+            const androidOptions = getAndroidTaskMap(this.adaptation.Project.path, task.id);
+            if (!androidOptions) {
+                return null;
+            }
+            const taskMap = getNativeItem(this.adaptation.Project.path, task.id);
+            if (!taskMap) {
+                return null;
+            }
+            ret.package = androidOptions.packageName || "";
+            ret.name = task.options.name || "";
+            const { landscapeLeft, landscapeRight, portrait, upsideDown } = androidOptions.orientation;
+            updateOrientation(landscapeLeft, landscapeRight, portrait, upsideDown)
         }
         return ret;
     }
-    private getV2LocalBuilderJson(): Local_Builder_Json | null {
-        const buildCfgFile = Path.join(this.adaptation.Project.path, 'local/builder.json');
-        if (!Fs.existsSync(buildCfgFile)) {
-            return null;
-        }
-        let data: Local_Builder_Json | null = null;
-        try {
-            data = JSON.parse(Fs.readFileSync(buildCfgFile, 'utf-8'))
-        } catch (e: any) {
-            data = null;
-        }
-        return data;
-    }
+
     /**
      * native 平台在v2版本，只会索引到build/jsb-link/，也就是assets所在的目录
      */
     getLatestBuildDirectory(): string {
         if (this.adaptation.Env.isPluginV2) {
-            const data: Local_Builder_Json | null = this.getV2LocalBuilderJson();
+            const data: Local_Builder_Json | null = getV2LocalBuilderJson(this.adaptation.Project.path);
             if (!data) {
                 return ""
             }
@@ -105,18 +103,61 @@ export class Builder extends Base {
                 return ""
             }
             return dir;
+        } else if (this.adaptation.Env.isPluginV3) {
+            const task: Task | null = this.getLatestBuildTask();
+            if (task && task.options) {
+                const { buildPath, outputName } = task.options;
+                const buildRoot = this.adaptation.Util.urlToFspath(buildPath);
+                const dir = join(buildRoot, outputName);
+                if (Fs.existsSync(dir)) {
+                    return dir;
+                }
+            }
         }
         return ""
     }
     getLatestBuildPlatform(): Platform {
         if (this.adaptation.Env.isPluginV2) {
-            const data: Local_Builder_Json | null = this.getV2LocalBuilderJson();
+            const data: Local_Builder_Json | null = getV2LocalBuilderJson(this.adaptation.Project.path);
             if (!data) {
                 return Platform.Unknown
             }
             return (data.platform as Platform) || Platform.Unknown;
+        } else if (this.adaptation.Env.isPluginV3) {
+            const task: Task | null = this.getLatestBuildTask();
+            if (task) {
+                return task.options?.platform as Platform || Platform.Unknown;
+            }
         }
         return Platform.Unknown;
+    }
+
+    private getLatestBuildTask(): Task | null {
+        const data = getV3BuilderJson(this.adaptation.Project.path)
+        if (data) {
+            const { taskMap } = data.BuildTaskManager;
+            if (taskMap) {
+                const taskArray: Task[] = [];
+                for (const key in taskMap) {
+                    const task = taskMap[key];
+                    if (task.dirty) {
+                        continue;
+                    }
+                    if (task.options?.platform === Platform.Android) {
+                        taskArray.push(task);
+                    }
+                }
+                if (taskArray.length) {
+                    taskArray.sort((a: Task, b: Task) => {
+                        const timeA = dayjs(a.time).valueOf();
+                        const timeB = dayjs(b.time).valueOf();
+                        return timeB - timeA;
+                    })
+                    return taskArray[0];
+                }
+            }
+        }
+        return null;
     }
     public isNativePlatform(platform: Platform) {
         return !![Platform.Android, Platform.Ios, Platform.Mac, Platform.Win32].includes(platform);

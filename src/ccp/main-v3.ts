@@ -1,12 +1,12 @@
 import CCP from './entry-main'
-import ClientSocket from './client-socket';
+import { ClientSocket } from './client-socket';
 import { BuilderOptions } from '../declare';
 import * as Path from 'path';
 
 export function load() {
     if (CCP.options && CCP.options.server) {
-        const { enabled, port } = CCP.options.server;
-        if (!!enabled) {
+        const { enabled, port, creatorHMR } = CCP.options.server;
+        if (!!enabled && creatorHMR) {
             const client = new ClientSocket();
             client.setReloadCallback(() => {
                 const pkgDir = CCP.Adaptation.Util.urlToFspath(`packages://${CCP.manifest!.name}`)
