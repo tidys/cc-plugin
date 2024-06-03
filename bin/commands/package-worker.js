@@ -7,6 +7,7 @@ exports.PackageV3 = exports.PackageV2 = exports.PackageInterface = void 0;
 const log_1 = require("../log");
 const lodash_1 = require("lodash");
 const utils_1 = __importDefault(require("../utils"));
+const common_1 = require("../common");
 class PackageInterface {
     constructor(config) {
         this.config = config;
@@ -88,11 +89,23 @@ class PackageV3 extends PackageInterface {
             menu: [],
             shortcuts: [],
         };
-        this.addMessageToContributions('onBuilder', 'onBuilder');
+        this.addMessageToContributions('onBuilder', 'onBuilder'); // 预定义的事件
     }
     panelReady() {
+        var _a;
         super.panelReady();
         this.packageData.panels = {};
+        // 预定义发送到面板的message
+        (_a = this.config.manifest.panels) === null || _a === void 0 ? void 0 : _a.forEach(panel => {
+            /** 对应package.json的contributions.messages
+             * "panelID-recv_entry": {
+             *      "methods": ["panelID.recv_entry"]
+             * }
+             */
+            const key = (0, common_1.getV3PanelRecvMessageFunctionName)(panel.name);
+            const method = (0, common_1.getV3MethodFunctionName)(panel.name);
+            this.addMessageToContributions(key, method);
+        });
     }
     panelBuild(panel) {
         super.panelBuild(panel);
