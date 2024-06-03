@@ -7,19 +7,26 @@
 推荐使用typescript开发插件，更丝滑流畅。
 
 ## 开源案例
-- [icon-tools](https://github.com/son-king/icon-tool)
+[icon-tools](https://github.com/son-king/icon-tool)
+
+[cocos store](https://store.cocos.com/app/detail/3981)支持一下呗
 
 ## 特点
 
 - 使用 typescript + vue 开发
 - 完美适配所有版本的creator
 - 完善的工作流：一键创建插件、打包插件、发布插件
+
 ## 打包插件的优势
 使用官方提供的插件模板，如果使用到了node的第三方package，在发布插件的时候需要将node_modules目录一起上传，会导致插件的文件数量非常多，而且插件体积也会稍微变大。
 
 creator文件在安装解压插件时，会出现node_modules目录解压失败等异常问题，导致插件运行起来出现问题，目前我的确是收到用户反馈过类似的问题。
 
-cc-plugin因为使用了webpack，会将文件（包括使用到的node_modules）统一进行打包，尽可能减少插件自身的文件数量，对减少插件体积大小也有一定的效果，同时也避免了安装解压失败导致插件运行的问题。
+cc-plugin因为使用了webpack，会将项目代码及其依赖的devDependencies统一进行打包，尽可能减少插件自身的文件数量，对减少插件体积大小也有一定的效果，同时也避免了安装解压失败导致插件运行的问题。
+
+注意是`devDependencies`，不是`dependencies`，所以如果你想将`node package`打包进插件，需要将`node package`添加到`devDependencies`中。
+
+这么设计也是考虑到了某些`package`不支持web环境，这些`package`只能配置到`dependencies`中，否则会导致打包失败，比如fs模块等。
 
 ## 如何使用
 
