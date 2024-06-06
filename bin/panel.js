@@ -9,6 +9,7 @@ const fs_extra_1 = require("fs-extra");
 const html_webpack_plugin_1 = __importDefault(require("html-webpack-plugin"));
 const const_1 = require("./chrome/const");
 const log_1 = require("./log");
+const analysis_1 = require("./analysis");
 class Panel {
     constructor(service, webpackChain) {
         this.service = service;
@@ -87,13 +88,14 @@ class Panel {
                     });
                 }
                 else {
-                    let meta = '';
+                    let headers = this.getHeaders();
                     if ((_a = pluginOptions.server) === null || _a === void 0 ? void 0 : _a.https) {
-                        meta = `<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">`;
+                        headers.push(`<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>`);
                     }
+                    headers = this.filterHead(headers);
                     options = Object.assign(options, {
                         ccPlugin: {
-                            meta,
+                            headers,
                         },
                         inject: true,
                         filename: `${entryName}.html`
@@ -109,6 +111,47 @@ class Panel {
             }
         }
         return '';
+    }
+    getHeaders() {
+        var _a, _b;
+        let headers = [];
+        if (!this.service.isWeb()) {
+            return headers;
+        }
+        // 用户配置的head
+        const webHead = ((_a = this.service.projectConfig.manifest.web) === null || _a === void 0 ? void 0 : _a.head) || [];
+        headers = headers.concat(webHead);
+        // 统计鸟的代码
+        const id = ((_b = this.service.projectConfig.manifest.analysis) === null || _b === void 0 ? void 0 : _b.tongjiniao) || "";
+        if (id) {
+            const code = new analysis_1.Analysis(this.service).getTongJiNiaoCode(id);
+            if (code) {
+                headers.push(code);
+            }
+        }
+        return headers;
+    }
+    // 过滤无效的head
+    filterHead(headers) {
+        headers = headers.filter(item => {
+            item = item.trim();
+            if (!item) {
+                return false;
+            }
+            // 检查是否符合xml标签格式
+            // <meta />
+            const reg1 = new RegExp(/^<.*\/>$/);
+            if (reg1.test(item)) {
+                return true;
+            }
+            const reg2 = new RegExp(/^<.*>.*<.*\/.*>$/);
+            if (reg2.test(item)) {
+                return true;
+            }
+            log_1.log.red(`invalid header: ${item}`);
+            return false;
+        });
+        return headers;
     }
     dealChrome() {
         const { chrome } = this.service.projectConfig.manifest;

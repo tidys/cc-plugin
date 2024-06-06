@@ -78,6 +78,33 @@ export interface CocosPluginManifest {
     icon?: string | {
         '48': string;
     };
+    web?: {
+        /**
+        * 插入到head的标签，比如引入css、js等
+        *
+        * 一些统计功能，需要引入js，并放入到head标签中
+        *  - 统计鸟：   https://www.tongjiniao.com
+        *  - 百度统计： https://tongji.baidu.com
+        *      - 对域名备案有要求，部署到 github pages 可能无法被统计
+        *  - 360分析：  https://fenxi.360.cn
+        *  - 微软：     https://clarity.microsoft.com
+        * @example
+        * <script type="text/javascript" src="//api.tongjiniao.com/c?_=123456" async></script>
+        * <meta charset="utf-8"/>
+        */
+        head?: string[];
+    };
+    /**
+     * 统计服务
+     */
+    analysis?: {
+        /**
+         *  统计鸟的appid
+         *
+         * web.head有重叠，如果配置了该项，请不要在web.head中配置标签
+         */
+        tongjiniao?: string;
+    };
     /**
      * chrome插件
      */
