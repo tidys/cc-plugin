@@ -86,15 +86,13 @@ export default class Panel {
                         }
                     })
                 } else {
-                    let meta = '';
-                    if (pluginOptions.server?.https) {
-                        meta = `<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>`;
-                    }
                     let headers = this.getHeaders();
+                    if (pluginOptions.server?.https) {
+                        headers.push(`<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>`);
+                    }
                     headers = this.filterHead(headers);
                     options = Object.assign(options, {
                         ccPlugin: {
-                            meta,
                             headers,
                         },
                         inject: true,
