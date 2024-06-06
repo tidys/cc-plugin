@@ -7,6 +7,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { template } from "lodash";
 import { ChromeConst } from './chrome/const';
 import { log } from './log'
+import { Analysis } from './analysis';
 
 export default class Panel {
     private service: CocosPluginService;
@@ -87,11 +88,14 @@ export default class Panel {
                 } else {
                     let meta = '';
                     if (pluginOptions.server?.https) {
-                        meta = `<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">`;
+                        meta = `<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>`;
                     }
+                    let headers = this.getHeaders();
+                    headers = this.filterHead(headers);
                     options = Object.assign(options, {
                         ccPlugin: {
                             meta,
+                            headers,
                         },
                         inject: true,
                         filename: `${entryName}.html`
@@ -107,6 +111,46 @@ export default class Panel {
             }
         }
         return '';
+    }
+    private getHeaders() {
+        let headers: string[] = [];
+        if (!this.service.isWeb()) {
+            return headers;
+        }
+        // 用户配置的head
+        const webHead = this.service.projectConfig.manifest.web?.head || [];
+        headers = headers.concat(webHead);
+        // 统计鸟的代码
+        const id = this.service.projectConfig.manifest.analysis?.tongjiniao || "";
+        if (id) {
+            const code = new Analysis(this.service).getTongJiNiaoCode(id)
+            if (code) {
+                headers.push(code);
+            }
+        }
+        return headers;
+    }
+    // 过滤无效的head
+    private filterHead(headers: string[]) {
+        headers = headers.filter(item => {
+            item = item.trim();
+            if (!item) {
+                return false;
+            }
+            // 检查是否符合xml标签格式
+            // <meta />
+            const reg1 = new RegExp(/^<.*\/>$/)
+            if (reg1.test(item)) {
+                return true;
+            }
+            const reg2 = new RegExp(/^<.*>.*<.*\/.*>$/)
+            if (reg2.test(item)) {
+                return true;
+            }
+            log.red(`invalid header: ${item}`);
+            return false;
+        });
+        return headers;
     }
     dealChrome() {
         const { chrome } = this.service.projectConfig.manifest;
