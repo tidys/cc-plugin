@@ -102,6 +102,8 @@ export interface CocosPluginManifest {
         /**
          *  统计鸟的appid
          * 
+         * 统计鸟是根据域名进行统计的，不支持子目录，如果你使用的是github pages，一个appid就能满足需求
+         * 
          * web.head有重叠，如果配置了该项，请不要在web.head中配置标签
          */
         tongjiniao?: string;
@@ -210,11 +212,28 @@ export interface CocosPluginOptions {
     treeShaking?: boolean;
     /**
      * 静态文件目录，支持绝对路径和相对路径（相对于cc-plugin.config.ts所在目录）
+     * 
      * 可以把插件依赖的静态文件放在该目录下，在发布插件时，会将该目录随着插件一起发布
+     * 
      * 调试时为了避免大量的重复复制文件，该目录下的文件并不会同步到插件所在的目录下
-     * 要获取该目录下的文件，请统一使用接口：CCP.Adaptation.AssetDB.getStaticFile("1.exe")
+     * 
+     * 要获取该目录下的文件，请统一使用接口：
+     * 
+     * ```ts
+     *  CCP.Adaptation.AssetDB.getStaticFile("1.exe")
+     * ```
      */
     staticFileDirectory?: string;
+    /**
+     * 过滤掉静态文件目录下的哪些文件，支持正则表达式
+     * 
+     * 比如static中的某个文件夹是使用git管理，插件在使用的过程中会从远程仓库下载，但是插件发布时不需要将该文件夹一起发布。
+     * 
+     * @example
+     *  a/b/* 表示a/b目录下的所有文件会被过滤掉
+     * 
+     */
+    staticFileFilter?: string[];
 }
 
 // 一些默认值

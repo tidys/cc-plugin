@@ -11,7 +11,7 @@ import * as Path from 'path';
 import { PluginType } from '../declare';
 import { merge } from 'lodash';
 import { getFallback } from './fallback';
-import { existsSync } from 'fs';
+import { existsSync, statSync } from 'fs';
 import { copyFileSync, copySync, emptyDirSync, ensureDirSync } from 'fs-extra';
 import { Option, OptionValues } from 'commander';
 import { checkBuildType, getBuildOptions, parseBuildOptions, defineVar } from './commonOptions';
@@ -131,7 +131,41 @@ export default class Pack extends PluginApi {
         const base = Path.basename(dir)
         const destDir = Path.join(dest, base)
         ensureDirSync(destDir)
-        copySync(dir, destDir, { overwrite: true })
-        log.green(`静态文件拷贝成功：${dir} => ${dest}`)
+        const filterArray: string[] = service.projectConfig.options.staticFileFilter || [];
+        const validFilter: string[] = [];
+        filterArray.map(item => {
+            try {
+                new RegExp(item);
+                validFilter.push(item);
+            } catch {
+                log.yellow(`invalid filter reg: ${item}`)
+            }
+        })
+        log.green(`copy static files: ${dir} => ${dest}`)
+        copySync(dir, destDir, {
+            overwrite: true,
+            filter: (src: string, dest: string) => {
+                if (!filterArray.length) {
+                    return true;
+                }
+                // if (!statSync(src).isFile()) {
+                //     return true;
+                // }
+                const rel = Path.relative(dir!, src).replace(/\\/g, '/');
+                if (!rel) {
+                    return true;
+                }
+                for (let i = 0; i < validFilter.length; i++) {
+                    const filter = validFilter[i];
+                    // .replace(/\\/g, '/');// 正则中也有\转义符，这里不能替换
+                    if (new RegExp(filter).test(rel)) {
+                        log.green(`reg [${filter}] filter file: ${rel}`)
+                        return false;
+                    }
+                }
+                return true;
+            }
+        })
+        log.green(`copy static files successful: ${dir} => ${dest}`)
     }
 }
