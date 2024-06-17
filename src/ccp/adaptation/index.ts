@@ -34,6 +34,7 @@ export class Adaptation {
     public IP = new IP(this);
     constructor() {
         this.Env.init();
+        this.Util.init();
     }
     public require(name: string): any {
         if (this.Env.isPluginV2) {

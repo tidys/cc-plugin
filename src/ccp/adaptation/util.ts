@@ -1,6 +1,7 @@
+import { existsSync, readFileSync, readdirSync, statSync } from 'fs';
 import { Base } from './base'
-const Path = require('path'); // 为了适配浏览器
-const URL = require('url')
+import { basename, dirname, join } from 'path';
+import { UrlWithParsedQuery, UrlWithStringQuery, parse } from "url"
 
 export class Util extends Base {
     /**
@@ -58,8 +59,8 @@ export class Util extends Base {
             // 暂时不想使用编辑器的接口
             // Editor.Message.request("asset-db",'query-uuid',url);
             const projectPath = this.adaptation.Project.path;
-            const packageDir = Path.join(projectPath, 'extensions');
-            const assetDir = Path.join(projectPath, 'assets');
+            const packageDir = join(projectPath, 'extensions');
+            const assetDir = join(projectPath, 'assets');
             if (fspath.includes(packageDir)) {
                 return fspath.replace(packageDir, 'packages:/')
             } else if (fspath.includes(assetDir)) {
@@ -83,20 +84,80 @@ export class Util extends Base {
         }
         return ''
     }
+    public init() {
+        let root = join(__dirname, "../..");
+        const name = basename(root);
+        if (this.adaptation.Env.isPluginV2) {
+            if (name !== 'packages') {
+                root = "";
+            }
+        } else if (this.adaptation.Env.isPluginV3) {
+            if (name !== 'extensions') {
+                root = "";
+            }
+        }
+        if (root && existsSync(root)) {
+            const files = readdirSync(root);
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fullPath = join(root, file);
+                if (!statSync(fullPath).isDirectory()) {
+                    continue;
+                }
+                const pkg = join(fullPath, 'package.json');
+                if (!existsSync(pkg)) {
+                    continue;
+                }
+                try {
+                    const pkgJson = JSON.parse(readFileSync(pkg, 'utf-8'))
+                    if (pkgJson.name) {
+                        this.setPackageUrlRealPath(pkgJson.name, fullPath)
+                    }
+                } catch {
+                    continue;
+                }
+            }
+        }
+    }
+    // creator有时安装插件的目录名字并不一定是插件的名字
+    // 记录下url映射的真实目录，在获取失败的时候，使用这个映射重新获取
+    private packageUrlMap: Record<string, string> = {};
+    setPackageUrlRealPath(url: string, realPath: string) {
+        this.packageUrlMap[url] = realPath;
+    }
+    private getPackageUrlRealPath(result: UrlWithStringQuery, pluginDir: string, r1: string): string {
+        let pkgPath = join(this.adaptation.Project.path, pluginDir, r1)
+        if (!pkgPath || !existsSync(pkgPath)) {
+            if (!result.hostname) {
+                return "";
+            }
+            if (!result.pathname) {
+                return "";
+            }
+            const mapPath = this.packageUrlMap[result.hostname];
+            if (mapPath) {
+                pkgPath = join(mapPath, result.pathname);
+            }
+        }
+        if (!pkgPath || !existsSync(pkgPath)) {
+            // 如果还是获取不到path，就只能返回空字符
+            pkgPath = "";
+        }
+        return pkgPath;
+    }
     urlToFspath(url: string) {
-        // FIXME: creator有时安装插件的目录名字并不一定是做插件名字
-        let result = URL.parse(url);
+        let result = parse(url);
         let r1 = result.pathname
-            ? Path.join(result.hostname, result.pathname)
-            : Path.join(result.hostname);
+            ? join(result.hostname || "", result.pathname)
+            : join(result.hostname || "");
         if (this.adaptation.Env.isPluginV2) {
             // const { uuidToUrl, uuidToFspath, urlToFspath, fspathToUuid } = Editor.remote.AssetDB.assetdb;
             if (result.protocol === 'packages:') {
-                return Path.join(this.adaptation.Project.path, 'packages', r1)
+                return this.getPackageUrlRealPath(result, 'packages', r1)
             } else if (result.protocol === 'db:') {
-                return Path.join(this.adaptation.Project.path, r1)
+                return join(this.adaptation.Project.path, r1)
             } else if (result.protocol === 'project:') {
-                return Path.join(this.adaptation.Project.path, r1)
+                return join(this.adaptation.Project.path, r1)
             }
             return null;
         } else if (this.adaptation.Env.isWeb) {
@@ -110,13 +171,13 @@ export class Util extends Base {
                 }
             }
             return r1;
-        } else {
+        } else if (this.adaptation.Env.isPluginV3) {
             if (result.protocol === 'packages:') {
-                return Path.join(this.adaptation.Project.path, 'extensions', r1)
+                return this.getPackageUrlRealPath(result, 'extensions', r1)
             } else if (result.protocol === 'db:') {
-                return Path.join(this.adaptation.Project.path, r1)
+                return join(this.adaptation.Project.path, r1)
             } else if (result.protocol === 'project:') {
-                return Path.join(this.adaptation.Project.path, r1)
+                return join(this.adaptation.Project.path, r1)
             }
             return null;
         }
