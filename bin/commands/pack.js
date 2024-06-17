@@ -151,8 +151,43 @@ class Pack extends plugin_api_1.PluginApi {
         const base = Path.basename(dir);
         const destDir = Path.join(dest, base);
         (0, fs_extra_1.ensureDirSync)(destDir);
-        (0, fs_extra_1.copySync)(dir, destDir, { overwrite: true });
-        log_1.log.green(`静态文件拷贝成功：${dir} => ${dest}`);
+        const filterArray = service.projectConfig.options.staticFileFilter || [];
+        const validFilter = [];
+        filterArray.map(item => {
+            try {
+                new RegExp(item);
+                validFilter.push(item);
+            }
+            catch (_a) {
+                log_1.log.yellow(`invalid filter reg: ${item}`);
+            }
+        });
+        log_1.log.green(`copy static files: ${dir} => ${dest}`);
+        (0, fs_extra_1.copySync)(dir, destDir, {
+            overwrite: true,
+            filter: (src, dest) => {
+                if (!filterArray.length) {
+                    return true;
+                }
+                // if (!statSync(src).isFile()) {
+                //     return true;
+                // }
+                const rel = Path.relative(dir, src).replace(/\\/g, '/');
+                if (!rel) {
+                    return true;
+                }
+                for (let i = 0; i < validFilter.length; i++) {
+                    const filter = validFilter[i];
+                    // .replace(/\\/g, '/');// 正则中也有\转义符，这里不能替换
+                    if (new RegExp(filter).test(rel)) {
+                        log_1.log.green(`reg [${filter}] filter file: ${rel}`);
+                        return false;
+                    }
+                }
+                return true;
+            }
+        });
+        log_1.log.green(`copy static files successful: ${dir} => ${dest}`);
     }
 }
 exports.default = Pack;

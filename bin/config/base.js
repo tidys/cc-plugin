@@ -37,6 +37,7 @@ const package_json_1 = __importDefault(require("../commands/package.json"));
 const chrome_manifest_1 = require("../chrome/chrome-manifest");
 const vue_loader_1 = require("vue-loader");
 const require_v3_1 = __importDefault(require("../plugin/require-v3"));
+const readme_1 = __importDefault(require("../plugin/readme"));
 const webpack_1 = __importDefault(require("webpack"));
 const log_1 = require("../log");
 const FsExtra = __importStar(require("fs-extra"));
@@ -281,6 +282,9 @@ class Base extends plugin_api_1.PluginApi {
                         .use(npm_install_1.default, [options.output]);
                     webpackChain.plugin('cc-plugin-package.json')
                         .use(package_json_1.default, [service]);
+                    if (service.isCreatorPluginV3()) {
+                        webpackChain.plugin("readme").use(readme_1.default, [service]);
+                    }
                 }
             }
             webpackChain
