@@ -13,6 +13,7 @@ import CocosPluginPackageJson from '../commands/package.json';
 import { ChromeManifest } from '../chrome/chrome-manifest'
 import { VueLoaderPlugin } from 'vue-loader';
 import requireV3 from '../plugin/require-v3';
+import Readme from '../plugin/readme';
 import webpack from 'webpack';
 import { log } from '../log';
 import * as FsExtra from 'fs-extra';
@@ -265,6 +266,10 @@ export default class Base extends PluginApi {
                         .use(NpmInstall, [options.output! as string])
                     webpackChain.plugin('cc-plugin-package.json')
                         .use(CocosPluginPackageJson, [service])
+
+                    if (service.isCreatorPluginV3()) {
+                        webpackChain.plugin("readme").use(Readme, [service])
+                    }
                 }
             }
 

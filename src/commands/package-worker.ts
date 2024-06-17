@@ -13,13 +13,13 @@ export abstract class PackageInterface {
         utils.init(config);
     }
 
-    menuReady() {};
+    menuReady() { };
 
-    menuBuild(menu: MenuOptions) {};
+    menuBuild(menu: MenuOptions) { };
 
-    panelReady() {};
+    panelReady() { };
 
-    panelBuild(panel: PanelOptions) {};
+    panelBuild(panel: PanelOptions) { };
 }
 
 export class PackageV2 extends PackageInterface {
@@ -35,24 +35,24 @@ export class PackageV2 extends PackageInterface {
         this.packageData!['main-menu'] = {};
     }
 
-  /**
-   * 2.x的menu
-   "main-menu": {
-      "小王子/BitMap字体工具/字体图集(IMAGE)": {
-          "message": "bitmap-font:openFNT"
+    /**
+     * 2.x的menu
+     "main-menu": {
+        "小王子/BitMap字体工具/字体图集(IMAGE)": {
+            "message": "bitmap-font:openFNT"
+        },
+        "小王子/BitMap字体工具/字体文件(TTF)": {
+            "message": "bitmap-font:openTTF"
+        }
       },
-      "小王子/BitMap字体工具/字体文件(TTF)": {
-          "message": "bitmap-font:openTTF"
-      }
-    },
-   */
+     */
     menuBuild(menu: MenuOptions) {
         super.menuBuild(menu);
         let menus = this.packageData!['main-menu']!;
         const { name } = menu.message;
         const panel = menu.message.panel || this.config.manifest.name;
         const menuReal = utils.menuPackage(menu.path);
-      menus[trim(menuReal, '/')] = { message: `${panel}:${name}` };
+        menus[trim(menuReal, '/')] = { message: `${panel}:${name}` };
     }
 
     panelReady() {
@@ -86,7 +86,7 @@ export class PackageV3 extends PackageInterface {
 
     constructor(config: ProjectConfig, packageData: CocosPluginV3) {
         super(config);
-        this.packageData = packageData; 
+        this.packageData = packageData;
         this.packageData.package_version = 2;
         this.packageData!.contributions = {
             builder: './builder.js', // todo 目前这里是写死的，需要后续优化下
@@ -100,6 +100,7 @@ export class PackageV3 extends PackageInterface {
 
     panelReady() {
         super.panelReady();
+        this.packageData!.editor = ">=3.0.0";
         this.packageData!.panels = {}
         // 预定义发送到面板的message
         this.config.manifest.panels?.forEach(panel => {
@@ -140,7 +141,7 @@ export class PackageV3 extends PackageInterface {
         let menu = this.packageData!.contributions!.menu!;
         let msgKey = this.addMessage(menuOpts);
         const menuReal = utils.menuPackage(menuOpts.path);
-        let { newLabel, newPath } = this.dealPath(menuReal); 
+        let { newLabel, newPath } = this.dealPath(menuReal);
         menu.push({
             path: newPath,
             label: newLabel,
@@ -148,16 +149,16 @@ export class PackageV3 extends PackageInterface {
         })
     }
 
-  /**
-   * 3.x的menu格式
-   menu:[
-      {
-          "path": "小王子/BitMap字体工具",
-          "label": "字体图集(IMAGE)",
-          "message": "openFNT"
-      }
-  ]
-   */
+    /**
+     * 3.x的menu格式
+     menu:[
+        {
+            "path": "小王子/BitMap字体工具",
+            "label": "字体图集(IMAGE)",
+            "message": "openFNT"
+        }
+    ]
+     */
     private dealPath(path: string) {
         let newPath = '', newLabel = ''
         path = trim(path, '/')

@@ -323,6 +323,10 @@ export interface CocosPluginV3 {
     name: string;
     version: string;
     description?: string;
+    /**
+     * 支持的编辑器版本
+     */
+    editor?: string;
     package_version?: number;
     main: string;
     author?: string;
