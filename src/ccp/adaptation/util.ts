@@ -145,7 +145,7 @@ export class Util extends Base {
         }
         return pkgPath;
     }
-    urlToFspath(url: string) {
+    urlToFspath(url: string): string {
         let result = parse(url);
         let r1 = result.pathname
             ? join(result.hostname || "", result.pathname)
@@ -159,7 +159,7 @@ export class Util extends Base {
             } else if (result.protocol === 'project:') {
                 return join(this.adaptation.Project.path, r1)
             }
-            return null;
+            return "";
         } else if (this.adaptation.Env.isWeb) {
             if (result.protocol === 'packages:') {
                 const pluginName = this.adaptation.config!.manifest.name;
@@ -179,7 +179,8 @@ export class Util extends Base {
             } else if (result.protocol === 'project:') {
                 return join(this.adaptation.Project.path, r1)
             }
-            return null;
+            return "";
         }
+        return "";
     }
 }
