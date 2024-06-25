@@ -183,4 +183,22 @@ export class Util extends Base {
         }
         return "";
     }
+    getProperty(keys: Array<string[]>): any {
+        for (let i = 0; i < keys.length; i++) {
+            const keyArray = keys[i];
+            let obj: any = window;
+            for (let j = 0; j < keyArray.length; j++) {
+                const key = keyArray[j];
+                if (obj.hasOwnProperty(key)) {
+                    obj = obj[key];
+                    if (j === keyArray.length - 1) {
+                        return obj;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+        return null;
+    }
 }
