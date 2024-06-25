@@ -226,6 +226,14 @@ export interface CocosPluginOptions {
      *
      */
     staticFileFilter?: string[];
+    /**
+     * 当对static资源发起xhr请求时
+     *
+     * 在开发阶段webpack dev server 会拦截重定向
+     *
+     * 打包后，会将static资源复制到插件根目录
+     */
+    staticRequestRedirect?: boolean;
 }
 export declare const DefaultCocosPluginOptions: CocosPluginOptions;
 export interface CocosPluginConfig {

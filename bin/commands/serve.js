@@ -136,7 +136,7 @@ class Serve extends plugin_api_1.PluginApi {
     }
     runWebpackServer(compiler, service) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { server } = service.projectConfig.options;
+            const { server, staticFileDirectory, staticRequestRedirect } = service.projectConfig.options;
             const host = yield webpack_dev_server_1.default.internalIP('v4');
             const port = yield portfinder_1.default.getPortPromise();
             const useHttps = !!(server && server.https);
@@ -147,6 +147,32 @@ class Serve extends plugin_api_1.PluginApi {
                     hosts: ['localhost', '127.0.0.1', host]
                 });
                 httpOptions = { cert, key };
+            }
+            const proxy = {};
+            if (staticRequestRedirect && staticFileDirectory) {
+                // 处理xhr请求static的资源
+                proxy[staticFileDirectory] = {
+                    bypass: function (req, res, proxyOptions) {
+                        const { url } = req;
+                        if (url) {
+                            const file = Path.join(service.context, url || "");
+                            if (!Fs.existsSync(file)) {
+                                return;
+                            }
+                            const ext = Path.extname(url);
+                            let data = null;
+                            if ('.plist' === ext) {
+                                data = Fs.readFileSync(file, "utf-8");
+                            }
+                            else {
+                                data = Fs.readFileSync(file);
+                            }
+                            if (data) {
+                                res.end(data);
+                            }
+                        }
+                    }
+                };
             }
             const webpackDevServerInstance = new webpack_dev_server_1.default({
                 // inputFileSystem: FsExtra,
@@ -161,7 +187,8 @@ class Serve extends plugin_api_1.PluginApi {
                 devMiddleware: {
                     //service.isChromePlugin() ? true : false,
                     writeToDisk: !!(server && server.writeToDisk),
-                }
+                },
+                proxy,
             }, compiler);
             webpackDevServerInstance.startCallback((error) => {
                 if (error) {

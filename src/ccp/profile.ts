@@ -53,7 +53,7 @@ export class Profile {
         this.Key = fileName;
         let retData: Record<string, any> = {}
         if (CCP.Adaptation.Env.isWeb) {
-            // 从localstorage中读取
+            // 从 local storage 中读取
             const str = localStorage.getItem(this.Key);
             if (str) {
                 try {
@@ -61,6 +61,8 @@ export class Profile {
                 } catch (e) {
                     retData = this.defaultData;
                 }
+            } else {
+                retData = this.defaultData;
             }
         } else {
             // 不再调用编辑器接口,设置统一放在项目目录下

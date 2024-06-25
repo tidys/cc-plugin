@@ -7,7 +7,7 @@ import * as Path from 'path';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import * as Fs from 'fs';
 import DevServer from '../plugin/dev-server';
-import webpackDevSever from 'webpack-dev-server'
+import webpackDevSever, { IncomingMessage, ProxyConfigMap } from 'webpack-dev-server'
 import PortFinder from 'portfinder'
 import printf from 'printf';
 import { log } from '../log'
@@ -19,6 +19,7 @@ import { OptionValues } from 'commander';
 import { PluginType } from 'declare';
 import mkcert from 'webpack-mkcert'
 import { showWeChatQrCode } from './tool';
+import { ServerResponse } from 'http';
 
 PortFinder.basePort = 9087;
 
@@ -111,7 +112,7 @@ export default class Serve extends PluginApi {
     }
 
     async runWebpackServer(compiler: webpack.Compiler, service: CocosPluginService) {
-        const { server } = service.projectConfig.options;
+        const { server, staticFileDirectory, staticRequestRedirect } = service.projectConfig.options;
         const host = await webpackDevSever.internalIP('v4');
         const port = await PortFinder.getPortPromise();
         const useHttps = !!(server && server.https)
@@ -122,6 +123,31 @@ export default class Serve extends PluginApi {
                 hosts: ['localhost', '127.0.0.1', host]
             })
             httpOptions = { cert, key };
+        }
+        const proxy: ProxyConfigMap = {};
+        if (staticRequestRedirect && staticFileDirectory) {
+            // 处理xhr请求static的资源
+            proxy[staticFileDirectory] = {
+                bypass: function (req: IncomingMessage, res: ServerResponse, proxyOptions) {
+                    const { url } = req;
+                    if (url) {
+                        const file = Path.join(service.context, url || "");
+                        if (!Fs.existsSync(file)) {
+                            return;
+                        }
+                        const ext = Path.extname(url);
+                        let data: any = null;
+                        if ('.plist' === ext) {
+                            data = Fs.readFileSync(file, "utf-8")
+                        } else {
+                            data = Fs.readFileSync(file);
+                        }
+                        if (data) {
+                            res.end(data)
+                        }
+                    }
+                }
+            }
         }
         const webpackDevServerInstance = new webpackDevSever({
             // inputFileSystem: FsExtra,
@@ -136,7 +162,8 @@ export default class Serve extends PluginApi {
             devMiddleware: {
                 //service.isChromePlugin() ? true : false,
                 writeToDisk: !!(server && server.writeToDisk),
-            }
+            },
+            proxy,
         }, compiler);
         webpackDevServerInstance.startCallback((error) => {
             if (error) {
