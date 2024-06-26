@@ -161,7 +161,7 @@ class Serve extends plugin_api_1.PluginApi {
                             }
                             const ext = Path.extname(url);
                             let data = null;
-                            if ('.plist' === ext) {
+                            if (['.plist', '.json', '.txt'].includes(ext)) {
                                 data = Fs.readFileSync(file, "utf-8");
                             }
                             else {

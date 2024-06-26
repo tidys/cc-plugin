@@ -1,7 +1,8 @@
 import { existsSync } from "fs";
 import { Base } from "./base";
 import axios from 'axios';
-import { join } from "path";
+import { basename, dirname, join } from "path";
+import { UrlWithParsedQuery, UrlWithStringQuery, parse } from "url"
 
 const Path = require('path'); // 为了适配浏览器
 export enum AssetsType {
@@ -75,6 +76,12 @@ export class AssetDB extends Base {
                 if (!ext) {
                     return ''
                 } else {
+                    // fspath = fspath.replace(/\\/g, '/');
+                    // const result = parse(window.location.href);
+                    // const dir = dirname(result.path || "").replace(/\\/g, '/')
+                    // const arr1 = dir.split('/').filter(item => !!item);
+                    // const arr2 = fspath.split('/').filter(item => !!item);
+                    // fspath = arr1.concat(arr2).join("/")
                     const res = await axios.get(fspath);
                     return res.data;
                 }

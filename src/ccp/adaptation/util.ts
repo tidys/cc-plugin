@@ -163,12 +163,11 @@ export class Util extends Base {
         } else if (this.adaptation.Env.isWeb) {
             if (result.protocol === 'packages:') {
                 const pluginName = this.adaptation.config!.manifest.name;
-                if (r1.startsWith('/')) {
-                    r1 = r1.substring(1, r1.length)
+                const arr = r1.replace(/\\/g, '/').split("/").filter(item => !!item);
+                if (arr.length && arr[0] === pluginName) {
+                    arr.shift();
                 }
-                if (r1.startsWith(pluginName)) {
-                    r1 = r1.substring(pluginName.length, r1.length)
-                }
+                r1 = arr.join("/");
             }
             return r1;
         } else if (this.adaptation.Env.isPluginV3) {
