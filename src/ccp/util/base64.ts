@@ -35,7 +35,7 @@ export class Base64 {
      * @param type head的类型，可以直接传递file ext
      * @returns
      */
-    public static fillHead(data: string, type: string): string {
+    public static fillHead(data: string, type: string | "jpeg" | "jpg" | "png"): string {
         if (this.invalid(data)) {
             return data;
         }

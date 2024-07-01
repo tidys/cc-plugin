@@ -139,6 +139,12 @@ export default class Serve extends PluginApi {
                         let data: any = null;
                         if (['.plist', '.json', '.txt'].includes(ext)) {
                             data = Fs.readFileSync(file, "utf-8")
+                        } else if ([".png", '.jpg', '.jpeg'].includes(ext)) {
+                            const head: Record<string, string> = {};
+                            head['.jpg'] = head['.jpeg'] = `data:image/jpeg;base64,`;
+                            head['.png'] = 'data:image/png;base64,';
+                            data = Fs.readFileSync(file).toString('base64');
+                            data = `${head[ext]}${data}`;
                         } else {
                             data = Fs.readFileSync(file);
                         }
