@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "fs";
 import { Base } from "./base";
 import axios from 'axios';
-import { basename, dirname, join } from "path";
+import { basename, dirname, extname, join } from "path";
 import { UrlWithParsedQuery, UrlWithStringQuery, parse } from "url"
 
 const Path = require('path'); // 为了适配浏览器
@@ -86,7 +86,11 @@ export class AssetDB extends Base {
                     return res.data;
                 }
             } else if (this.adaptation.Env.isPlugin) {
-                return readFileSync(fspath).buffer;
+                if (['.plist', '.json', 'txt', '.atlas', '.log'].includes(extname(fspath))) {
+                    return readFileSync(fspath, 'utf-8');
+                } else {
+                    return readFileSync(fspath).buffer;
+                }
             }
         }
         return ''
@@ -100,9 +104,15 @@ export class AssetDB extends Base {
      * @param [check=false] 如果你想校验文件是否存在，那么这个参数设置为true
      */
     getStaticFile(file: string, check: boolean = false) {
-        const staticFileDirectory = this.adaptation.config?.options.staticFileDirectory;
+        let staticFileDirectory = this.adaptation.config?.options.staticFileDirectory;
         if (!staticFileDirectory) {
             return ""
+        }
+        if (staticFileDirectory.startsWith('./')) {
+            staticFileDirectory = staticFileDirectory.substring(2);
+        }
+        if (file.startsWith(staticFileDirectory)) {
+            file = file.substring(staticFileDirectory.length + 1);
         }
         let ret: string = "";
         if (this.adaptation.Env.isDev) {
