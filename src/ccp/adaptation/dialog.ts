@@ -130,6 +130,17 @@ export class Dialog extends Base {
     async select(options: SelectDialogOptions): Promise<Record<string, ArrayBuffer | null>> {
         options = Object.assign({ fillData: true }, options);
         if (this.adaptation.Env.isWeb) {
+            // TODO:接入https的新api
+            if (
+                // @ts-ignore
+                typeof showDirectoryPicker === 'undefined' ||
+                // @ts-ignore
+                typeof showOpenFilePicker === 'undefined'
+            ) {
+
+            } else {
+
+            }
             return new Promise((resolve, reject) => {
                 const inputEl: HTMLInputElement = document.createElement('input');
                 inputEl.type = 'file'; // only file

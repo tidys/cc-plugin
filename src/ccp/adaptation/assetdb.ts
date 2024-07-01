@@ -1,4 +1,4 @@
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { Base } from "./base";
 import axios from 'axios';
 import { basename, dirname, join } from "path";
@@ -68,7 +68,7 @@ export class AssetDB extends Base {
         }
     }
 
-    async fileData(url: string): Promise<string> {
+    async fileData(url: string): Promise<string | ArrayBuffer> {
         let fspath = this.adaptation.Util.urlToFspath(url);
         if (fspath) {
             if (this.adaptation.Env.isWeb) {
@@ -85,6 +85,8 @@ export class AssetDB extends Base {
                     const res = await axios.get(fspath);
                     return res.data;
                 }
+            } else if (this.adaptation.Env.isPlugin) {
+                return readFileSync(fspath).buffer;
             }
         }
         return ''

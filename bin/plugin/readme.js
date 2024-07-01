@@ -8,7 +8,7 @@ class Readme {
         this.service = service;
     }
     apply(compiler) {
-        compiler.hooks.afterDone.tap('npm-install', () => {
+        compiler.hooks.afterDone.tap('readme', () => {
             const rootDir = compiler.options.output.path;
             const files = ['README.zh.md', 'README.en.md'];
             for (let i = 0; i < files.length; i++) {
