@@ -158,6 +158,8 @@ export class Util extends Base {
                 return join(this.adaptation.Project.path, r1)
             } else if (result.protocol === 'project:') {
                 return join(this.adaptation.Project.path, r1)
+            } else if (existsSync(url)) {
+                return url;
             }
             return "";
         } else if (this.adaptation.Env.isWeb) {
@@ -177,6 +179,8 @@ export class Util extends Base {
                 return join(this.adaptation.Project.path, r1)
             } else if (result.protocol === 'project:') {
                 return join(this.adaptation.Project.path, r1)
+            } else if (existsSync(url)) {
+                return url;
             }
             return "";
         }
