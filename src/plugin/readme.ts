@@ -11,7 +11,7 @@ export default class Readme {
     }
 
     apply(compiler: webpack.Compiler) {
-        compiler.hooks.afterDone.tap('npm-install', () => {
+        compiler.hooks.afterDone.tap('readme', () => {
             const rootDir = compiler.options.output.path! as string;
             const files = ['README.zh.md', 'README.en.md']
             for (let i = 0; i < files.length; i++) {
