@@ -44,7 +44,7 @@ export class Shell extends Base {
             Electron.remote?.shell?.showItemInFolder(path);
         }
     }
-
+    // TODO: remote的问题：The remote module is deprecated. Use https://github.com/electron/remote instead.
     beep() {
         if (this.adaptation.Env.isPluginV2) {
             // @ts-ignore
