@@ -5,6 +5,27 @@ import { UrlWithParsedQuery, UrlWithStringQuery, parse } from "url"
 
 export class Util extends Base {
     /**
+     * 使用通配符查找文件
+     */
+    async glob(rule: string): Promise<string[]> {
+        if (this.adaptation.Env.isWeb) {
+
+        } else if (this.adaptation.Env.isPlugin) {
+            return new Promise((resolve, reject) => {
+                const glob = eval(` require("glob")`);
+                glob(rule, { absolute: true, dot: true }, (error: any, files: string[]) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(files);
+                    }
+                });
+            });
+
+        }
+        return []
+    }
+    /**
      * 将长ID 压缩为 短ID
      */
     compressUuid(longUUID: string) {
