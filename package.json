@@ -12,6 +12,7 @@
     "@popperjs/core": "^2.11.6",
     "@vue/cli-service": "^5.0.0-rc.1",
     "@vue/compiler-sfc": "3.2.26",
+    "@xuyanfeng/chokidar-browserify": "^1.0.1",
     "@xuyanfeng/express-browserify": "^1.0.0",
     "@xuyanfeng/fs-browserify": "^1.0.0",
     "@xuyanfeng/fs-extra-browserify": "^1.0.0",

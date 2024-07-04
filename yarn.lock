@@ -1091,6 +1091,11 @@
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
+"@xuyanfeng/chokidar-browserify@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@xuyanfeng/chokidar-browserify/-/chokidar-browserify-1.0.1.tgz#59f190f1e16290fa11eaaef8de72ab0f43cd481f"
+  integrity sha512-2xhqQrnPivSDrf35WEuoSI26fj7gxSoYT+22B9ENT7GbP3kgGF38nWCLYw1yHNtPlMJJpqo63vcLyNwc41TSDg==
+
 "@xuyanfeng/express-browserify@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@xuyanfeng/express-browserify/-/express-browserify-1.0.0.tgz#55eef8697650c5d279e39ce4218f8075c63d9e0b"
