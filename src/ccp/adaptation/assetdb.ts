@@ -15,7 +15,48 @@ export interface AssetsInfo {
     uuid: string;
     path: string;
 }
+export interface ImportResult {
+    uuid: string;
+    url: string;
+    path: string;
+    type: string;
+}
 export class AssetDB extends Base {
+    /**
+     * 导入文件到项目中，如果导入失败，则会返回空数组
+     * @param files 导入的文件，绝对路径
+     * @param url 导入到项目的地址，比如： db://assets/
+     */
+    async import(files: string[], url: string): Promise<Array<ImportResult>> {
+        if (this.adaptation.Env.isWeb) {
+            return [];
+        } else if (this.adaptation.Env.isPluginV2) {
+            return new Promise((resolve, reject) => {
+                const ret: ImportResult[] = [];
+                // @ts-ignore
+                Editor.assetdb.import(files, url, (err: number, results: Array<{ url: string; parentUuid: string, uuid: string, path: string, type: string }>) => {
+                    if (err) {
+                        resolve(ret);
+                    } else {
+                        results.forEach((result) => {
+                            ret.push({
+                                uuid: result.uuid,
+                                url: result.url,
+                                path: result.path,
+                                type: result.type
+                            })
+                        });
+                        resolve(ret);
+                    }
+
+                });
+            });
+
+        } else if (this.adaptation.Env.isPluginV3) {
+
+        }
+        return [];
+    }
     refresh(url: string) {
         if (this.adaptation.Env.isPluginV2) {
             // @ts-ignore
