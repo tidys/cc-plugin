@@ -1106,10 +1106,10 @@
   resolved "https://registry.yarnpkg.com/@xuyanfeng/fs-browserify/-/fs-browserify-1.0.0.tgz#808811e8d7e2fb8bcad9fd7290a4ca0f280bc585"
   integrity sha512-Tir61SPNwFLSRE18QsD8vJZg78td9+uDDUnyWB/iP896zhqhzXlqJnPOKOIZEPs4dQ1IqjZZfFwJ9STIH2uD+A==
 
-"@xuyanfeng/fs-extra-browserify@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@xuyanfeng/fs-extra-browserify/-/fs-extra-browserify-1.0.0.tgz#fa4da807ae7754a67a98f30f57431748fabaad99"
-  integrity sha512-hC93w1kngskl3GUgsL6HsqVyDUcTb5HaNHq1llQjQRJ6BBP0JRORRQLXZiGBfu518Zboiqk648g7SKw+WUgU/g==
+"@xuyanfeng/fs-extra-browserify@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@xuyanfeng/fs-extra-browserify/-/fs-extra-browserify-1.0.1.tgz#d20e9ae6f48f9027add4679bac9b40bb9249b60c"
+  integrity sha512-K+bLekY4iiZ/PD/SU15VvyZrIxiOCv4TB/YUBev+is/jHoGYasV4lCJParBSAUbLcm6hFifcq3Y9Pi4dQAGhug==
 
 "@xuyanfeng/globby-browserify@^1.0.0":
   version "1.0.0"
