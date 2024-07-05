@@ -4,6 +4,13 @@ import { basename, dirname, join } from 'path';
 import { UrlWithParsedQuery, UrlWithStringQuery, parse } from "url"
 
 export class Util extends Base {
+    async globArray(rules: string[]): Promise<string[]> {
+        let ret: string[] = [];
+        for (let rule of rules) {
+            ret = ret.concat(await this.glob(rule));
+        }
+        return ret;
+    }
     /**
      * 使用通配符查找文件
      */
