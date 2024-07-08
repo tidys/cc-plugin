@@ -7,9 +7,12 @@
 推荐使用typescript开发插件，更丝滑流畅。
 
 ## 开源案例
-[icon-tools](https://github.com/son-king/icon-tool)
 
-[cocos store](https://store.cocos.com/app/detail/3981)支持一下呗
+| name         | github                                | cocos store                             |
+| ------------ | ------------------------------------- | --------------------------------------- |
+| icon-tools   | https://github.com/son-king/icon-tool | https://store.cocos.com/app/detail/3981 |
+| excel-killer | https://github.com/tidys/excel-killer | https://store.cocos.com/app/detail/2016 |
+
 
 ## 特点
 
