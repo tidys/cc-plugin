@@ -177,6 +177,10 @@ class Serve extends plugin_api_1.PluginApi {
                                     data = Fs.readFileSync(file);
                                 }
                             }
+                            else if ('.wasm' === ext) {
+                                res.setHeader('Content-Type', 'application/wasm');
+                                data = Fs.readFileSync(file);
+                            }
                             else {
                                 data = Fs.readFileSync(file);
                             }
