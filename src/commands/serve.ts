@@ -150,8 +150,12 @@ export default class Serve extends PluginApi {
                             } else {
                                 data = Fs.readFileSync(file)
                             }
+                        } else if ('.wasm' === ext) {
+                            res.setHeader('Content-Type', 'application/wasm');
+                            data = Fs.readFileSync(file);
                         } else {
                             data = Fs.readFileSync(file);
+
                         }
                         if (data) {
                             res.end(data)
