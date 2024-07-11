@@ -14,6 +14,10 @@ export interface DropOptions {
     atlas?: (name: string, data: string) => void;
     pvr?: (name: string, data: ArrayBuffer) => void;
     etc?: (name: string, data: ArrayBuffer) => void;
+    /**
+     * 任何格式的文件，如果没有配置对应格式回调，就会使用该回调
+     */
+    any?: (name: string, data: ArrayBuffer) => void;
 }
 export enum Accept {
     TTF = 'ttf',
@@ -163,7 +167,7 @@ export class Drop {
             return;
         }
         // 依靠callback知道是否支持文件类型，其实不太好
-        const cb = this.map[ext.toLocaleLowerCase()];
+        let cb = this.map[ext.toLocaleLowerCase()] || this.options.any || null;
         if (!cb) {
             this.tipsNotSupported(name);
             return;
