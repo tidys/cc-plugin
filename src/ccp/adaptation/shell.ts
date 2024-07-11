@@ -2,6 +2,7 @@ import { existsSync, statSync } from 'fs';
 import * as OS from 'os';
 import { Base } from './base';
 import { dirname, sep } from 'path';
+import { execSync } from 'child_process';
 const Electron = require('electron');
 export class Shell extends Base {
     private _getCmd(path: string): string {
@@ -36,6 +37,14 @@ export class Shell extends Base {
             path = dirname(path)
         }
         path = path.replace(/\//g, sep);
+        if (this.adaptation.Env.isPlugin) {
+            if (this.adaptation.Env.isWin) {
+                execSync(`start explorer.exe /select,"${path}"`);
+                return;
+            } else {
+
+            }
+        }
         if (this.adaptation.Env.isPluginV2) {
             // @ts-ignore
             Electron.remote?.shell?.showItemInFolder(path);
