@@ -33,18 +33,18 @@ export class Shell extends Base {
         if (!existsSync(path)) {
             return;
         }
-        if (statSync(path).isFile()) {
-            path = dirname(path)
-        }
+        // if (statSync(path).isFile()) {
+        //     path = dirname(path)
+        // }
         path = path.replace(/\//g, sep);
-        if (this.adaptation.Env.isPlugin) {
-            if (this.adaptation.Env.isWin) {
-                execSync(`start explorer.exe /select,"${path}"`);
-                return;
-            } else {
+        // if (this.adaptation.Env.isPlugin) {
+        //     if (this.adaptation.Env.isWin) {
+        //         execSync(`start explorer.exe /select,"${path}"`);
+        //         return;
+        //     } else {
 
-            }
-        }
+        //     }
+        // }
         if (this.adaptation.Env.isPluginV2) {
             // @ts-ignore
             Electron.remote?.shell?.showItemInFolder(path);
