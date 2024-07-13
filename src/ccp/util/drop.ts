@@ -1,23 +1,35 @@
 import { extname } from 'path';
 import adaptation from '../adaptation/index';
 
+type ArrayBufferCallback = (
+    /**
+     * 文件的路径，在web环境是文件名，在插件环境时文件的绝对路径
+     */
+    name: string,
+    data: ArrayBuffer) => Promise<void>;
+type StringCallback = (
+    /**
+     * 文件的路径，在web环境是文件名，在插件环境时文件的绝对路径
+     */
+    name: string,
+    data: string) => Promise<void>;
 export interface DropOptions {
     accept?: Accept[];
     multi?: boolean;
-    ttf?: (name: string, data: ArrayBuffer) => void;
-    texture?: (name: string, data: ArrayBuffer) => void;
-    json?: (name: string, data: string) => void;
-    plist?: (name: string, data: string) => void;
-    jsc?: (name: string, data: ArrayBuffer) => void;
-    js?: (name: string, data: string) => void;
-    ts?: (name: string, data: string) => void;
-    atlas?: (name: string, data: string) => void;
-    pvr?: (name: string, data: ArrayBuffer) => void;
-    etc?: (name: string, data: ArrayBuffer) => void;
+    ttf?: ArrayBufferCallback;
+    texture?: ArrayBufferCallback;
+    json?: StringCallback;
+    plist?: StringCallback;
+    jsc?: ArrayBufferCallback;
+    js?: StringCallback;
+    ts?: StringCallback;
+    atlas?: StringCallback;
+    pvr?: ArrayBufferCallback;
+    etc?: ArrayBufferCallback;
     /**
      * 任何格式的文件，如果没有配置对应格式回调，就会使用该回调
      */
-    any?: (name: string, data: ArrayBuffer) => void;
+    any?: ArrayBufferCallback;
 }
 export enum Accept {
     TTF = 'ttf',
@@ -32,7 +44,7 @@ export enum Accept {
     ETC = 'pkm'
 }
 export class Drop {
-    private map: Record<string, (name: string, data: ArrayBuffer) => void> = {};
+    private map: Record<string, ArrayBufferCallback> = {};
     private options: DropOptions;
     constructor(options: DropOptions) {
         this.options = options;
@@ -99,56 +111,56 @@ export class Drop {
             noLink: true,
         });
     }
-    private dropFont(name: string, data: ArrayBuffer) {
+    private async dropFont(name: string, data: ArrayBuffer) {
         const { ttf } = this.options;
-        ttf && ttf(name, data);
+        ttf && await ttf(name, data);
     }
-    private dropTexture(name: string, data: ArrayBuffer) {
+    private async dropTexture(name: string, data: ArrayBuffer) {
         const { texture } = this.options;
-        texture && texture(name, data);
+        texture && await texture(name, data);
     }
-    private dropJSC(name: string, data: ArrayBuffer) {
+    private async dropJSC(name: string, data: ArrayBuffer) {
         const { jsc } = this.options;
-        jsc && jsc(name, data);
+        jsc && await jsc(name, data);
     }
-    private dropJS(name: string, data: ArrayBuffer) {
+    private async dropJS(name: string, data: ArrayBuffer) {
         const { js } = this.options;
         const textDecoder = new TextDecoder();
         const str = textDecoder.decode(data);
-        js && js(name, str);
+        js && await js(name, str);
     }
-    private dropTS(name: string, data: ArrayBuffer) {
+    private async dropTS(name: string, data: ArrayBuffer) {
         const { ts } = this.options;
         const textDecoder = new TextDecoder();
         const str = textDecoder.decode(data);
-        ts && ts(name, str);
+        ts && await ts(name, str);
     }
-    private dropJson(name: string, data: ArrayBuffer) {
+    private async dropJson(name: string, data: ArrayBuffer) {
         const { json } = this.options;
         const textDecoder = new TextDecoder();
         const str = textDecoder.decode(data);
-        json && json(name, str);
+        json && await json(name, str);
     }
-    private dropAtlas(name: string, data: ArrayBuffer) {
+    private async dropAtlas(name: string, data: ArrayBuffer) {
         const { atlas } = this.options;
         const textDecoder = new TextDecoder();
         const str = textDecoder.decode(data);
-        atlas && atlas(name, str);
+        atlas && await atlas(name, str);
     }
-    private dropPlist(name: string, data: ArrayBuffer) {
+    private async dropPlist(name: string, data: ArrayBuffer) {
         const { plist } = this.options;
         const textDecoder = new TextDecoder();
         const str = textDecoder.decode(data);
-        plist && plist(name, str);
+        plist && await plist(name, str);
     }
-    private dropPvr(name: string, data: ArrayBuffer) {
+    private async dropPvr(name: string, data: ArrayBuffer) {
         const { pvr } = this.options;
-        pvr && pvr(name, data)
+        pvr && await pvr(name, data)
     }
 
-    private dropEtc(name: string, data: ArrayBuffer) {
+    private async dropEtc(name: string, data: ArrayBuffer) {
         const { etc } = this.options;
-        etc && etc(name, data)
+        etc && await etc(name, data)
     }
     private _onWebOne(itemFile: DataTransferItem) {
         if (itemFile.kind !== 'file') {
@@ -158,7 +170,13 @@ export class Drop {
         if (!entry) {
             return;
         }
-        const { isFile, name } = entry;
+        const file = itemFile.getAsFile();
+        if (!file) { return; }
+        // 在creator中有file.path，其指向磁盘路径
+        // 在web中 file.name === entry.name
+        // @ts-ignore
+        const name = file.path || file.name || entry.name;
+        const { isFile } = entry;
         if (!isFile) {
             return;
         }
@@ -172,13 +190,11 @@ export class Drop {
             this.tipsNotSupported(name);
             return;
         }
-        const file = itemFile.getAsFile();
-        if (!file) { return; }
         const reader = new FileReader();
         reader.onload = (event) => {
             const data = event.target!.result;
             (async () => {
-                cb(name, data as ArrayBuffer);
+                await cb(name, data as ArrayBuffer);
             })();
         };
         reader.readAsArrayBuffer(file);
