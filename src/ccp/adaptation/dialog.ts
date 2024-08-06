@@ -172,7 +172,11 @@ export class Dialog extends Base {
                     for (let i = 0; i < inputEl.files!.length; i++) {
                         const file: File = inputEl.files![i];
                         if (fillData) {
+                            debugger;
                             const type = extname(file.name).toLocaleLowerCase();
+                            if (options.filters && !options.filters.find(item => item.extensions.find(ext => ext.toLowerCase() === type))) {
+                                continue;
+                            }
                             let readerFunction = typeReader[type];
                             if (!readerFunction) {
                                 console.warn(`${file.name} no reader, use arraybuffer reader`);
