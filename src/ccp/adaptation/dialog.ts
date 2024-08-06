@@ -161,9 +161,9 @@ export class Dialog extends Base {
                 };
                 if (options.filters?.length) {
                     let accept: string[] = [];
+                    options.filters = this.dealFilterExtensions(options.filters, false);
                     const types = Object.keys(typeReader);
                     options.filters![0].extensions.forEach((ext) => {
-                        ext = ext.startsWith('.') ? ext : `.${ext}`;
                         const extItem = types.find((el) => el === ext.toLocaleLowerCase());
                         if (extItem) {
                             accept.push(extItem);
@@ -183,11 +183,10 @@ export class Dialog extends Base {
                     for (let i = 0; i < inputEl.files!.length; i++) {
                         const file: File = inputEl.files![i];
                         if (fillData) {
-                            debugger;
-                            const type = extname(file.name).toLocaleLowerCase();
-                            if (options.filters && !options.filters.find(item => item.extensions.find(ext => ext.toLowerCase() === type))) {
+                            if (!this.canReadFileByFilter(file.name, options)) {
                                 continue;
                             }
+                            const type = extname(file.name).toLocaleLowerCase();
                             let readerFunction = typeReader[type];
                             if (!readerFunction) {
                                 console.warn(`${file.name} no reader, use arraybuffer reader`);
@@ -217,7 +216,7 @@ export class Dialog extends Base {
                 dialogOptions.properties = ['openDirectory'];
             } else if (options.type === 'file') {
                 dialogOptions.properties = ['openFile'];
-                const filter = this.dealFilter(options.filters || []);
+                const filter = this.dealFilterExtensions(options.filters || [], true);
                 // @ts-ignore
                 dialogOptions.filters = filter;
             }
@@ -238,7 +237,7 @@ export class Dialog extends Base {
         } else {
             const ret: Record<string, any> = {};
             if (options.filters) {
-                options.filters = this.dealFilter(options.filters || []);
+                options.filters = this.dealFilterExtensions(options.filters || [], true);
             }
             // @ts-ignore
             const result = await Editor.Dialog.select(options);
@@ -252,12 +251,29 @@ export class Dialog extends Base {
             return ret;
         }
     }
-    private dealFilter(filters: FileFilter[]): FileFilter[] {
+    private canReadFileByFilter(file: string, options: SelectDialogOptions) {
+        const filter = options.filters || [];
+        if (filter.length <= 0) {
+            // 用户没有设置过滤器，则允许读取文件
+            return true;
+        }
+        const fileExt = extname(file);
+        const isInFilter = !!filter.find(item => item.extensions.find(ext => ext === fileExt));
+        // 在过滤器里面的文件也可以读取
+        return isInFilter;
+    }
+    /**
+     * 处理过滤器末尾的.
+     */
+    private dealFilterExtensions(filters: FileFilter[], cut: boolean): FileFilter[] {
         const filter: FileFilter[] = filters || [];
         filter.forEach(item => {
             item.extensions = item.extensions.map(ext => {
-                if (ext.startsWith('.')) {
+                if (cut && ext.startsWith('.')) {
                     return ext.substring(1, ext.length);
+                }
+                if (!cut && !ext.startsWith('.')) {
+                    return '.' + ext;
                 }
                 return ext;
             })
