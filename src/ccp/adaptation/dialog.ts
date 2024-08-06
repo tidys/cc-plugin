@@ -39,7 +39,7 @@ const DefaultDialogMessageOptions: DialogMessageOptions = {
 interface FileFilter {
     /**
      * 过滤文件后缀, 
-     * 例如: ['png', '.png']都可以，底层会自动添加 .
+     * 例如: ['png', '.png']都可以，底层会自动处理
      */
     extensions: string[];
     /**
@@ -130,6 +130,17 @@ export class Dialog extends Base {
     async select(options: SelectDialogOptions): Promise<Record<string, ArrayBuffer | null>> {
         options = Object.assign({ fillData: true }, options);
         if (this.adaptation.Env.isWeb) {
+            // TODO:接入https的新api
+            if (
+                // @ts-ignore
+                typeof showDirectoryPicker === 'undefined' ||
+                // @ts-ignore
+                typeof showOpenFilePicker === 'undefined'
+            ) {
+
+            } else {
+
+            }
             return new Promise((resolve, reject) => {
                 const inputEl: HTMLInputElement = document.createElement('input');
                 inputEl.type = 'file'; // only file
@@ -206,15 +217,7 @@ export class Dialog extends Base {
                 dialogOptions.properties = ['openDirectory'];
             } else if (options.type === 'file') {
                 dialogOptions.properties = ['openFile'];
-                const filter: FileFilter[] = options.filters || [];
-                filter.forEach(item => {
-                    item.extensions = item.extensions.map(ext => {
-                        if (ext.startsWith('.')) {
-                            return ext.substring(1, ext.length);
-                        }
-                        return ext;
-                    })
-                })
+                const filter = this.dealFilter(options.filters || []);
                 // @ts-ignore
                 dialogOptions.filters = filter;
             }
@@ -234,6 +237,9 @@ export class Dialog extends Base {
             return ret;
         } else {
             const ret: Record<string, any> = {};
+            if (options.filters) {
+                options.filters = this.dealFilter(options.filters || []);
+            }
             // @ts-ignore
             const result = await Editor.Dialog.select(options);
             (result.filePaths || []).forEach((e: string) => {
@@ -245,5 +251,17 @@ export class Dialog extends Base {
             });
             return ret;
         }
+    }
+    private dealFilter(filters: FileFilter[]): FileFilter[] {
+        const filter: FileFilter[] = filters || [];
+        filter.forEach(item => {
+            item.extensions = item.extensions.map(ext => {
+                if (ext.startsWith('.')) {
+                    return ext.substring(1, ext.length);
+                }
+                return ext;
+            })
+        })
+        return filter;
     }
 }

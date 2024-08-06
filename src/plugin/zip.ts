@@ -37,7 +37,16 @@ export default class Zip {
         }
         return dir;
     }
-
+    private deleteUnNeedFiles(dir: string) {
+        const files = ['package-lock.json'];
+        for (let i = 0; i < files.length; i++) {
+            const item = files[i];
+            const fullPath = Path.join(dir, item)
+            if (Fs.existsSync(fullPath)) {
+                Fs.unlinkSync(fullPath)
+            }
+        }
+    }
     private zipDir(dir: string, pluginName: string) {
         // remove old zip
         const outDir = this.getOutDir(dir);
@@ -46,6 +55,7 @@ export default class Zip {
             Fs.unlinkSync(zipFilePath);
             console.log('删除旧版本压缩包: ' + zipFilePath);
         }
+        this.deleteUnNeedFiles(dir);
         // pack
         const zip = new JsZip();
         this._packageDir(dir, zip.folder(pluginName))

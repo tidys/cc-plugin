@@ -12,9 +12,10 @@
     "@popperjs/core": "^2.11.6",
     "@vue/cli-service": "^5.0.0-rc.1",
     "@vue/compiler-sfc": "3.2.26",
+    "@xuyanfeng/chokidar-browserify": "^1.0.1",
     "@xuyanfeng/express-browserify": "^1.0.0",
     "@xuyanfeng/fs-browserify": "^1.0.0",
-    "@xuyanfeng/fs-extra-browserify": "^1.0.0",
+    "@xuyanfeng/fs-extra-browserify": "^1.0.1",
     "@xuyanfeng/globby-browserify": "^1.0.0",
     "@xuyanfeng/sharp-browserify": "^1.0.0",
     "assert": "^2.0.0",
@@ -103,7 +104,8 @@
     "@types/webpack": "^5.28.0",
     "@types/webpack-sources": "^3.2.0",
     "eslint": "7.32.0",
-    "husky": "^3.1.0"
+    "husky": "^3.1.0",
+    "wasm-loader": "^1.3.0"
   },
   "directories": {
     "doc": "doc",
@@ -130,5 +132,5 @@
     "yalc-push": "npm run clean-bin-dir && npm run sync-version && npm run types && tsc && yalc push"
   },
   "types": "./types/declare.d.ts",
-  "version": "2.1.46"
+  "version": "2.1.53"
 }

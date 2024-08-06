@@ -86,6 +86,7 @@ export default class Base extends PluginApi {
                     .set('fs-extra', '@xuyanfeng/fs-extra-browserify')
                     .set('fs', '@xuyanfeng/fs-browserify')
                     .set('globby', '@xuyanfeng/globby-browserify')
+                    .set("chokidar", '@xuyanfeng/chokidar-browserify')
                     .end();
             }
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json').add('.glsl').end();
@@ -317,6 +318,13 @@ export default class Base extends PluginApi {
                 .plugin('CriticalDependency')
                 .use(filter, [{ exclude: [/Critical dependency/] }])
 
+            if (service.isWeb() && false) {
+                // 预定义全局变量Buffer会导致其他pkg误判环境，暂时屏蔽
+                webpackChain.plugin("Buffer").use(
+                    webpack.ProvidePlugin,
+                    [{ Buffer: require.resolve("browserify-buffer") }]
+                )
+            }
             const userPlugins = service.userWebpackConfig.plugins || [];
             if (userPlugins.length) {
                 // webpackChain.plugin('provide-process/browser').use(webpack.ProvidePlugin, [{

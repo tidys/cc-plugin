@@ -88,6 +88,7 @@ export class Builder extends Base {
 
     /**
      * native 平台在v2版本，只会索引到build/jsb-link/，也就是assets所在的目录
+     * native 平台在v3版本，只会索引到build/android，真正的assets/src在assets下
      */
     getLatestBuildDirectory(): string {
         if (this.adaptation.Env.isPluginV2) {

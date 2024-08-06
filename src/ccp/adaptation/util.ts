@@ -4,6 +4,34 @@ import { basename, dirname, join } from 'path';
 import { UrlWithParsedQuery, UrlWithStringQuery, parse } from "url"
 
 export class Util extends Base {
+    async globArray(rules: string[]): Promise<string[]> {
+        let ret: string[] = [];
+        for (let rule of rules) {
+            ret = ret.concat(await this.glob(rule));
+        }
+        return ret;
+    }
+    /**
+     * 使用通配符查找文件
+     */
+    async glob(rule: string): Promise<string[]> {
+        if (this.adaptation.Env.isWeb) {
+
+        } else if (this.adaptation.Env.isPlugin) {
+            return new Promise((resolve, reject) => {
+                const glob = eval(` require("glob")`);
+                glob(rule, { absolute: true, dot: true }, (error: any, files: string[]) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(files);
+                    }
+                });
+            });
+
+        }
+        return []
+    }
     /**
      * 将长ID 压缩为 短ID
      */
@@ -145,7 +173,7 @@ export class Util extends Base {
         }
         return pkgPath;
     }
-    urlToFspath(url: string) {
+    urlToFspath(url: string): string {
         let result = parse(url);
         let r1 = result.pathname
             ? join(result.hostname || "", result.pathname)
@@ -158,17 +186,18 @@ export class Util extends Base {
                 return join(this.adaptation.Project.path, r1)
             } else if (result.protocol === 'project:') {
                 return join(this.adaptation.Project.path, r1)
+            } else if (existsSync(url)) {
+                return url;
             }
-            return null;
+            return "";
         } else if (this.adaptation.Env.isWeb) {
             if (result.protocol === 'packages:') {
                 const pluginName = this.adaptation.config!.manifest.name;
-                if (r1.startsWith('/')) {
-                    r1 = r1.substring(1, r1.length)
+                const arr = r1.replace(/\\/g, '/').split("/").filter(item => !!item);
+                if (arr.length && arr[0] === pluginName) {
+                    arr.shift();
                 }
-                if (r1.startsWith(pluginName)) {
-                    r1 = r1.substring(pluginName.length, r1.length)
-                }
+                r1 = arr.join("/");
             }
             return r1;
         } else if (this.adaptation.Env.isPluginV3) {
@@ -178,8 +207,29 @@ export class Util extends Base {
                 return join(this.adaptation.Project.path, r1)
             } else if (result.protocol === 'project:') {
                 return join(this.adaptation.Project.path, r1)
+            } else if (existsSync(url)) {
+                return url;
             }
-            return null;
+            return "";
         }
+        return "";
+    }
+    getProperty(keys: Array<string[]>): any {
+        for (let i = 0; i < keys.length; i++) {
+            const keyArray = keys[i];
+            let obj: any = window;
+            for (let j = 0; j < keyArray.length; j++) {
+                const key = keyArray[j];
+                if (obj.hasOwnProperty(key)) {
+                    obj = obj[key];
+                    if (j === keyArray.length - 1) {
+                        return obj;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+        return null;
     }
 }

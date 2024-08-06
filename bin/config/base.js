@@ -107,6 +107,7 @@ class Base extends plugin_api_1.PluginApi {
                     .set('fs-extra', '@xuyanfeng/fs-extra-browserify')
                     .set('fs', '@xuyanfeng/fs-browserify')
                     .set('globby', '@xuyanfeng/globby-browserify')
+                    .set("chokidar", '@xuyanfeng/chokidar-browserify')
                     .end();
             }
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json').add('.glsl').end();
@@ -334,6 +335,10 @@ class Base extends plugin_api_1.PluginApi {
             webpackChain
                 .plugin('CriticalDependency')
                 .use(webpack_filter_warnings_plugin_1.default, [{ exclude: [/Critical dependency/] }]);
+            if (service.isWeb() && false) {
+                // 预定义全局变量Buffer会导致其他pkg误判环境，暂时屏蔽
+                webpackChain.plugin("Buffer").use(webpack_1.default.ProvidePlugin, [{ Buffer: require.resolve("browserify-buffer") }]);
+            }
             const userPlugins = service.userWebpackConfig.plugins || [];
             if (userPlugins.length) {
                 // webpackChain.plugin('provide-process/browser').use(webpack.ProvidePlugin, [{

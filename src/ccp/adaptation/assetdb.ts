@@ -1,7 +1,8 @@
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { Base } from "./base";
 import axios from 'axios';
-import { join } from "path";
+import { basename, dirname, extname, join } from "path";
+import { UrlWithParsedQuery, UrlWithStringQuery, parse } from "url"
 
 const Path = require('path'); // 为了适配浏览器
 export enum AssetsType {
@@ -14,7 +15,48 @@ export interface AssetsInfo {
     uuid: string;
     path: string;
 }
+export interface ImportResult {
+    uuid: string;
+    url: string;
+    path: string;
+    type: string;
+}
 export class AssetDB extends Base {
+    /**
+     * 导入文件到项目中，如果导入失败，则会返回空数组
+     * @param files 导入的文件，绝对路径
+     * @param url 导入到项目的地址，比如： db://assets/
+     */
+    async import(files: string[], url: string): Promise<Array<ImportResult>> {
+        if (this.adaptation.Env.isWeb) {
+            return [];
+        } else if (this.adaptation.Env.isPluginV2) {
+            return new Promise((resolve, reject) => {
+                const ret: ImportResult[] = [];
+                // @ts-ignore
+                Editor.assetdb.import(files, url, (err: number, results: Array<{ url: string; parentUuid: string, uuid: string, path: string, type: string }>) => {
+                    if (err) {
+                        resolve(ret);
+                    } else {
+                        results.forEach((result) => {
+                            ret.push({
+                                uuid: result.uuid,
+                                url: result.url,
+                                path: result.path,
+                                type: result.type
+                            })
+                        });
+                        resolve(ret);
+                    }
+
+                });
+            });
+
+        } else if (this.adaptation.Env.isPluginV3) {
+
+        }
+        return [];
+    }
     refresh(url: string) {
         if (this.adaptation.Env.isPluginV2) {
             // @ts-ignore
@@ -67,7 +109,7 @@ export class AssetDB extends Base {
         }
     }
 
-    async fileData(url: string): Promise<string> {
+    async fileData(url: string): Promise<string | ArrayBuffer> {
         let fspath = this.adaptation.Util.urlToFspath(url);
         if (fspath) {
             if (this.adaptation.Env.isWeb) {
@@ -75,8 +117,20 @@ export class AssetDB extends Base {
                 if (!ext) {
                     return ''
                 } else {
+                    // fspath = fspath.replace(/\\/g, '/');
+                    // const result = parse(window.location.href);
+                    // const dir = dirname(result.path || "").replace(/\\/g, '/')
+                    // const arr1 = dir.split('/').filter(item => !!item);
+                    // const arr2 = fspath.split('/').filter(item => !!item);
+                    // fspath = arr1.concat(arr2).join("/")
                     const res = await axios.get(fspath);
                     return res.data;
+                }
+            } else if (this.adaptation.Env.isPlugin) {
+                if (['.plist', '.json', 'txt', '.atlas', '.log'].includes(extname(fspath))) {
+                    return readFileSync(fspath, 'utf-8');
+                } else {
+                    return readFileSync(fspath).buffer;
                 }
             }
         }
@@ -91,9 +145,15 @@ export class AssetDB extends Base {
      * @param [check=false] 如果你想校验文件是否存在，那么这个参数设置为true
      */
     getStaticFile(file: string, check: boolean = false) {
-        const staticFileDirectory = this.adaptation.config?.options.staticFileDirectory;
+        let staticFileDirectory = this.adaptation.config?.options.staticFileDirectory;
         if (!staticFileDirectory) {
             return ""
+        }
+        if (staticFileDirectory.startsWith('./')) {
+            staticFileDirectory = staticFileDirectory.substring(2);
+        }
+        if (file.startsWith(staticFileDirectory)) {
+            file = file.substring(staticFileDirectory.length + 1);
         }
         let ret: string = "";
         if (this.adaptation.Env.isDev) {

@@ -1,7 +1,7 @@
 import { Base } from "./base";
 
 import { versionApi, Versions } from '../version-api';
-const { V246, V247, V248, V249, V2410, V2411 } = Versions;
+const { V246, V247, V248, V249, V2410, V2411, V2412, V2413, V2414 } = Versions;
 
 export class Project extends Base {
     public isValid(projPath: string) { }
@@ -15,11 +15,19 @@ export class Project extends Base {
     }
     get path(): string {
         if (this.adaptation.Env.isPluginV2) {
+            if (this._path) {
+                return this._path;
+            }
+            this._path = this.adaptation.Util.getProperty([
+                ["Editor", "Project", 'path'],
+                ['Editor', 'projectInfo', 'path']
+            ]) || "";
+            return this._path;
             return versionApi(
                 this.adaptation.CCEditor.version,
                 [
                     {
-                        version: [V246, V247, V248, V249, V2410, V2411],
+                        version: [V246, V247, V248, V249, V2410, V2411, V2412, V2413, V2414],
                         fn: () => {
                             // @ts-ignore
                             return Editor.Project.path;

@@ -30,6 +30,7 @@ function getFallback(service) {
             express: require.resolve("@xuyanfeng/express-browserify"),
             fs: require.resolve("@xuyanfeng/fs-browserify"),
             sharp: require.resolve("@xuyanfeng/sharp-browserify"),
+            chokidar: require.resolve("@xuyanfeng/chokidar-browserify"),
             electron: false,
             async_hooks: false,
             string_decoder: false,
