@@ -211,24 +211,28 @@ class CocosPluginService {
         if (type === declare_1.PluginType.Chrome) {
             return projectDir;
         }
-        // creator相对目录
         if (projectDir.startsWith('./')) {
-            log_1.log.red(`当type为creator插件时，options.outputProject 暂时不支持相对目录的写法：${projectDir}`);
-            process.exit(0);
-        }
-        let output = projectDir;
-        if (this.checkIsProjectDir(projectDir)) {
-            output = Path.join(projectDir, pluginDir, pluginName);
-            if (!FS.existsSync(output)) {
-                log_1.log.yellow(`自动创建输出目录：${output}`);
-                FsExtra.ensureDirSync(output);
-            }
+            // 相对目录，不检查是否为creator项目
+            const output = Path.join(this.context, projectDir);
+            FsExtra.ensureDirSync(output);
+            return output;
         }
         else {
-            log_1.log.yellow(`options.outputProject需要配置为有效的Creator项目目录：${projectDir}`);
-            output = projectDir;
+            // 绝对路径
+            let output = projectDir;
+            if (this.checkIsProjectDir(projectDir)) {
+                output = Path.join(projectDir, pluginDir, pluginName);
+                if (!FS.existsSync(output)) {
+                    log_1.log.yellow(`自动创建输出目录：${output}`);
+                    FsExtra.ensureDirSync(output);
+                }
+            }
+            else {
+                log_1.log.yellow(`options.outputProject需要配置为有效的Creator项目目录：${projectDir}`);
+                output = projectDir;
+            }
+            return output;
         }
-        return output;
     }
     getPluginDir(version) {
         if (version === declare_1.PluginType.PluginV2) {
@@ -258,10 +262,7 @@ class CocosPluginService {
                 }
             }
         }
-        if (projectPath && FS.existsSync(projectPath)) {
-            return projectPath;
-        }
-        return null;
+        return projectPath;
     }
     getFullPath(path) {
         if (path.startsWith('./')) {
@@ -287,6 +288,7 @@ class CocosPluginService {
                 if (cfgProject) {
                     dirs.push({ url: cfgProject, source: ccpConfigJson });
                 }
+                // 其次支持cc-plugin.config.ts里面的配置
                 if (v2 !== undefined && type === declare_1.PluginType.PluginV2) {
                     dirs.push({ url: v2, source: const_1.ConfigTypeScript });
                 }
@@ -309,7 +311,7 @@ class CocosPluginService {
                 else {
                     for (let i = 0; i < dirs.length; i++) {
                         const { url, source } = dirs[i];
-                        if (url && FS.existsSync(url)) {
+                        if (url) {
                             options.output = this.catchOutput(type, url, pluginDir, manifest.name);
                             break;
                         }

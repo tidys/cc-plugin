@@ -230,23 +230,27 @@ export class CocosPluginService {
             return projectDir;
         }
 
-        // creator相对目录
         if (projectDir.startsWith('./')) {
-            log.red(`当type为creator插件时，options.outputProject 暂时不支持相对目录的写法：${projectDir}`)
-            process.exit(0)
-        }
-        let output = projectDir;
-        if (this.checkIsProjectDir(projectDir)) {
-            output = Path.join(projectDir, pluginDir, pluginName);
-            if (!FS.existsSync(output)) {
-                log.yellow(`自动创建输出目录：${output}`)
-                FsExtra.ensureDirSync(output)
-            }
+            // 相对目录，不检查是否为creator项目
+            const output = Path.join(this.context, projectDir);
+            FsExtra.ensureDirSync(output);
+            return output;
         } else {
-            log.yellow(`options.outputProject需要配置为有效的Creator项目目录：${projectDir}`);
-            output = projectDir;
+            // 绝对路径
+            let output = projectDir;
+            if (this.checkIsProjectDir(projectDir)) {
+                output = Path.join(projectDir, pluginDir, pluginName);
+                if (!FS.existsSync(output)) {
+                    log.yellow(`自动创建输出目录：${output}`)
+                    FsExtra.ensureDirSync(output)
+                }
+            } else {
+                log.yellow(`options.outputProject需要配置为有效的Creator项目目录：${projectDir}`);
+                output = projectDir;
+            }
+            return output;
         }
-        return output;
+
     }
 
     getPluginDir(version: PluginType): string {
@@ -277,10 +281,7 @@ export class CocosPluginService {
                 }
             }
         }
-        if (projectPath && FS.existsSync(projectPath)) {
-            return projectPath;
-        }
-        return null;
+        return projectPath;
     }
     private getFullPath(path: string) {
         if (path.startsWith('./')) {
@@ -306,6 +307,7 @@ export class CocosPluginService {
                 if (cfgProject) {
                     dirs.push({ url: cfgProject, source: ccpConfigJson })
                 }
+                // 其次支持cc-plugin.config.ts里面的配置
                 if (v2 !== undefined && type === PluginType.PluginV2) {
                     dirs.push({ url: v2, source: ConfigTypeScript })
                 }
@@ -327,7 +329,7 @@ export class CocosPluginService {
                 } else {
                     for (let i = 0; i < dirs.length; i++) {
                         const { url, source } = dirs[i];
-                        if (url && FS.existsSync(url)) {
+                        if (url) {
                             options.output = this.catchOutput(type, url, pluginDir!, manifest.name);
                             break;
                         } else {
