@@ -37,7 +37,7 @@ export default class Panel {
             ejsTemplate = join(__dirname, '../template/panel-v3.ejs');
         } else if (this.service.isCreatorPluginV2()) {
             ejsTemplate = join(__dirname, '../template/panel-v2.ejs');
-        } else if (this.service.isWeb()) {
+        } else if (this.service.isWeb() || this.service.isElectron()) {
             ejsTemplate = join(this.service.root, './template/web/index.html');
         }
 
@@ -57,7 +57,7 @@ export default class Panel {
             if (this.service.isWeb() || this.service.isChromePlugin()) {
                 entryName = panel.name;
             }
-            if (this.service.isCreatorPlugin()) {
+            if (this.service.isCreatorPlugin() || this.service.isElectron()) {
                 entryName = `panel/${panel.name}`;
             }
 

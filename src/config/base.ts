@@ -20,6 +20,7 @@ import * as FsExtra from 'fs-extra';
 // @ts-ignore
 import filter from 'webpack-filter-warnings-plugin'
 import { ConfigTypeScript } from '../const';
+import { ElectronPackageJson } from '../electron/package_json';
 
 export default class Base extends PluginApi {
     getExternal(dir: string, defaultModules: string[] = []) {
@@ -76,6 +77,8 @@ export default class Base extends PluginApi {
                 webpackChain.target('web');
             } else if (service.isCreatorPlugin()) {
                 webpackChain.target('node');
+            } else if (service.isElectron()) {
+                webpackChain.target("electron-renderer")
             }
             // https://webpack.docschina.org/configuration/resolve#resolvealias
             if (service.isWeb()) {
@@ -92,7 +95,7 @@ export default class Base extends PluginApi {
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json').add('.glsl').end();
 
             // 排除模块 https://webpack.docschina.org/configuration/externals#externals
-            if (service.isCreatorPlugin()) {
+            if (service.isCreatorPlugin() || service.isElectron()) {
                 let externals = this.getExternal(service.context, ['electron', 'sharp', 'fs-extra', 'express', 'glob'])
                 webpackChain.externals(externals)
             }
@@ -121,6 +124,11 @@ export default class Base extends PluginApi {
                 const mainAdaptation = Path.join(service.root, mainFile)
                 // 注意先后顺序
                 webpackChain.entry('main')
+                    .add(manifest.main)
+                    .add(mainAdaptation);
+            } else if (service.isElectron()) {
+                const mainAdaptation = Path.join(service.root, "src/ccp/main-electron.ts")
+                webpackChain.entry("main")
                     .add(manifest.main)
                     .add(mainAdaptation);
             }
@@ -273,7 +281,10 @@ export default class Base extends PluginApi {
                     }
                 }
             }
-
+            if (service.isElectron()) {
+                webpackChain.plugin("electron-pkg-json")
+                    .use(ElectronPackageJson, [service])
+            }
             webpackChain
                 .plugin('vue')
                 .use(VueLoaderPlugin)

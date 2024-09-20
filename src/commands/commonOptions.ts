@@ -50,6 +50,7 @@ export function checkBuildType(type: string, exit: boolean = false) {
     if (type === PluginType.PluginV2 ||
         type === PluginType.PluginV3 ||
         type === PluginType.Chrome ||
+        type === PluginType.Electron ||
         type == PluginType.Web) {
         return true;
     }

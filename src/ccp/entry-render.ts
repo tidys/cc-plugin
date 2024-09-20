@@ -63,7 +63,7 @@ export class CocosCreatorPluginRender {
                 originReady(rootElement, args);
             }
         }
-        if (this.Adaptation.Env.isWeb || this.Adaptation.Env.isChrome) {
+        if (this.Adaptation.Env.isWeb || this.Adaptation.Env.isChrome || this.Adaptation.Env.isElectron) {
             let el = document.body.querySelector('#app');
             if (el && options.ready) {
                 options.ready(el, null);

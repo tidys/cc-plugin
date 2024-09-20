@@ -55,6 +55,11 @@ export declare const Panel: {
 };
 export interface CocosPluginManifest {
     name: string;
+    /**
+     * creator插件的主进程入口
+     *
+     * web类型没有使用该参数
+     */
     main: string;
     version: string;
     description?: string;
@@ -140,7 +145,8 @@ export declare enum PluginType {
     PluginV2 = "cp-v2",// cocos creator 插件v2版本
     PluginV3 = "cp-v3",// cocos creator 插件v3版本
     Web = "web",// web页面
-    Chrome = "chrome"
+    Chrome = "chrome",// chrome插件
+    Electron = "electron"
 }
 export interface CocosPluginOptions {
     server?: {
@@ -340,6 +346,10 @@ export interface CocosPluginV3 {
     dependencies?: string[];
 }
 export interface PluginMainWrapper {
+    /**
+     * 创建函数，目前只有electron在用
+     */
+    create?: Function;
     load: Function;
     unload?: Function;
     builder?: {

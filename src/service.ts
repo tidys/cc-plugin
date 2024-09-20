@@ -85,7 +85,10 @@ export class CocosPluginService {
         const { type } = this.projectConfig;
         return type === PluginType.Chrome;
     }
-
+    public isElectron() {
+        const { type } = this.projectConfig;
+        return type === PluginType.Electron;
+    }
     private resolvePlugins() {
         this.plugins.push(new Base())
         this.plugins.push(new Create())
@@ -299,7 +302,7 @@ export class CocosPluginService {
         let { outputProject } = options;
         const pluginDir = this.getPluginDir(type!);
         if (typeof outputProject === 'object') {
-            const { v2, v3, web, chrome } = outputProject!;
+            const { v2, v3, web, chrome, electron } = outputProject!;
             if (type === PluginType.PluginV2 || type === PluginType.PluginV3 || type === PluginType.Chrome) {
                 // 优先支持配置文件
                 const cfgProject = this.getConfigProjectPath(type);
@@ -339,6 +342,13 @@ export class CocosPluginService {
                 }
             } else if (web && type === PluginType.Web) {
                 let fullPath = Path.join(this.context, web);
+                if (!FS.existsSync(fullPath)) {
+                    log.yellow(`auto create directory: ${fullPath}`);
+                    FsExtra.ensureDirSync(fullPath);
+                }
+                options.output = fullPath;
+            } else if (electron && type === PluginType.Electron) {
+                let fullPath = Path.join(this.context, electron);
                 if (!FS.existsSync(fullPath)) {
                     log.yellow(`auto create directory: ${fullPath}`);
                     FsExtra.ensureDirSync(fullPath);

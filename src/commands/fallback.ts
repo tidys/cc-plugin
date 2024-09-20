@@ -6,7 +6,7 @@ export function getFallback(service: CocosPluginService) {
     let fallback: Record<string, string | boolean> = {
         fs: false,
     };
-    if (service.isWeb() || service.isChromePlugin()) {
+    if (service.isWeb() || service.isChromePlugin() || service.isElectron()) {
         // web情况下： 模块重定向，不需要的设置为false即可
         fallback = Object.assign(fallback, {
             assert: require.resolve("assert"),
