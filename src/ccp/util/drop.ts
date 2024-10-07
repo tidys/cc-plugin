@@ -43,6 +43,63 @@ export enum Accept {
     PVR = 'pvr',
     ETC = 'pkm'
 }
+
+class DropFile {
+    buffer: ArrayBuffer | null = null;
+    ext: string = "";
+    name: string = "";
+    support: boolean = true;
+    valid: boolean = false;
+    file: File | null = null;
+    init(itemFile: DataTransferItem) {
+        if (itemFile.kind !== 'file') {
+            this.valid = false;
+            return;
+        }
+        this.file = itemFile.getAsFile();
+        if (!this.file) {
+            this.valid = false;
+            return;
+        }
+        const entry = itemFile.webkitGetAsEntry();
+        if (!entry) {
+            this.valid = false;
+            return;
+        }
+        const { isFile } = entry;
+        if (!isFile) {
+            this.valid = false;
+            return;
+        }
+        // 在creator中有file.path，其指向磁盘路径
+        // 在web中 file.name === entry.name
+        // @ts-ignore
+        this.name = this.file.path || this.file.name || entry.name;
+        this.ext = extname(this.name);
+        if (!this.ext) {
+            return;
+        }
+        this.valid = true;
+    }
+    async getBuffer(): Promise<ArrayBuffer | null> {
+        return new Promise((resolve, reject) => {
+            if (this.valid && this.file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const data = event.target!.result as ArrayBuffer;
+                    this.buffer = data;
+                    resolve(data);
+                };
+                reader.onerror = (event) => {
+                    reject(null);
+                };
+                reader.readAsArrayBuffer(this.file);
+            } else {
+                reject(null);
+            }
+        });
+    }
+}
 export class Drop {
     private map: Record<string, ArrayBufferCallback> = {};
     private options: DropOptions;
@@ -58,45 +115,45 @@ export class Drop {
         for (let i = 0; i < accept.length; i++) {
             switch (accept[i]) {
                 case Accept.TTF: {
-                    this.map['.ttf'] = this.dropFont.bind(this);
+                    this.map['.ttf'] = this.dropFont;
                     break;
                 }
                 case Accept.Texture: {
-                    this.map['.png'] = this.dropTexture.bind(this);
-                    this.map['.jpg'] = this.dropTexture.bind(this);
-                    this.map['.jpeg'] = this.dropTexture.bind(this);
+                    this.map['.png'] = this.dropTexture;
+                    this.map['.jpg'] = this.dropTexture;
+                    this.map['.jpeg'] = this.dropTexture;
                     break;
                 }
                 case Accept.JSON: {
-                    this.map['.json'] = this.dropJson.bind(this);
+                    this.map['.json'] = this.dropJson;
                     break;
                 }
                 case Accept.PLIST: {
-                    this.map['.plist'] = this.dropPlist.bind(this);
+                    this.map['.plist'] = this.dropPlist;
                     break;
                 }
                 case Accept.JSC: {
-                    this.map['.jsc'] = this.dropJSC.bind(this);
+                    this.map['.jsc'] = this.dropJSC;
                     break;
                 }
                 case Accept.JS: {
-                    this.map['.js'] = this.dropJS.bind(this);
+                    this.map['.js'] = this.dropJS;
                     break;
                 }
                 case Accept.TS: {
-                    this.map['.ts'] = this.dropTS.bind(this);
+                    this.map['.ts'] = this.dropTS;
                     break;
                 }
                 case Accept.ATLAS: {
-                    this.map['.atlas'] = this.dropAtlas.bind(this);
+                    this.map['.atlas'] = this.dropAtlas;
                     break;
                 }
                 case Accept.ETC: {
-                    this.map['.pkm'] = this.dropEtc.bind(this);
+                    this.map['.pkm'] = this.dropEtc;
                     break;
                 }
                 case Accept.PVR: {
-                    this.map['.pvr'] = this.dropPvr.bind(this);
+                    this.map['.pvr'] = this.dropPvr;
                     break;
                 }
             }
@@ -162,44 +219,7 @@ export class Drop {
         const { etc } = this.options;
         etc && await etc(name, data)
     }
-    private _onWebOne(itemFile: DataTransferItem) {
-        if (itemFile.kind !== 'file') {
-            return;
-        }
-        const entry = itemFile.webkitGetAsEntry();
-        if (!entry) {
-            return;
-        }
-        const file = itemFile.getAsFile();
-        if (!file) { return; }
-        // 在creator中有file.path，其指向磁盘路径
-        // 在web中 file.name === entry.name
-        // @ts-ignore
-        const name = file.path || file.name || entry.name;
-        const { isFile } = entry;
-        if (!isFile) {
-            return;
-        }
-        const ext = extname(name);
-        if (!ext) {
-            return;
-        }
-        // 依靠callback知道是否支持文件类型，其实不太好
-        let cb = this.map[ext.toLocaleLowerCase()] || this.options.any || null;
-        if (!cb) {
-            this.tipsNotSupported(name);
-            return;
-        }
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const data = event.target!.result;
-            (async () => {
-                await cb(name, data as ArrayBuffer);
-            })();
-        };
-        reader.readAsArrayBuffer(file);
-    }
-    public onWeb(event: DragEvent): void {
+    public async onWeb(event: DragEvent): Promise<void> {
         if (!event.dataTransfer) {
             return;
         }
@@ -208,18 +228,44 @@ export class Drop {
             // 暂时不处理非chrome环境
             return;
         }
+        const dtItems: DataTransferItem[] = [];
         if (this.options.multi === true) {
             for (let i = 0; i < items.length; i++) {
-                const itemFile = items[i];
-                this._onWebOne(itemFile);
+                dtItems.push(items[i]);
             }
         } else {
             const itemFile = items[0];
-            this._onWebOne(itemFile);
+            dtItems.push(itemFile);
+        }
+        const task: Promise<any>[] = [];
+        const dropFiles: DropFile[] = [];
+        for (let i = 0; i < dtItems.length; i++) {
+            const itemFile = dtItems[i];
+            const df = new DropFile();
+            df.init(itemFile);
+            if (df.valid) {
+                dropFiles.push(df);
+                // 这里不能异步，会导致items数据丢失，应该先存在来
+                const p = df.getBuffer();
+                if (p) {
+                    task.push(p);
+                }
+            }
+        }
+        await Promise.all(task);
+        for (let i = 0; i < dropFiles.length; i++) {
+            const df = dropFiles[i];
+            // 依靠callback知道是否支持文件类型，其实不太好
+            const cb = this.map[df.ext.toLocaleLowerCase()] || this.options.any || null;
+            if (cb) {
+                await cb.call(this, name, df.buffer);
+            } else {
+                this.tipsNotSupported(df.name);
+            }
         }
     }
-    public onCreator(event: DragEvent): void {
-        this.onWeb(event);
+    public async onCreator(event: DragEvent): Promise<void> {
+        await this.onWeb(event);
         return;
     }
 }
