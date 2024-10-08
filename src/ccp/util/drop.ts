@@ -258,7 +258,7 @@ export class Drop {
             // 依靠callback知道是否支持文件类型，其实不太好
             const cb = this.map[df.ext.toLocaleLowerCase()] || this.options.any || null;
             if (cb) {
-                await cb.call(this, name, df.buffer);
+                await cb.call(this, df.name, df.buffer);
             } else {
                 this.tipsNotSupported(df.name);
             }

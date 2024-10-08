@@ -40,7 +40,7 @@ class Panel {
         else if (this.service.isCreatorPluginV2()) {
             ejsTemplate = (0, path_1.join)(__dirname, '../template/panel-v2.ejs');
         }
-        else if (this.service.isWeb()) {
+        else if (this.service.isWeb() || this.service.isElectron()) {
             ejsTemplate = (0, path_1.join)(this.service.root, './template/web/index.html');
         }
         // let panelMain = panel.main.endsWith(".ts") ? panel.main : `${panel.main}.ts`;
@@ -58,7 +58,7 @@ class Panel {
             if (this.service.isWeb() || this.service.isChromePlugin()) {
                 entryName = panel.name;
             }
-            if (this.service.isCreatorPlugin()) {
+            if (this.service.isCreatorPlugin() || this.service.isElectron()) {
                 entryName = `panel/${panel.name}`;
             }
             let entryPoint = webpackChain.entryPoints.get(entryName);

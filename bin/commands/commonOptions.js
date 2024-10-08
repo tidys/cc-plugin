@@ -55,6 +55,7 @@ function checkBuildType(type, exit = false) {
     if (type === declare_1.PluginType.PluginV2 ||
         type === declare_1.PluginType.PluginV3 ||
         type === declare_1.PluginType.Chrome ||
+        type === declare_1.PluginType.Electron ||
         type == declare_1.PluginType.Web) {
         return true;
     }

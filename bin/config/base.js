@@ -44,6 +44,7 @@ const FsExtra = __importStar(require("fs-extra"));
 // @ts-ignore
 const webpack_filter_warnings_plugin_1 = __importDefault(require("webpack-filter-warnings-plugin"));
 const const_1 = require("../const");
+const package_json_2 = require("../electron/package_json");
 class Base extends plugin_api_1.PluginApi {
     getExternal(dir, defaultModules = []) {
         let map = {};
@@ -98,6 +99,9 @@ class Base extends plugin_api_1.PluginApi {
             else if (service.isCreatorPlugin()) {
                 webpackChain.target('node');
             }
+            else if (service.isElectron()) {
+                webpackChain.target("electron-renderer");
+            }
             // https://webpack.docschina.org/configuration/resolve#resolvealias
             if (service.isWeb()) {
                 const vuePath = path_1.default.resolve(service.root, './node_modules/vue');
@@ -112,7 +116,7 @@ class Base extends plugin_api_1.PluginApi {
             }
             webpackChain.resolve.extensions.add('.ts').add('.vue').add('.js').add('.json').add('.glsl').end();
             // 排除模块 https://webpack.docschina.org/configuration/externals#externals
-            if (service.isCreatorPlugin()) {
+            if (service.isCreatorPlugin() || service.isElectron()) {
                 let externals = this.getExternal(service.context, ['electron', 'sharp', 'fs-extra', 'express', 'glob']);
                 webpackChain.externals(externals);
             }
@@ -141,6 +145,12 @@ class Base extends plugin_api_1.PluginApi {
                 const mainAdaptation = path_1.default.join(service.root, mainFile);
                 // 注意先后顺序
                 webpackChain.entry('main')
+                    .add(manifest.main)
+                    .add(mainAdaptation);
+            }
+            else if (service.isElectron()) {
+                const mainAdaptation = path_1.default.join(service.root, "src/ccp/main-electron.ts");
+                webpackChain.entry("main")
                     .add(manifest.main)
                     .add(mainAdaptation);
             }
@@ -287,6 +297,10 @@ class Base extends plugin_api_1.PluginApi {
                         webpackChain.plugin("readme").use(readme_1.default, [service]);
                     }
                 }
+            }
+            if (service.isElectron()) {
+                webpackChain.plugin("electron-pkg-json")
+                    .use(package_json_2.ElectronPackageJson, [service]);
             }
             webpackChain
                 .plugin('vue')

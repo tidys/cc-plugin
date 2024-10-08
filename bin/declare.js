@@ -15,7 +15,7 @@ var PluginType;
     PluginType["PluginV3"] = "cp-v3";
     PluginType["Web"] = "web";
     PluginType["Chrome"] = "chrome";
-    // Electron="electron", // 桌面应用
+    PluginType["Electron"] = "electron";
     // Vscode="vscode", // vscode插件
 })(PluginType || (exports.PluginType = PluginType = {}));
 // 一些默认值
