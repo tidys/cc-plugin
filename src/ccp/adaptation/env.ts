@@ -25,7 +25,15 @@ export class Env extends Base {
     get isPluginV2() {
         return this._type === PluginType.PluginV2;
     }
-
+    get pluginDirectory() {
+        if (this.isPluginV2) {
+            return 'packages';
+        }
+        if (this.isPluginV3) {
+            return 'extensions';
+        }
+        return "";
+    }
     get isPluginV3() {
         return this._type === PluginType.PluginV3;
     }
