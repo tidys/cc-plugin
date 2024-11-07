@@ -8,7 +8,9 @@
     "url": "https://github.com/tidys/cc-plugin/issues"
   },
   "dependencies": {
+    "@babel/core": "^7.26.0",
     "@babel/generator": "^7.16.8",
+    "@babel/preset-env": "^7.26.0",
     "@popperjs/core": "^2.11.6",
     "@vue/cli-service": "^5.0.0-rc.1",
     "@vue/compiler-sfc": "3.2.26",
@@ -20,6 +22,7 @@
     "@xuyanfeng/sharp-browserify": "^1.0.0",
     "assert": "^2.0.0",
     "axios": "^0.26.1",
+    "babel-loader": "^9.2.1",
     "browserify-buffer": "^1.1.2",
     "browserify-zlib": "^0.2.0",
     "chalk": "2.4.2",
