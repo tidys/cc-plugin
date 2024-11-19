@@ -92,7 +92,7 @@ export class Panel extends Base {
      *          if(event.reply){
      *              // 响应sendToMain的回调
      *              // 第一个参数代表错误值，如果处理成功必须为0，非0值会被electron视为错误捕获住，影响回调的触发
-     *              // 第二个参数就是回调函数接收到的参数，即sendToMain的第三个参数
+     *              // 第二个参数就是回调函数接收到的参数，这里是将sendToMain的第三个参数又回传给回调了
      *              event.reply(0, args);
      *          }
      *      }
