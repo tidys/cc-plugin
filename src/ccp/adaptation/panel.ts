@@ -62,13 +62,42 @@ export class Panel extends Base {
         return false;
     }
     /**
-     * 发送消息给插件的主进程
-     * v2版本
-     * 需要主进程event.reply(arg1, arg2)才能触发回调，如果没有reply，则不会触发回调
-     * @param plugin 插件名，self会自动转换为自己
-     * @param functionName 函数名
-     * @param args 参数
+     * 发送消息给插件的主进程（目前仅仅在v2中实现了）
+     * 
+     * @param plugin 接收消息的插件名，如果要发送给插件自身，使用`self`即可。
+     * @param functionName 定义在主进程的消息函数名，也就是cc-plugin的main.ts里面的messages
+     * @param args 目标插件主进程接收到的参数，如果要传递的参数比较多，建议使用`Object/Array`，需要注意的是`Object/Array`必须为可被JSON序列化的数据。
+     * @param callback 消息回调函数，需要目标插件的主进程`event.reply(0, args)`才能触发回调，如果没有reply，则不会触发回调
      * @returns 
+     * 
+     * @example
+     * // 发送到插件自己的主进程
+     * sendToMain("self", "functionName", {name:"xxx", age:18}, (err:any, data:any)=>{
+     *      // 参数和event.reply对应
+     *      if(err) {
+     *          return;
+     *      }
+     *      console.log(data)
+     * })
+     * // 发送到A插件的主进程
+     * sendToMain("pluginA-name", "functionName", "args", ()=>{
+     *    
+     * })
+     * 
+     * // 插件主进程main.ts的处理
+     * CCP.init(pluginConfig, {
+     *  messages: {
+     *      // functionName是和sendToMain的第二个参数对应的
+     *      functionName (event:any, args:any){
+     *          if(event.reply){
+     *              // 响应sendToMain的回调
+     *              // 第一个参数代表错误值，如果处理成功必须为0，非0值会被electron视为错误捕获住，影响回调的触发
+     *              // 第二个参数就是回调函数接收到的参数，即sendToMain的第三个参数
+     *              event.reply(0, args);
+     *          }
+     *      }
+     *  }
+     * })
      */
     sendToMain(plugin: string, functionName: string, args: string | number | object | boolean | Array<any>, callback?: (arg1: any, arg2: any) => void): boolean {
         if (typeof args === 'function') {
