@@ -1319,10 +1319,10 @@
   resolved "https://registry.yarnpkg.com/@xuyanfeng/fs-browserify/-/fs-browserify-1.0.0.tgz#808811e8d7e2fb8bcad9fd7290a4ca0f280bc585"
   integrity sha512-Tir61SPNwFLSRE18QsD8vJZg78td9+uDDUnyWB/iP896zhqhzXlqJnPOKOIZEPs4dQ1IqjZZfFwJ9STIH2uD+A==
 
-"@xuyanfeng/fs-extra-browserify@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@xuyanfeng/fs-extra-browserify/-/fs-extra-browserify-1.0.1.tgz#d20e9ae6f48f9027add4679bac9b40bb9249b60c"
-  integrity sha512-K+bLekY4iiZ/PD/SU15VvyZrIxiOCv4TB/YUBev+is/jHoGYasV4lCJParBSAUbLcm6hFifcq3Y9Pi4dQAGhug==
+"@xuyanfeng/fs-extra-browserify@^1.0.2":
+  version "1.0.2"
+  resolved "https://mirrors.cloud.tencent.com/npm/@xuyanfeng/fs-extra-browserify/-/fs-extra-browserify-1.0.2.tgz#64c7e571aa0e881c47f2c15d33a42a81a74c2ab5"
+  integrity sha512-vbysPDyzcMdliomc6CfoF/zZ3BoPScR9ObdZIjZ9Tf6yf6L1vNI9PLJxM6bL/LYv5QupqRzMQ5awkiCy+pFuyw==
 
 "@xuyanfeng/globby-browserify@^1.0.0":
   version "1.0.0"
