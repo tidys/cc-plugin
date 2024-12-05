@@ -2,9 +2,7 @@
 
 专为`Cocos Creator`插件开发的cli，一次编写，同时发布web网页版本、creator v2版本、creator v3版本，免去多版本同步的问题。
 
-使用webpack抹平了v2、v3插件版本的底层差异，使开发插件更加工程化。
-
-推荐使用typescript开发插件，更丝滑流畅。
+使用webpack抹平了v2、v3插件版本的底层差异，使开发插件更加工程化，让开发者更加的专注于逻辑的实现，让插件开发更加的简单。
 
 ## 开源案例
 
@@ -16,22 +14,18 @@
 
 ## 特点
 
-- 使用 typescript + vue 开发
-- 完美适配所有版本的creator
-- 完善的工作流：一键创建插件、打包插件、发布插件
+1. 使用 typescript + vue3.x 开发， 天然支持hmr(hot module replacement)热替换，开发效率更高。
+2. 插件开发更加工程化，支持代码 tree shaking ，更友好的运行环境判断，更友好的 nodejs native 模块支持。
+3. 封装了部分creator编辑器api，更友好的兼容性，更加统一的编写体验，更友好的代码提示。
+4. 配合[cc-ui](https://www.npmjs.com/package/@xuyanfeng/cc-ui)编写UI面板，多种常用组件可供选择，同时兼容性更好，在不同的creator版本上都能正常运行。
+5. 完美适配所有版本的creator，兼容性更好，同时支持发布web版本，配合`github pages`、`github action`，方便给用户体验试用，进而引流。
+6. 完善的工作流：一键创建插件、打包插件、发布插件
+7. 发布的插件没有node_modules目录的麻烦，体积更小，用户安装更轻松简便。
+8. 发布的插件代码自动压缩混淆，增加用户二次开发难度，如有必要，后续会接入[jsfuck](https://www.npmjs.com/package/jsfuck)/[javascript-obfuscator](https://www.npmjs.com/package/javascript-obfuscator)等支持，进一步提高插件的安全性
 
-## 打包插件的优势
-使用官方提供的插件模板，如果使用到了node的第三方package，在发布插件的时候需要将node_modules目录一起上传，会导致插件的文件数量非常多，而且插件体积也会稍微变大。
 
-creator文件在安装解压插件时，会出现node_modules目录解压失败等异常问题，导致插件运行起来出现问题，目前我的确是收到用户反馈过类似的问题。
 
-cc-plugin因为使用了webpack，会将项目代码及其依赖的devDependencies统一进行打包，尽可能减少插件自身的文件数量，对减少插件体积大小也有一定的效果，同时也避免了安装解压失败导致插件运行的问题。
-
-注意是`devDependencies`，不是`dependencies`，所以如果你想将`node package`打包进插件，需要将`node package`添加到`devDependencies`中。
-
-这么设计也是考虑到了某些`package`不支持web环境，这些`package`只能配置到`dependencies`中，否则会导致打包失败，比如fs模块等。
-
-## 如何使用
+## 使用步骤
 
 1. 全局安装，命令行关键字cc-plugin、ccp都支持
 
@@ -68,6 +62,17 @@ cc-plugin因为使用了webpack，会将项目代码及其依赖的devDependenci
     npm run ccp-pack-v2
     npm run ccp-pack-v3
     ``` 
+
+## 打包插件的优势
+使用官方提供的插件模板，如果使用到了node的第三方package，在发布插件的时候需要将node_modules目录一起上传，会导致插件的文件数量非常多，而且插件体积也会稍微变大。
+
+creator文件在安装解压插件时，会出现node_modules目录解压失败等异常问题，导致插件运行起来出现问题，目前我的确是收到用户反馈过类似的问题。
+
+cc-plugin因为使用了webpack，会将项目代码及其依赖的devDependencies统一进行打包，尽可能减少插件自身的文件数量，对减少插件体积大小也有一定的效果，同时也避免了安装解压失败导致插件运行的问题。
+
+注意是`devDependencies`，不是`dependencies`，所以如果你想将`node package`打包进插件，需要将`node package`添加到`devDependencies`中。
+
+这么设计也是考虑到了某些`package`不支持web环境，这些`package`只能配置到`dependencies`中，否则会导致打包失败，比如fs模块等。
 
 ## cc-plugin.config.ts 配置
 
@@ -179,9 +184,45 @@ npm i @xuyanfeng/cc-editor -g
 `cc-plugin.json`不建议纳入版本管理，它更像是一个本机配置，满足了不同电脑，配置不同的需求。
 `cc-plugin`检索`outputProject`时会优先从`cc-plugin.json`中读取配置。
 
-## `__DEV__` / `__DEV_WORKSPACE__`
-- `__DEV__`: 用于判断是否为ccp的serve环境
-- `__DEV_WORKSPACE__`：serve环境下的工作空间路径
+## `__DEV__` 
+
+用于判断是否为ccp的serve环境，布尔值。
+ - `cc-plugin serve`时为`true`
+ - `cc-plugin pack`时为`false`
+ 
+ 如果有些逻辑想要在开发环境保留，但是又不想在发布后出现，可以使用该全局变量，发布插件后，tree shaking会自动剔除关联的代码。
+
+## `__DEV_WORKSPACE__`
+
+serve环境下的工作空间路径，即`cc-plugin.config.ts`所在的目录。
+
+## 插件携带了一下静态文件如何处理
+
+举例：插件携带了一个`1.exe`文件，需要按照以下步骤处理
+
+1. 按照以下结构组织
+  
+   - static
+     - 1.exe
+   - cc-plugin.config.ts
+
+2. 配置`cc-plugin.config.ts`
+
+    ```ts
+    const options: CocosPluginOptions = {
+    staticFileDirectory: "./static",
+    staticRequestRedirect: true,
+    };
+    export default { options };
+    ```
+3. 使用插件提供的API获取资源路径
+
+    ```ts
+    CCP.Adaptation.AssetDB.getStaticFile("1.exe")
+    ```
+
+在发布插件后，会自动将`static`目录下的文件打包到插件的根目录下。
+
 
 ## `__VALID_CODE__`
 
