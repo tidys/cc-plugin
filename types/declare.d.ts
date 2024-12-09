@@ -1,6 +1,9 @@
 declare global {
     const __VALID_CODE__: boolean;
     const __PLUGIN_TYPE__: string;
+    /**
+     * 是否在开发模式下，也就是ccp serve xxx的运行环境
+     */
     const __DEV__: boolean;
     /**
      * 开发模式下的工作目录，也就是cc-plugin.config.ts所在的目录

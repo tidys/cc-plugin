@@ -1,25 +1,24 @@
-import { PluginApi } from '../plugin-api';
-import Config from 'webpack-chain';
-import Chain from 'webpack-chain';
-import webpack from 'webpack';
-import { cocosPluginService, CocosPluginService } from '../service';
-import * as Path from 'path';
-import { CleanWebpackPlugin } from 'clean-webpack-plugin'
-import * as Fs from 'fs';
-import DevServer from '../plugin/dev-server';
-import webpackDevSever, { IncomingMessage, ProxyConfigMap } from 'webpack-dev-server'
-import PortFinder from 'portfinder'
-import printf from 'printf';
-import { log } from '../log'
-import { PluginMgr } from '../plugin-mgr';
-import { merge } from 'lodash';
-import { getFallback } from './fallback';
-import { checkBuildType, getBuildOptions, parseBuildOptions, defineVar } from './commonOptions';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import { OptionValues } from 'commander';
 import { PluginType } from 'declare';
-import mkcert from 'webpack-mkcert'
-import { showWeChatQrCode } from './tool';
+import * as Fs from 'fs';
 import { ServerResponse } from 'http';
+import { merge } from 'lodash';
+import * as Path from 'path';
+import PortFinder from 'portfinder';
+import printf from 'printf';
+import webpack from 'webpack';
+import { default as Chain, default as Config } from 'webpack-chain';
+import webpackDevSever, { IncomingMessage, ProxyConfigMap } from 'webpack-dev-server';
+import mkcert from 'webpack-mkcert';
+import { log } from '../log';
+import { PluginApi } from '../plugin-api';
+import { PluginMgr } from '../plugin-mgr';
+import DevServer from '../plugin/dev-server';
+import { cocosPluginService, CocosPluginService } from '../service';
+import { checkBuildType, defineVar, getBuildOptions, parseBuildOptions } from './commonOptions';
+import { getFallback } from './fallback';
+import { showWeChatQrCode } from './tool';
 
 PortFinder.basePort = 9087;
 

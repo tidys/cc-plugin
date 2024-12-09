@@ -103,7 +103,7 @@ class Base extends plugin_api_1.PluginApi {
                 webpackChain.target("electron-renderer");
             }
             // https://webpack.docschina.org/configuration/resolve#resolvealias
-            if (service.isWeb() && service.isChromePlugin()) {
+            if (service.isWeb() || service.isChromePlugin()) {
                 const vuePath = path_1.default.resolve(service.root, './node_modules/vue');
                 // webpackChain.resolve.alias.set('vue', vuePath).end();
                 webpackChain.resolve.alias
@@ -165,10 +165,13 @@ class Base extends plugin_api_1.PluginApi {
                 webpackChain.output.libraryTarget('commonjs');
                 webpackChain.output.publicPath(`packages://${pluginName}/`);
             }
-            if (service.isWeb()) {
+            if (service.isWeb() || service.isChromePlugin()) {
                 webpackChain.output.filename('[name].[fullhash].js');
             }
             else if (service.isCreatorPlugin()) {
+                webpackChain.output.filename('[name].js');
+            }
+            else {
                 webpackChain.output.filename('[name].js');
             }
             webpackChain.output.path(output);
