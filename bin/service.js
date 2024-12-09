@@ -278,9 +278,29 @@ class CocosPluginService {
         }
         return null;
     }
+    checkPluginName(name) {
+        if (!name) {
+            log_1.log.red("插件名字为空，请在cc-plugin.config.ts中填写有效的插件名字");
+            process.exit(0);
+        }
+        // 对应的问题： Invalid package name:  do not contains uppercase characters.
+        // if (/[A-Z]/.test(name)) {
+        //     log.red(`插件名字${name}不合法，不能包含大写字母`);
+        //     process.exit(0);
+        // }
+        // if (/^[a-z]/.test(name) === false) {
+        //     log.red(`插件名字${name}不合法，必须以小写字母开头。`);
+        //     process.exit(0);
+        // }
+        if (/^[a-z][a-z0-9-_]{0,213}$/.test(name) === false) {
+            log_1.log.red(`插件名字 ${name} 不合法，必须以小写字母开头，只能包含小写字母、数字、下划线、横线。`);
+            process.exit(0);
+        }
+    }
     checkUserOptions(userOptions, type) {
         // 根据配置，将output目录统一变为绝对路径
         const { options, manifest } = userOptions;
+        this.checkPluginName(manifest.name);
         let { outputProject } = options;
         const pluginDir = this.getPluginDir(type);
         if (typeof outputProject === 'object') {

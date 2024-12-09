@@ -26,21 +26,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const plugin_api_1 = require("../plugin-api");
-const path_1 = __importStar(require("path"));
-const fs_1 = __importStar(require("fs"));
-const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
 const css_minimizer_webpack_plugin_1 = __importDefault(require("css-minimizer-webpack-plugin"));
-const panel_1 = __importDefault(require("../panel"));
-const npm_install_1 = __importDefault(require("../plugin/npm-install"));
-const package_json_1 = __importDefault(require("../commands/package.json"));
-const chrome_manifest_1 = require("../chrome/chrome-manifest");
-const vue_loader_1 = require("vue-loader");
-const require_v3_1 = __importDefault(require("../plugin/require-v3"));
-const readme_1 = __importDefault(require("../plugin/readme"));
-const webpack_1 = __importDefault(require("webpack"));
-const log_1 = require("../log");
+const fs_1 = __importStar(require("fs"));
 const FsExtra = __importStar(require("fs-extra"));
+const mini_css_extract_plugin_1 = __importDefault(require("mini-css-extract-plugin"));
+const path_1 = __importStar(require("path"));
+const vue_loader_1 = require("vue-loader");
+const webpack_1 = __importDefault(require("webpack"));
+const chrome_manifest_1 = require("../chrome/chrome-manifest");
+const package_json_1 = __importDefault(require("../commands/package.json"));
+const log_1 = require("../log");
+const panel_1 = __importDefault(require("../panel"));
+const plugin_api_1 = require("../plugin-api");
+const npm_install_1 = __importDefault(require("../plugin/npm-install"));
+const readme_1 = __importDefault(require("../plugin/readme"));
+const require_v3_1 = __importDefault(require("../plugin/require-v3"));
 // @ts-ignore
 const webpack_filter_warnings_plugin_1 = __importDefault(require("webpack-filter-warnings-plugin"));
 const const_1 = require("../const");
@@ -93,7 +93,7 @@ class Base extends plugin_api_1.PluginApi {
             const { options, manifest } = service.projectConfig;
             const pluginName = manifest.name;
             // target
-            if (service.isWeb()) {
+            if (service.isWeb() || service.isChromePlugin()) {
                 webpackChain.target('web');
             }
             else if (service.isCreatorPlugin()) {
@@ -103,7 +103,7 @@ class Base extends plugin_api_1.PluginApi {
                 webpackChain.target("electron-renderer");
             }
             // https://webpack.docschina.org/configuration/resolve#resolvealias
-            if (service.isWeb()) {
+            if (service.isWeb() && service.isChromePlugin()) {
                 const vuePath = path_1.default.resolve(service.root, './node_modules/vue');
                 // webpackChain.resolve.alias.set('vue', vuePath).end();
                 webpackChain.resolve.alias

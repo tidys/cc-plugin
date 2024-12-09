@@ -179,7 +179,17 @@ export interface CocosPluginOptions {
     watchBuild?: boolean; // 监听构建
     /**
      * 配置的不同类型的输出目录，支持相对路径和绝对路径
-     * 最终都会汇总到output字段
+     * 
+     * 不要追加packages/extensions目录，直接填写creator的项目路径，cc-plugin会对项目路径进行校验。
+     * 
+     * cc-plugin.json中配置可以覆盖此选项，方便多人协作，一般来说不需要将cc-plugin.json纳入版本控制
+     * 
+     * ```
+     * {
+     *   "v2": "D://project2x/",
+     *   "v3": "D://project3x/"
+     * }
+     * ```
      */
     outputProject:
     | string
