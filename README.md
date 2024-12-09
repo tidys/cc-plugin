@@ -161,7 +161,7 @@ export default CCP.init(pluginConfig, {
     }
 })
 ```
-## 对插件开发有用的小工具
+## 提高插件开发效率的工具
 
 ```shell
 npm i @xuyanfeng/cc-editor -g 
