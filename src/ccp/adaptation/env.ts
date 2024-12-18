@@ -1,5 +1,5 @@
-import { Base } from "./base";
 import { BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType } from '../../declare';
+import { Base } from "./base";
 export class Env extends Base {
     private _type: PluginType | null = null;
 
@@ -18,6 +18,12 @@ export class Env extends Base {
     }
     get isChrome() {
         return this._type === PluginType.Chrome;
+    }
+    get isChromeRuntime() {
+        return (this.isChrome && chrome && chrome.runtime);
+    }
+    get isChromeDevtools() {
+        return (this.isChrome && chrome && chrome.devtools);
     }
     get isElectron() {
         return this._type === PluginType.Electron;

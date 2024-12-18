@@ -1,9 +1,9 @@
+import * as Fs from "fs";
+import { ensureFileSync } from "fs-extra";
+import { homedir } from "os";
+import * as Path from "path";
 import { CocosPluginConfig, PluginType } from "../declare";
 import CCP from "./entry-render";
-import * as Path from "path";
-import * as Fs from "fs";
-import { homedir } from "os"
-import { ensureFileSync } from "fs-extra";
 
 export class Profile {
     private Key = 'profile';
@@ -52,7 +52,7 @@ export class Profile {
     public _read(fileName: string) {
         this.Key = fileName;
         let retData: Record<string, any> = {}
-        if (CCP.Adaptation.Env.isWeb) {
+        if (CCP.Adaptation.Env.isWeb || CCP.Adaptation.Env.isChrome) {
             // 从 local storage 中读取
             const str = localStorage.getItem(this.Key);
             if (str) {
@@ -86,7 +86,7 @@ export class Profile {
 
     private _write() {
         const str = JSON.stringify(this.data, null, this.format ? (this.formatIndent || 4) : 0);
-        if (CCP.Adaptation.Env.isWeb) {
+        if (CCP.Adaptation.Env.isWeb || CCP.Adaptation.Env.isChrome) {
             try {
                 // Setting the value exceeded the quota.
                 localStorage.setItem(this.Key, str);

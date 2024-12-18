@@ -1,10 +1,10 @@
+import { existsSync } from 'fs';
+import FsExtra from 'fs-extra';
 import { dirname, join } from 'path';
 import { CocosPluginService } from 'service';
 import webpack from 'webpack';
-import FsExtra from 'fs-extra';
-import { ChromeConst } from './const';
-import { existsSync } from 'fs';
 import { log } from '../log';
+import { ChromeConst } from './const';
 
 interface IAction {
     default_popup: string,
@@ -62,8 +62,24 @@ const permissions = [
     "activeTab", "<all_urls>", "*://*/*", "tabs", "http://*/*", "https://*/*", "audio", "system.cpu", "clipboardRead",
     "clipboardWrite", "system.memory", "processes", "tabs", "storage", "nativeMessaging", "contextMenus", "notifications"
 ];
+const permissions_v3 = [...permissions,];
+
+/**
+ * 清单文件的资源
+ */
+interface ResourcesV3 {
+    resources: string[];
+    matches: string[];
+    use_dynamic_url: boolean;
+}
 class ChromeManifestDataV3 extends ChromeManifestDataBase {
-    private host_permissions: string[] = permissions;
+    private permissions: string[] = permissions_v3;
+    private web_accessible_resources: ResourcesV3[] = [{
+        resources: ["*.js"],
+        matches: ["<all_urls>", "*://*/*"],
+        use_dynamic_url: true
+    }];
+    private host_permissions: string[] = permissions_v3;
     private action: IAction = {
         default_popup: "",
         default_icon: {

@@ -144,7 +144,7 @@ export default class Base extends PluginApi {
                 webpackChain.output.libraryTarget('commonjs');
                 webpackChain.output.publicPath(`packages://${pluginName}/`);
             }
-            if (service.isWeb() || service.isChromePlugin()) {
+            if (service.isWeb()) {
                 webpackChain.output.filename('[name].[fullhash].js')
             } else if (service.isCreatorPlugin()) {
                 webpackChain.output.filename('[name].js')
