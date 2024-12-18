@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChromeManifest = void 0;
-const path_1 = require("path");
-const fs_extra_1 = __importDefault(require("fs-extra"));
-const const_1 = require("./const");
 const fs_1 = require("fs");
+const fs_extra_1 = __importDefault(require("fs-extra"));
+const path_1 = require("path");
 const log_1 = require("../log");
+const const_1 = require("./const");
 class ChromeManifestDataBase {
     constructor(name, version, description = "") {
         this.manifest_version = 0;
@@ -48,10 +48,17 @@ const permissions = [
     "activeTab", "<all_urls>", "*://*/*", "tabs", "http://*/*", "https://*/*", "audio", "system.cpu", "clipboardRead",
     "clipboardWrite", "system.memory", "processes", "tabs", "storage", "nativeMessaging", "contextMenus", "notifications"
 ];
+const permissions_v3 = [...permissions,];
 class ChromeManifestDataV3 extends ChromeManifestDataBase {
     constructor(name, version, description = "") {
         super(name, version, description);
-        this.host_permissions = permissions;
+        this.permissions = permissions_v3;
+        this.web_accessible_resources = [{
+                resources: ["*.js"],
+                matches: ["<all_urls>", "*://*/*"],
+                use_dynamic_url: true
+            }];
+        this.host_permissions = permissions_v3;
         this.action = {
             default_popup: "",
             default_icon: {

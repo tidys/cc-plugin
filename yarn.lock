@@ -657,6 +657,14 @@
   resolved "https://registry.yarnpkg.com/@types/chroma-js/-/chroma-js-2.4.3.tgz#2f10bd16483a87d8ead68764fc439550e9c4cbb6"
   integrity sha512-1ly5ly/7S/YF8aD7MxUQnFOZxdegimuOunJl0xDsLlguu5JrwuSTVGVH3UpIUlh6YauI0RMNT4cqjBonhgbdIQ==
 
+"@types/chrome@0.0.133":
+  version "0.0.133"
+  resolved "https://mirrors.cloud.tencent.com/npm/@types/chrome/-/chrome-0.0.133.tgz#9e1d55441584ba2d5274ca84db36427da9c5dc6e"
+  integrity sha512-G8uIUdaCTBILprQvQXBWGXZxjAWbkCkFQit17cdH3zYQEwU8f/etNl8+M7e8MRz9Xj8daHaVpysneMZMx8/ldQ==
+  dependencies:
+    "@types/filesystem" "*"
+    "@types/har-format" "*"
+
 "@types/connect-history-api-fallback@^1.3.5":
   version "1.5.4"
   resolved "https://registry.yarnpkg.com/@types/connect-history-api-fallback/-/connect-history-api-fallback-1.5.4.tgz#7de71645a103056b48ac3ce07b3520b819c1d5b3"
@@ -713,6 +721,18 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
+"@types/filesystem@*":
+  version "0.0.36"
+  resolved "https://mirrors.cloud.tencent.com/npm/@types/filesystem/-/filesystem-0.0.36.tgz#7227c2d76bfed1b21819db310816c7821d303857"
+  integrity sha512-vPDXOZuannb9FZdxgHnqSwAG/jvdGM8Wq+6N4D/d80z+D4HWH+bItqsZaVRQykAn6WEVeEkLm2oQigyHtgb0RA==
+  dependencies:
+    "@types/filewriter" "*"
+
+"@types/filewriter@*":
+  version "0.0.33"
+  resolved "https://mirrors.cloud.tencent.com/npm/@types/filewriter/-/filewriter-0.0.33.tgz#d9d611db9d9cd99ae4e458de420eeb64ad604ea8"
+  integrity sha512-xFU8ZXTw4gd358lb2jw25nxY9QAgqn2+bKKjKOYfNCzN4DKCFetK7sPtrlpg66Ywe3vWY9FNxprZawAh9wfJ3g==
+
 "@types/fs-extra@^9.0.13":
   version "9.0.13"
   resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.13.tgz#7594fbae04fe7f1918ce8b3d213f74ff44ac1f45"
@@ -727,6 +747,11 @@
   dependencies:
     "@types/minimatch" "*"
     "@types/node" "*"
+
+"@types/har-format@*":
+  version "1.2.16"
+  resolved "https://mirrors.cloud.tencent.com/npm/@types/har-format/-/har-format-1.2.16.tgz#b71ede8681400cc08b3685f061c31e416cf94944"
+  integrity sha512-fluxdy7ryD3MV6h8pTfTYpy/xQzCFC7m89nOH9y94cNqJ1mDIDPut7MnRHI3F6qRmh/cT2fUjG1MLdCNb4hE9A==
 
 "@types/html-minifier-terser@^6.0.0":
   version "6.1.0"
@@ -1319,10 +1344,10 @@
   resolved "https://registry.yarnpkg.com/@xuyanfeng/fs-browserify/-/fs-browserify-1.0.0.tgz#808811e8d7e2fb8bcad9fd7290a4ca0f280bc585"
   integrity sha512-Tir61SPNwFLSRE18QsD8vJZg78td9+uDDUnyWB/iP896zhqhzXlqJnPOKOIZEPs4dQ1IqjZZfFwJ9STIH2uD+A==
 
-"@xuyanfeng/fs-extra-browserify@^1.0.2":
-  version "1.0.2"
-  resolved "https://mirrors.cloud.tencent.com/npm/@xuyanfeng/fs-extra-browserify/-/fs-extra-browserify-1.0.2.tgz#64c7e571aa0e881c47f2c15d33a42a81a74c2ab5"
-  integrity sha512-vbysPDyzcMdliomc6CfoF/zZ3BoPScR9ObdZIjZ9Tf6yf6L1vNI9PLJxM6bL/LYv5QupqRzMQ5awkiCy+pFuyw==
+"@xuyanfeng/fs-extra-browserify@^1.0.3":
+  version "1.0.3"
+  resolved "https://mirrors.cloud.tencent.com/npm/@xuyanfeng/fs-extra-browserify/-/fs-extra-browserify-1.0.3.tgz#a97add75645d924639cb4d855abaef1455c3ad06"
+  integrity sha512-NgmhlTvbC0mj7XLJ6VWBQP7B6/PMXPM6H9975OQZElBpDLTKL+O2pnFAcd1lYyZwsG7/JlQQDZnI5Fuj9ZcdQw==
 
 "@xuyanfeng/globby-browserify@^1.0.0":
   version "1.0.0"
