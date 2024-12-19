@@ -177,11 +177,52 @@ class CocosPluginService {
     init(type) {
         this.loadEnv();
         const userOptions = this.loadUserOptions();
-        userOptions && this.checkUserOptions(userOptions, type);
+        if (userOptions) {
+            this.checkUserOptions(userOptions, type);
+        }
         this.projectConfig = (0, lodash_1.defaultsDeep)(userOptions, this.defaults);
         this.projectConfig.type = type;
         this.loadUserWebpackConfig();
         this.checkConfig();
+    }
+    /**
+     * 处理asset db
+     * server模式下需要link，pack模式下需要copy
+     */
+    dealAssetDb(link = true) {
+        debugger;
+        const { type } = this.projectConfig;
+        const { manifest, options } = this.projectConfig;
+        let dbDir = null;
+        if (type === declare_1.PluginType.PluginV2) {
+            const { asset_db_v2 } = manifest;
+            dbDir = asset_db_v2 || null;
+        }
+        else if (type === declare_1.PluginType.PluginV3) {
+            const { asset_db_v3 } = manifest;
+            dbDir = asset_db_v3 || null;
+        }
+        if (dbDir) {
+            if (!dbDir.path) {
+                log_1.log.red(`asset db dir path is empty`);
+                process.exit(1);
+            }
+            const fullpath = Path.join(this.context, dbDir.path);
+            if (!FS.existsSync(fullpath)) {
+                log_1.log.red(`asset db dir not exist: ${dbDir.path}`);
+                process.exit(1);
+            }
+            const targetDir = Path.join(options.output, dbDir.path);
+            if (FS.existsSync(targetDir)) {
+                FsExtra.removeSync(targetDir);
+            }
+            if (link) {
+                FsExtra.ensureSymlinkSync(fullpath, targetDir, 'dir');
+            }
+            else {
+                FsExtra.copySync(fullpath, targetDir);
+            }
+        }
     }
     // 校验插件配置
     checkConfig() {

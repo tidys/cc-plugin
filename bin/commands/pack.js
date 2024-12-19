@@ -61,6 +61,7 @@ class Pack extends plugin_api_1.PluginApi {
                 (0, fs_extra_1.emptyDirSync)(output);
                 log_1.log.yellow(`清空目录：${output}`);
             }
+            service_1.cocosPluginService.dealAssetDb(false);
             api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
                 webpackChain.mode('production');
                 webpackChain.devtool(false);

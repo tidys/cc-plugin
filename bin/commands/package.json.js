@@ -58,6 +58,7 @@ class CocosPluginPackageJson {
         else if (type === declare_1.PluginType.PluginV3) {
             packageWorker = new package_worker_1.PackageV3(this.service.projectConfig, packageJson);
         }
+        packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.assetDbBuild();
         // 面板
         packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.panelReady();
         (_a = this.manifest.panels) === null || _a === void 0 ? void 0 : _a.map((panel) => {

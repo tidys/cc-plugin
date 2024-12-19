@@ -71,6 +71,7 @@ class Serve extends plugin_api_1.PluginApi {
             if (service.isCreatorPlugin() && output) {
                 log_1.log.blue((0, printf_1.default)('%-20s %s', 'plugin dir:      ', output));
             }
+            service_1.cocosPluginService.dealAssetDb(true);
             const { options, manifest } = service.projectConfig;
             api.chainWebpack((webpackChain) => __awaiter(this, void 0, void 0, function* () {
                 var _b;

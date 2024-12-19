@@ -17,6 +17,8 @@ class PackageInterface {
     ;
     menuBuild(menu) { }
     ;
+    assetDbBuild() { }
+    ;
     panelReady() { }
     ;
     panelBuild(panel) { }
@@ -55,6 +57,9 @@ class PackageV2 extends PackageInterface {
     panelReady() {
         super.panelReady();
     }
+    assetDbBuild() {
+        super.assetDbBuild();
+    }
     panelBuild(panel) {
         super.panelBuild(panel);
         const panelName = !!panel.name ? `panel.${panel.name}` : 'panel';
@@ -88,8 +93,34 @@ class PackageV3 extends PackageInterface {
             messages: {},
             menu: [],
             shortcuts: [],
+            "asset-db": {},
         };
         this.addMessageToContributions('onBuilder', 'onBuilder'); // 预定义的事件
+    }
+    assetDbBuild() {
+        super.assetDbBuild();
+        const dbConfig = this.config.manifest.asset_db_v3;
+        if (!dbConfig) {
+            return;
+        }
+        if (!this.packageData || !this.packageData.contributions) {
+            return;
+        }
+        const db = this.packageData.contributions['asset-db'];
+        let readonly = true;
+        if (dbConfig.readonly === undefined) {
+            readonly = true;
+        }
+        else if (dbConfig.readonly === true) {
+            readonly = true;
+        }
+        else {
+            readonly = false;
+        }
+        db.mount = {
+            path: dbConfig.path,
+            readonly: readonly
+        };
     }
     panelReady() {
         var _a;
