@@ -42,6 +42,7 @@ export default class Serve extends PluginApi {
             if (service.isCreatorPlugin() && output) {
                 log.blue(printf('%-20s %s', 'plugin dir:      ', output))
             }
+            cocosPluginService.dealAssetDb(true);
             const { options, manifest } = service.projectConfig;
             api.chainWebpack(async (webpackChain: Config) => {
                 // 当server开启时，一般来说都需要启用watchBuild，不然没有实际意义

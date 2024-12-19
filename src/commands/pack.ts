@@ -33,7 +33,7 @@ export default class Pack extends PluginApi {
                     emptyDirSync(output);
                     log.yellow(`清空目录：${output}`);
                 }
-
+                cocosPluginService.dealAssetDb(false);
                 api.chainWebpack(async (webpackChain: Config) => {
                     webpackChain.mode('production')
                     webpackChain.devtool(false);

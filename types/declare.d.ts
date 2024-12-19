@@ -103,6 +103,19 @@ export interface CocosPluginManifest {
         head?: string[];
     };
     /**
+     * 注册资源数据库，资源数据库的名字为插件的名字
+     *
+     * 在creator v3中调用示例 db://test-package/foo
+     */
+    asset_db_v3?: AssetDB;
+    /**
+     * 注册资源数据库，资源数据库的名字为插件的名字
+     *
+     * 在creator v2中调用
+     *
+     */
+    asset_db_v2?: AssetDB;
+    /**
      * 统计服务
      */
     analysis?: {
@@ -143,6 +156,16 @@ export interface CocosPluginManifest {
         script_inject: string;
         script_background: string;
     };
+}
+export interface AssetDB {
+    /**
+    * 资源数据库相对插件根目录的地址
+    */
+    path: string;
+    /**
+     * 是否只读，默认为true
+     */
+    readonly?: boolean;
 }
 export declare enum PluginType {
     PluginV2 = "cp-v2",// cocos creator 插件v2版本
@@ -354,6 +377,12 @@ export interface CocosPluginV3 {
             win?: string;
             mac?: string;
         }>;
+        'asset-db': {
+            mount?: {
+                path: string;
+                readonly: boolean;
+            };
+        };
     };
     panels?: Record<string, PanelOptionsV3>;
     dependencies?: string[];

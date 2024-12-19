@@ -1,9 +1,9 @@
 import webpack from 'webpack';
-import {CocosPluginV2, CocosPluginV3, PluginType} from '../declare';
+import { CocosPluginV2, CocosPluginV3, PluginType } from '../declare';
 import Path from 'path';
 import * as FsExtra from 'fs-extra';
 import { CocosPluginService } from '../service';
-import {PackageInterface, PackageV2, PackageV3} from './package-worker';
+import { PackageInterface, PackageV2, PackageV3 } from './package-worker';
 
 export default class CocosPluginPackageJson {
     private service;
@@ -37,6 +37,7 @@ export default class CocosPluginPackageJson {
         } else if (type === PluginType.PluginV3) {
             packageWorker = new PackageV3(this.service.projectConfig, packageJson);
         }
+        packageWorker?.assetDbBuild();
         // 面板
         packageWorker?.panelReady();
         this.manifest.panels?.map((panel) => {
