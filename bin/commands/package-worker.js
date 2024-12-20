@@ -59,6 +59,33 @@ class PackageV2 extends PackageInterface {
     }
     assetDbBuild() {
         super.assetDbBuild();
+        const dbConfig = this.config.manifest.asset_db_v2;
+        if (!dbConfig) {
+            return;
+        }
+        if (!this.packageData) {
+            return;
+        }
+        // readonly 在2.x中没用
+        let readonly = true;
+        if (dbConfig.readonly === undefined) {
+            readonly = true;
+        }
+        else if (dbConfig.readonly === true) {
+            readonly = true;
+        }
+        else {
+            readonly = false;
+        }
+        this.packageData['runtime-resource'] = {
+            path: dbConfig.path,
+            // mount 的文件夹名称为 [packageName]-[runtime-resource.name]
+            // name: this.config.manifest.name,
+            name: "code",
+        };
+        this.packageData.reload = {
+            ignore: [dbConfig.path]
+        };
     }
     panelBuild(panel) {
         super.panelBuild(panel);

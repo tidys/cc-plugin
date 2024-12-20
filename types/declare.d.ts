@@ -109,7 +109,7 @@ export interface CocosPluginManifest {
      */
     asset_db_v3?: AssetDB;
     /**
-     * 注册资源数据库，资源数据库的名字为插件的名字
+     * 注册资源数据库，资源数据库的名字为: [插件的名字]-code
      *
      * 在creator v2中调用
      *
@@ -294,6 +294,13 @@ export interface CocosPluginV2 {
         accelerator?: string;
     }>;
     dependencies?: string[];
+    "runtime-resource"?: {
+        path: string;
+        name: string;
+    };
+    reload?: {
+        ignore?: string[];
+    };
 }
 export interface PanelOptionsV3 {
     /**

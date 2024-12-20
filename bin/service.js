@@ -190,7 +190,6 @@ class CocosPluginService {
      * server模式下需要link，pack模式下需要copy
      */
     dealAssetDb(link = true) {
-        debugger;
         const { type } = this.projectConfig;
         const { manifest, options } = this.projectConfig;
         let dbDir = null;
