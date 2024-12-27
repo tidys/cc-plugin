@@ -324,16 +324,23 @@ class CocosPluginService {
             process.exit(0);
         }
         // 对应的问题： Invalid package name:  do not contains uppercase characters.
-        // if (/[A-Z]/.test(name)) {
-        //     log.red(`插件名字${name}不合法，不能包含大写字母`);
-        //     process.exit(0);
-        // }
-        // if (/^[a-z]/.test(name) === false) {
-        //     log.red(`插件名字${name}不合法，必须以小写字母开头。`);
-        //     process.exit(0);
-        // }
         if (/^[a-z][a-z0-9-_]{0,213}$/.test(name) === false) {
-            log_1.log.red(`插件名字 ${name} 不合法，必须以小写字母开头，只能包含小写字母、数字、下划线、横线。`);
+            log_1.log.red(`插件名字 ${name} 不合法`);
+            const err = [];
+            if (/[A-Z]/.test(name)) {
+                err.push(`不能包含大写字母`);
+            }
+            if (/^[a-z]/.test(name) === false) {
+                err.push(`必须以小写字母开头`);
+            }
+            if (err.length) {
+                let str = "";
+                for (let i = 0; i < err.length; i++) {
+                    str += (`${i + 1}:${err[i]}\n`);
+                }
+                log_1.log.red(str);
+            }
+            log_1.log.red(`请检查是否符合以下规范：\n1.必须以小写字母开头\n2.只能包含小写字母、数字、下划线、横线。`);
             process.exit(0);
         }
     }
