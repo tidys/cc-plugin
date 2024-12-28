@@ -170,7 +170,7 @@ export default class Serve extends PluginApi {
             hot: true,
             allowedHosts: ["all"],
             open: true,
-            host,
+            host: "0.0.0.0",
             https: httpOptions,
             port,
             static: "./dist",
