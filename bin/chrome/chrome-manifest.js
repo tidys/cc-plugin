@@ -45,8 +45,8 @@ class ChromeManifestDataBase {
 const permissions = [
     "wss://*/*",
     "ws://*/*",
-    "activeTab", "<all_urls>", "*://*/*", "tabs", "http://*/*", "https://*/*", "audio", "system.cpu", "clipboardRead",
-    "clipboardWrite", "system.memory", "processes", "tabs", "storage", "nativeMessaging", "contextMenus", "notifications"
+    "<all_urls>",
+    "*://*/*", "http://*/*", "https://*/*",
 ];
 const permissions_v3 = [...permissions,];
 class ChromeManifestDataV3 extends ChromeManifestDataBase {

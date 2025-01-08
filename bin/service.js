@@ -336,7 +336,7 @@ class CocosPluginService {
             if (err.length) {
                 let str = "";
                 for (let i = 0; i < err.length; i++) {
-                    str += (`${i + 1}:${err[i]}\n`);
+                    str += (`${i + 1}.${err[i]}\n`);
                 }
                 log_1.log.red(str);
             }
