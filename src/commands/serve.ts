@@ -48,7 +48,8 @@ export default class Serve extends PluginApi {
                 // 当server开启时，一般来说都需要启用watchBuild，不然没有实际意义
                 webpackChain.watch(!!options.watchBuild || options.server?.enabled!)
                 webpackChain.mode('development');
-                webpackChain.devtool('source-map');
+                // const s: Config.DevTool = options.sourcemap;
+                webpackChain.devtool('inline-source-map');
                 // 传递变量给项目，用于代码剔除
                 parseBuildOptions(webpackChain, type, opts);
                 defineVar(webpackChain, true, service.context);

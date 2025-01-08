@@ -249,6 +249,10 @@ export interface CocosPluginOptions {
      * package.json是否压缩
      */
     min?: boolean;
+    /**
+     * 开发模式下是否生成sourcemap，默认生成
+     */
+    sourcemap?: string;
     treeShaking?: boolean;
     /**
      * 静态文件目录，支持绝对路径和相对路径（相对于cc-plugin.config.ts所在目录）
