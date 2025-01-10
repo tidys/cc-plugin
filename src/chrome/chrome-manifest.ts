@@ -60,6 +60,7 @@ const permissions = [
     "wss://*/*",
     "ws://*/*",
     "<all_urls>",
+    "storage",
     "*://*/*", "http://*/*", "https://*/*",
 ];
 const permissions_v3 = [...permissions,];

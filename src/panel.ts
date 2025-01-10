@@ -112,19 +112,21 @@ export default class Panel {
     }
     private getHeaders() {
         let headers: string[] = [];
-        if (!this.service.isWeb()) {
-            return headers;
-        }
         // 用户配置的head
         const webHead = this.service.projectConfig.manifest.web?.head || [];
         headers = headers.concat(webHead);
         // 统计鸟的代码
-        const id = this.service.projectConfig.manifest.analysis?.tongjiniao || "";
+        const analysis = new Analysis(this.service)
+        let id = this.service.projectConfig.manifest.analysis?.tongjiniao || "";
         if (id) {
-            const code = new Analysis(this.service).getTongJiNiaoCode(id)
-            if (code) {
-                headers.push(code);
-            }
+            const code = analysis.getTongJiNiaoCode(id)
+            headers = headers.concat(code);
+        }
+        // Google Analytics的代码
+        id = this.service.projectConfig.manifest.analysis?.googleAnalytics || "";
+        if (id) {
+            const code = analysis.getGoogleAnalyticsCode(id)
+            headers = headers.concat(code);
         }
         return headers;
     }

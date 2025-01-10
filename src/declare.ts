@@ -128,6 +128,10 @@ export interface CocosPluginManifest {
          * web.head有重叠，如果配置了该项，请不要在web.head中配置标签
          */
         tongjiniao?: string;
+        /**
+         * 谷歌统计的ID，id可以在手动添加里面找到，一般来说代码不会发生变化，区别只有ID不同
+         */
+        googleAnalytics?: string;
     },
     /**
      * chrome插件
