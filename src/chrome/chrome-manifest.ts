@@ -63,24 +63,33 @@ const permissions = [
     "storage",
     "*://*/*", "http://*/*", "https://*/*",
 ];
-const permissions_v3 = [...permissions,];
-
+const host_permissions = [
+    "wss://*/*",
+    "ws://*/*",
+    "<all_urls>",
+    "*://*/*", "http://*/*", "https://*/*",
+];
 /**
  * 清单文件的资源
  */
 interface ResourcesV3 {
     resources: string[];
     matches: string[];
-    use_dynamic_url: boolean;
+    /**
+     * 如果为 true，则仅允许通过动态 ID 访问资源。系统会为每个会话生成一个动态 ID。
+     * 
+     * 系统会在浏览器重启或扩展程序重新加载时重新生成此文件。
+     */
+    use_dynamic_url?: boolean;
 }
 class ChromeManifestDataV3 extends ChromeManifestDataBase {
-    private permissions: string[] = permissions_v3;
+    private permissions: string[] = permissions;
     private web_accessible_resources: ResourcesV3[] = [{
         resources: ["*.js"],
         matches: ["<all_urls>", "*://*/*"],
-        use_dynamic_url: true
+        use_dynamic_url: false,
     }];
-    private host_permissions: string[] = permissions_v3;
+    private host_permissions: string[] = host_permissions;
     private action: IAction = {
         default_popup: "",
         default_icon: {
