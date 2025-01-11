@@ -166,6 +166,8 @@ export default class Zip {
                 return 'plugin-v3';
             case PluginType.Web:
                 return "web";
+            case PluginType.Chrome:
+                return "chrome";
             default:
                 return '';
         }
