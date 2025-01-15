@@ -10,8 +10,16 @@ import adaptation, { Adaptation } from './adaptation/index';
 import profile from './profile';
 import { ClientSocket } from './client-socket';
 import { flag } from '../common'
+import { ChromeConst, ChromePanelMsg } from '../chrome/const'
 interface PanelOptions {
-    ready: (rootElement: any, args: any) => void;
+    ready: (rootElement: any, args: {
+        /**
+         * chrome插件的devtools会创建2个，需要对shown的devtool面板进行vue渲染，所以特别传递了body参数
+         */
+        body?: HTMLElement,
+        doc?: Document,
+        win?: Window,
+    }) => void;
     /**
      * 插件面板接受的主进程消息
      */
@@ -63,11 +71,58 @@ export class CocosCreatorPluginRender {
                 originReady(rootElement, args);
             }
         }
-        if (this.Adaptation.Env.isWeb || this.Adaptation.Env.isChrome || this.Adaptation.Env.isElectron) {
+        if (this.Adaptation.Env.isWeb || this.Adaptation.Env.isElectron) {
             let el = document.body.querySelector('#app');
             if (el && options.ready) {
-                options.ready(el, null);
+                options.ready(el, {});
             }
+        } else if (this.Adaptation.Env.isChrome) {
+            let iconPath = "";
+            const { icon } = config.manifest;
+            if (icon && icon["48"]) {
+                iconPath = icon["48"];
+            }
+            let hasInit = false;
+            let curWin: Window | null = null;
+            chrome.devtools.panels.create(config.manifest.name, iconPath, ChromeConst.html.devtools, (panel: chrome.devtools.panels.ExtensionPanel) => {
+                panel.onShown.addListener((win) => {
+                    curWin = win;
+                    // 因为chrome会创建一个隐藏的devtools.html，所以需要标记下
+                    win['devtools_panel'] = win.document['devtools_panel'] = true;
+                    if (hasInit) {
+                        const event = new CustomEvent(ChromePanelMsg.Show, {});
+                        win.dispatchEvent(event);
+                    } else {
+                        hasInit = true;
+                        let el = win.document.body.querySelector('#app');
+                        if (el && options.ready) {
+                            // 给元素增加一个属性，好辨认
+                            [win.document.body, win.document.body.parentElement, el].forEach((element) => {
+                                if (element) {
+                                    element.setAttribute('devtools_panel', "");
+                                }
+                            })
+                            options.ready(el, {
+                                win: win,
+                                body: win.document.body,
+                                doc: win.document,
+                            });
+                        }
+                    }
+                })
+                panel.onHidden.addListener(() => {
+                    if (curWin) {
+                        const event = new CustomEvent(ChromePanelMsg.Show, {});
+                        curWin.dispatchEvent(event);
+                    }
+                })
+                panel.onSearch.addListener((query) => {
+                    if (curWin) {
+                        const event = new CustomEvent(ChromePanelMsg.Search, { detail: query });
+                        curWin.dispatchEvent(event);
+                    }
+                })
+            })
         }
         if (this.Adaptation.Env.isPluginV3) {
             if (!options.messages) {

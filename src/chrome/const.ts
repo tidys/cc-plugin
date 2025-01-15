@@ -13,3 +13,8 @@ export const ChromeConst = {
         devtools: 'devtools.html',
     }
 }
+export const ChromePanelMsg = {
+    Show: 'show',
+    Hide: 'Hide',
+    Search: 'search',
+}
