@@ -57,17 +57,15 @@ class ChromeManifestDataBase {
     }
 }
 const permissions = [
-    "wss://*/*",
-    "ws://*/*",
-    "<all_urls>",
     "storage",
-    "*://*/*", "http://*/*", "https://*/*",
 ];
 const host_permissions = [
     "wss://*/*",
     "ws://*/*",
     "<all_urls>",
-    "*://*/*", "http://*/*", "https://*/*",
+    "*://*/*",
+    "http://*/*",
+    "https://*/*",
 ];
 /**
  * 清单文件的资源
