@@ -13,6 +13,9 @@ export interface AssetsInfo {
     url: string;
     type: AssetsType;
     uuid: string;
+    /**
+     * 文件的磁盘路径
+     */
     path: string;
 }
 export interface ImportResult {
@@ -66,8 +69,8 @@ export class AssetDB extends Base {
         }
     }
     async queryAssets(assetType: AssetsType = AssetsType.Texture): Promise<AssetsInfo[]> {
+        const typeMap = {};
         if (this.adaptation.Env.isPluginV2) {
-            const typeMap = {};
             typeMap[AssetsType.Texture] = 'texture';
             return new Promise((resolve, reject) => {
                 // @ts-ignore
@@ -92,7 +95,25 @@ export class AssetDB extends Base {
                 })
             });
         } else if (this.adaptation.Env.isPluginV3) {
-
+            typeMap[AssetsType.Texture] = 'image';
+            typeMap[AssetsType.All] = '';
+            // @ts-ignore
+            const results = await Editor.Message.request("asset-db", "query-assets", {
+                pattern: "db://assets/**/*",
+                type: typeMap[assetType],//scripts, scene, effect, image
+            });
+            const ret: AssetsInfo[] = [];
+            results.forEach((item: any) => {
+                // creator的数据
+                const { isDirectory, visible, file, path, readonly, type, url, uuid } = item;
+                ret.push({
+                    url: url,
+                    path: file,
+                    uuid: uuid,
+                    type: assetType,
+                })
+            })
+            return ret;
         } else {
 
         }
