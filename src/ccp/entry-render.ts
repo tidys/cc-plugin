@@ -72,57 +72,15 @@ export class CocosCreatorPluginRender {
             }
         }
         if (this.Adaptation.Env.isWeb || this.Adaptation.Env.isElectron) {
-            let el = document.body.querySelector('#app');
-            if (el && options.ready) {
-                options.ready(el, {});
-            }
+            this.runInWeb(config, options);
         } else if (this.Adaptation.Env.isChrome) {
-            let iconPath = "";
-            const { icon } = config.manifest;
-            if (icon && icon["48"]) {
-                iconPath = icon["48"];
+            const fn = chrome?.devtools?.panels?.create;
+            if (!!fn) {
+                this.runInChromeExtension(config, options);
+            } else {
+                // chrome web test env
+                this.runInWeb(config, options);
             }
-            let hasInit = false;
-            let curWin: Window | null = null;
-            chrome.devtools.panels.create(config.manifest.name, iconPath, ChromeConst.html.devtools, (panel: chrome.devtools.panels.ExtensionPanel) => {
-                panel.onShown.addListener((win) => {
-                    curWin = win;
-                    // 因为chrome会创建一个隐藏的devtools.html，所以需要标记下
-                    win['devtools_panel'] = win.document['devtools_panel'] = true;
-                    if (hasInit) {
-                        const event = new CustomEvent(ChromePanelMsg.Show, {});
-                        win.dispatchEvent(event);
-                    } else {
-                        hasInit = true;
-                        let el = win.document.body.querySelector('#app');
-                        if (el && options.ready) {
-                            // 给元素增加一个属性，好辨认
-                            [win.document.body, win.document.body.parentElement, el].forEach((element) => {
-                                if (element) {
-                                    element.setAttribute('devtools_panel', "");
-                                }
-                            })
-                            options.ready(el, {
-                                win: win,
-                                body: win.document.body,
-                                doc: win.document,
-                            });
-                        }
-                    }
-                })
-                panel.onHidden.addListener(() => {
-                    if (curWin) {
-                        const event = new CustomEvent(ChromePanelMsg.Show, {});
-                        curWin.dispatchEvent(event);
-                    }
-                })
-                panel.onSearch.addListener((query) => {
-                    if (curWin) {
-                        const event = new CustomEvent(ChromePanelMsg.Search, { detail: query });
-                        curWin.dispatchEvent(event);
-                    }
-                })
-            })
         }
         if (this.Adaptation.Env.isPluginV3) {
             if (!options.messages) {
@@ -143,7 +101,60 @@ export class CocosCreatorPluginRender {
 
         return options;
     }
-
+    private runInWeb(config: CocosPluginConfig, options: PanelOptions) {
+        let el = document.body.querySelector('#app');
+        if (el && options.ready) {
+            options.ready(el, {});
+        }
+    }
+    private runInChromeExtension(config: CocosPluginConfig, options: PanelOptions) {
+        let iconPath = "";
+        const { icon } = config.manifest;
+        if (icon && icon["48"]) {
+            iconPath = icon["48"];
+        }
+        let hasInit = false;
+        let curWin: Window | null = null;
+        chrome.devtools.panels.create(config.manifest.name, iconPath, ChromeConst.html.devtools, (panel: chrome.devtools.panels.ExtensionPanel) => {
+            panel.onShown.addListener((win) => {
+                curWin = win;
+                // 因为chrome会创建一个隐藏的devtools.html，所以需要标记下
+                win['devtools_panel'] = win.document['devtools_panel'] = true;
+                if (hasInit) {
+                    const event = new CustomEvent(ChromePanelMsg.Show, {});
+                    win.dispatchEvent(event);
+                } else {
+                    hasInit = true;
+                    let el = win.document.body.querySelector('#app');
+                    if (el && options.ready) {
+                        // 给元素增加一个属性，好辨认
+                        [win.document.body, win.document.body.parentElement, el].forEach((element) => {
+                            if (element) {
+                                element.setAttribute('devtools_panel', "");
+                            }
+                        })
+                        options.ready(el, {
+                            win: win,
+                            body: win.document.body,
+                            doc: win.document,
+                        });
+                    }
+                }
+            })
+            panel.onHidden.addListener(() => {
+                if (curWin) {
+                    const event = new CustomEvent(ChromePanelMsg.Show, {});
+                    curWin.dispatchEvent(event);
+                }
+            })
+            panel.onSearch.addListener((query) => {
+                if (curWin) {
+                    const event = new CustomEvent(ChromePanelMsg.Search, { detail: query });
+                    curWin.dispatchEvent(event);
+                }
+            })
+        })
+    }
     public builder() {
 
     }
