@@ -157,16 +157,14 @@ export default class Panel {
         if (chrome) {
             // index索引界面
             const panels: PanelOptions[] = [];
-            const ejsOptions = JSON.stringify([
-                ChromeConst.html.devtools,
-                ChromeConst.html.options,
-                ChromeConst.html.popup,
-            ].map(item => {
-                return {
-                    label: `${item}`,
-                    href: `${item}`,
-                };
-            }));
+            const indexView = [ChromeConst.html.devtools, ChromeConst.html.options, ChromeConst.html.popup,];
+            if (chrome.script_inject_view && this.service.isServerMode()) {
+                indexView.push(ChromeConst.html.inject_view);
+            }
+            const opts = indexView.map(item => {
+                return { label: `${item}`, href: `${item}`, };
+            })
+            const ejsOptions = JSON.stringify(opts);
             // TODO: 未处理https，不过影响不大
             panels.push({
                 name: 'index',
@@ -178,11 +176,18 @@ export default class Panel {
             });
 
             // 各个界面
-            [
+            const views = [
                 { name: ChromeConst.html.devtools, entry: chrome.view_devtools },
                 { name: ChromeConst.html.options, entry: chrome.view_options },
                 { name: ChromeConst.html.popup, entry: chrome.view_popup }
-            ].map(item => {
+            ]
+            if (chrome.script_inject_view && this.service.isServerMode()) {
+                views.push({
+                    name: ChromeConst.html.inject_view,
+                    entry: chrome.script_inject_view,
+                })
+            }
+            views.map(item => {
                 let name = item.name;
                 const suffix = '.html'
                 if (name.endsWith(suffix)) {

@@ -15,7 +15,7 @@ import { log } from '../log';
 import { PluginApi } from '../plugin-api';
 import { PluginMgr } from '../plugin-mgr';
 import DevServer from '../plugin/dev-server';
-import { cocosPluginService, CocosPluginService } from '../service';
+import { cocosPluginService, CocosPluginService, ServiceMode } from '../service';
 import { checkBuildType, defineVar, getBuildOptions, parseBuildOptions } from './commonOptions';
 import { getFallback } from './fallback';
 import { showWeChatQrCode } from './tool';
@@ -35,7 +35,7 @@ export default class Serve extends PluginApi {
     apply(api: PluginMgr, service: CocosPluginService): void {
         api.registerCommand('serve', getBuildOptions('开发插件'), async (type: string, opts: OptionValues) => {
             checkBuildType(type, true);
-            cocosPluginService.init(type as PluginType);
+            cocosPluginService.init(type as PluginType, ServiceMode.Serve);
             log.blue(printf('%-20s %s', 'service root:    ', service.root))
             log.blue(printf('%-20s %s', 'service context: ', service.context))
             const { output } = service.projectConfig.options

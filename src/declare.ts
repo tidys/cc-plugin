@@ -158,7 +158,17 @@ export interface CocosPluginManifest {
          */
         view_devtools: string;
         script_content: string;
+        /**
+         * 注入到网页的脚本
+         */
         script_inject: string;
+        /**
+         * 注入到网页的界面，实际发布chrome插件时不会关注这个字段，仅仅是为了方便在web上测试使用vue编写的界面
+         */
+        script_inject_view?: string;
+        /**
+         * 插件的后台脚本
+         */
         script_background: string;
     }
 }

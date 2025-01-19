@@ -1,5 +1,5 @@
 import { PluginApi } from '../plugin-api';
-import { ProjectConfig, CocosPluginService, cocosPluginService } from '../service';
+import { ProjectConfig, CocosPluginService, cocosPluginService, ServiceMode } from '../service';
 import Config from 'webpack-chain';
 import webpack, { cache } from 'webpack'
 import { PluginMgr } from '../plugin-mgr';
@@ -26,7 +26,7 @@ export default class Pack extends PluginApi {
         api.registerCommand('pack', getBuildOptions("打包插件"),
             (type, options: OptionValues) => {
                 checkBuildType(type, true);
-                cocosPluginService.init(type as PluginType);
+                cocosPluginService.init(type as PluginType, ServiceMode.Pack);
                 // 打包前，再次清理output目录，可能会清理2次，但是关系不大
                 const { output } = cocosPluginService.projectConfig.options;
                 if (output && existsSync(output)) {

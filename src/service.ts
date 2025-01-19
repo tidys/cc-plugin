@@ -30,7 +30,10 @@ export interface ProjectConfig {
     options: CocosPluginOptions,
     type: PluginType,
 }
-
+export enum ServiceMode {
+    Serve,
+    Pack,
+}
 const ccpConfigJson = "cc-plugin.json";
 /**
  * 对应的webpack配置
@@ -187,7 +190,16 @@ export class CocosPluginService {
             plugin.apply(this.pluginMgr, this);
         })
     }
-    public init(type: PluginType) {
+
+    private mode: ServiceMode = ServiceMode.Serve;
+    public isServerMode() {
+        return this.mode === ServiceMode.Serve;
+    }
+    public isPackMode() {
+        return this.mode === ServiceMode.Pack;
+    }
+    public init(type: PluginType, mode: ServiceMode) {
+        this.mode = mode;
         this.loadEnv();
         const userOptions = this.loadUserOptions();
         if (userOptions) {
