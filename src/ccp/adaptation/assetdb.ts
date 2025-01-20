@@ -68,6 +68,14 @@ export class AssetDB extends Base {
             // 暂时不需要实现，编辑器会自动刷新
         }
     }
+    hint(uuid: string) {
+        if (this.adaptation.Env.isPluginV2) {
+
+        } else if (this.adaptation.Env.isPluginV3) {
+            // @ts-ignore
+            Editor.Message.broadcast("ui-kit:touch-asset", uuid);
+        }
+    }
     async queryAssets(assetType: AssetsType = AssetsType.Texture): Promise<AssetsInfo[]> {
         const typeMap = {};
         if (this.adaptation.Env.isPluginV2) {

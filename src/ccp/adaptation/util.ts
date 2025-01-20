@@ -59,7 +59,7 @@ export class Util extends Base {
         }
         return ''
     }
-    fspathToUuid(fspath: string): string {
+    async fspathToUuid(fspath: string): Promise<string> {
         if (this.adaptation.Env.isPluginV2) {
             if (this.adaptation.isProcessRenderer) {
                 // @ts-ignore
@@ -68,10 +68,28 @@ export class Util extends Base {
                 // @ts-ignore
                 return Editor.assetdb.fspathToUuid(fspath) || ''
             }
-        } else {
-
+        }
+        else if (this.adaptation.Env.isPluginV3) {
+            const urlOrUuid = this.fspathToUrl(fspath);
+            // @ts-ignore 
+            const res = await Editor.Message.request("asset-db", "query-asset-info", urlOrUuid)
+            if (res) {
+                return res.uuid || ""
+            }
         }
         return ''
+    }
+    async uuidToFspath(uuid: string): Promise<string> {
+        if (this.adaptation.Env.isPluginV2) {
+
+        } else if (this.adaptation.Env.isPluginV3) {
+            // @ts-ignore
+            const res = await Editor.Message.request("asset-db", "query-asset-info", uuid)
+            if (res && res.file) {
+                return res.file;
+            }
+        }
+        return ""
     }
     fspathToUrl(fspath: string): string | null {
         if (this.adaptation.Env.isPluginV2) {
@@ -86,13 +104,13 @@ export class Util extends Base {
         } else {
             // 暂时不想使用编辑器的接口
             // Editor.Message.request("asset-db",'query-uuid',url);
-            const projectPath = this.adaptation.Project.path;
-            const packageDir = join(projectPath, 'extensions');
-            const assetDir = join(projectPath, 'assets');
+            const projectPath = this.adaptation.Project.path.replace(/\\/g, '/');
+            const packageDir = join(projectPath, 'extensions').replace(/\\/g, '/');
+            const assetDir = join(projectPath, 'assets').replace(/\\/g, '/');
             if (fspath.includes(packageDir)) {
                 return fspath.replace(packageDir, 'packages:/')
             } else if (fspath.includes(assetDir)) {
-                return fspath.replace(assetDir, 'db:/')
+                return fspath.replace(assetDir, 'db://assets/');
             } else {
                 return null;
             }
