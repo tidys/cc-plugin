@@ -83,7 +83,7 @@ interface ResourcesV3 {
 class ChromeManifestDataV3 extends ChromeManifestDataBase {
     private permissions: string[] = permissions;
     private web_accessible_resources: ResourcesV3[] = [{
-        resources: ["*.js"],
+        resources: ["*.js", "*.css"],
         matches: ["<all_urls>", "*://*/*"],
         use_dynamic_url: false,
     }];

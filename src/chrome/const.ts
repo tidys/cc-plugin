@@ -7,6 +7,10 @@ export const ChromeConst = {
          */
         inject: 'inject.js',
     },
+    css: {
+        inject_view: 'inject_view.css',
+
+    },
     html: {
         options: 'options.html',
         popup: 'popup.html',

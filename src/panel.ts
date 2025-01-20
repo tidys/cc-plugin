@@ -158,7 +158,7 @@ export default class Panel {
             // index索引界面
             const panels: PanelOptions[] = [];
             const indexView = [ChromeConst.html.devtools, ChromeConst.html.options, ChromeConst.html.popup,];
-            if (chrome.script_inject_view && this.service.isServerMode()) {
+            if (chrome.script_inject_view) {
                 indexView.push(ChromeConst.html.inject_view);
             }
             const opts = indexView.map(item => {
@@ -181,7 +181,7 @@ export default class Panel {
                 { name: ChromeConst.html.options, entry: chrome.view_options },
                 { name: ChromeConst.html.popup, entry: chrome.view_popup }
             ]
-            if (chrome.script_inject_view && this.service.isServerMode()) {
+            if (chrome.script_inject_view) {
                 views.push({
                     name: ChromeConst.html.inject_view,
                     entry: chrome.script_inject_view,
