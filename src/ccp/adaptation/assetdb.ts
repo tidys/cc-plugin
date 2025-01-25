@@ -7,9 +7,10 @@ import { UrlWithParsedQuery, UrlWithStringQuery, parse } from "url"
 const Path = require('path'); // 为了适配浏览器
 export enum AssetsType {
     All = 'all',
-    Texture = 'texture'
+    Texture = 'texture',
+    Audio = 'audio',
 }
-export interface AssetsInfo {
+export class AssetsInfo {
     url: string;
     type: AssetsType;
     uuid: string;
@@ -56,7 +57,20 @@ export class AssetDB extends Base {
             });
 
         } else if (this.adaptation.Env.isPluginV3) {
-
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (existsSync(file)) {
+                    // @ts-ignore
+                    const results = await Editor.Message.request("asset-db", "import-asset",
+                        file, // 本地文件的绝对路径
+                        url, // 导入数据库的url地址
+                        {
+                            overwrite: true,// 强制覆盖
+                            rename: true,// 冲突时否自动更名，默认 false
+                        }
+                    );
+                }
+            }
         }
         return [];
     }
@@ -92,12 +106,12 @@ export class AssetDB extends Base {
                     results.forEach((item: any) => {
                         // creator的数据
                         const { destPath, hidden, isSubAsset, path, readonly, type, url, uuid } = item;
-                        ret.push({
-                            url: url,
-                            path: path,
-                            uuid: uuid,
-                            type: assetType,
-                        })
+                        const info = new AssetsInfo();
+                        info.url = url;
+                        info.path = path;
+                        info.uuid = uuid;
+                        info.type = assetType;
+                        ret.push(info)
                     })
                     resolve(ret);
                 })
@@ -114,12 +128,12 @@ export class AssetDB extends Base {
             results.forEach((item: any) => {
                 // creator的数据
                 const { isDirectory, visible, file, path, readonly, type, url, uuid } = item;
-                ret.push({
-                    url: url,
-                    path: file,
-                    uuid: uuid,
-                    type: assetType,
-                })
+                const info = new AssetsInfo();
+                info.url = url;
+                info.path = file;
+                info.uuid = uuid;
+                info.type = assetType;
+                ret.push(info)
             })
             return ret;
         } else {

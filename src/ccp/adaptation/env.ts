@@ -16,6 +16,12 @@ export class Env extends Base {
     get isWeb() {
         return this._type === PluginType.Web;
     }
+    get isX86() {
+        return process.arch === 'x86';
+    }
+    get isX64() {
+        return process.arch === 'x64';
+    }
     get isChrome() {
         return this._type === PluginType.Chrome;
     }

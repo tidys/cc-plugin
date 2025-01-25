@@ -411,7 +411,7 @@ export class CocosPluginService {
                     }
                 }
                 if (dirs.length <= 0) {
-                    log.red(`未配置options.outputProject`);
+                    log.red(`未配置options.outputProject, 详细配置信息参考： https://www.npmjs.com/package/cc-plugin#%E5%85%B3%E4%BA%8Eoptionsoutputproject`);
                 } else {
                     for (let i = 0; i < dirs.length; i++) {
                         const { url, source } = dirs[i];

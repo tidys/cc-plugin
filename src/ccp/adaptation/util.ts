@@ -60,6 +60,7 @@ export class Util extends Base {
         return ''
     }
     async fspathToUuid(fspath: string): Promise<string> {
+        fspath = fspath.replace(/\\/g, '/');
         if (this.adaptation.Env.isPluginV2) {
             if (this.adaptation.isProcessRenderer) {
                 // @ts-ignore
@@ -92,6 +93,7 @@ export class Util extends Base {
         return ""
     }
     fspathToUrl(fspath: string): string | null {
+        fspath = fspath.replace(/\\/g, '/');
         if (this.adaptation.Env.isPluginV2) {
             if (this.adaptation.isProcessRenderer) {
                 // @ts-ignore
