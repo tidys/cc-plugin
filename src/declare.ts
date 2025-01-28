@@ -269,6 +269,12 @@ export interface CocosPluginOptions {
     sourcemap?: string;
     treeShaking?: boolean;
     /**
+     * 是否混淆代码，默认混淆
+     * 
+     * server环境不生效，只针对pack环境
+     */
+    obscure?: boolean;
+    /**
      * 静态文件目录，支持绝对路径和相对路径（相对于cc-plugin.config.ts所在目录）
      * 
      * 可以把插件依赖的静态文件放在该目录下，在发布插件时，会将该目录随着插件一起发布

@@ -16,7 +16,9 @@ import { copyFileSync, copySync, emptyDirSync, ensureDirSync } from 'fs-extra';
 import { Option, OptionValues } from 'commander';
 import { checkBuildType, getBuildOptions, parseBuildOptions, defineVar } from './commonOptions';
 import { showWeChatQrCode } from './tool';
-
+import WebpackObfuscator from 'webpack-obfuscator'
+import { WebpackObfuscatorOptions } from 'webpack-obfuscator/dist/plugin/index'
+import { ObfuscatorOptions } from 'javascript-obfuscator'
 export default class Pack extends PluginApi {
     exit() {
         process.exit(0);
@@ -56,7 +58,9 @@ export default class Pack extends PluginApi {
 
                         }
                     ])
-
+                    if (!service.projectConfig.options.obscure === false) {
+                        webpackChain.plugin("obscure").use(WebpackObfuscator);
+                    }
                     // 修改配置，主要是把server参数关闭了
                     webpackChain.module.rule('config-loader')
                         .test(/\.config.ts$/)

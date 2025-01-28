@@ -43,6 +43,7 @@
     "https-browserify": "^1.0.0",
     "inquirer": "^8.2.0",
     "interpret": "^2.2.0",
+    "javascript-obfuscator": "^4.1.1",
     "jszip": "^3.7.1",
     "less": "^4.1.2",
     "less-loader": "5.0.0",
@@ -85,6 +86,7 @@
     "webpack-dev-server": "^4.7.1",
     "webpack-filter-warnings-plugin": "^1.2.1",
     "webpack-mkcert": "^1.0.3",
+    "webpack-obfuscator": "^3.5.1",
     "webpack-shebang-plugin": "^1.1.7",
     "webpack-sources": "3.2.2",
     "xmlhttprequest": "^1.8.0"
@@ -92,8 +94,8 @@
   "description": "专为Cocos Creator插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。",
   "devDependencies": {
     "@types/axios": "^0.14.0",
-    "@types/chrome": "0.0.293",
     "@types/chroma-js": "^2.1.3",
+    "@types/chrome": "0.0.293",
     "@types/fs-extra": "^9.0.13",
     "@types/interpret": "^1.1.1",
     "@types/loader-utils": "^2.0.3",
