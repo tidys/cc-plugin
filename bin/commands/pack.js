@@ -47,6 +47,7 @@ const fallback_1 = require("./fallback");
 const fs_1 = require("fs");
 const fs_extra_1 = require("fs-extra");
 const commonOptions_1 = require("./commonOptions");
+const webpack_obfuscator_1 = __importDefault(require("webpack-obfuscator"));
 class Pack extends plugin_api_1.PluginApi {
     exit() {
         process.exit(0);
@@ -54,7 +55,7 @@ class Pack extends plugin_api_1.PluginApi {
     apply(api, service) {
         api.registerCommand('pack', (0, commonOptions_1.getBuildOptions)("打包插件"), (type, options) => {
             (0, commonOptions_1.checkBuildType)(type, true);
-            service_1.cocosPluginService.init(type);
+            service_1.cocosPluginService.init(type, service_1.ServiceMode.Pack);
             // 打包前，再次清理output目录，可能会清理2次，但是关系不大
             const { output } = service_1.cocosPluginService.projectConfig.options;
             if (output && (0, fs_1.existsSync)(output)) {
@@ -83,6 +84,9 @@ class Pack extends plugin_api_1.PluginApi {
                         }
                     }
                 ]);
+                if (!service.projectConfig.options.obscure === false) {
+                    webpackChain.plugin("obscure").use(webpack_obfuscator_1.default);
+                }
                 // 修改配置，主要是把server参数关闭了
                 webpackChain.module.rule('config-loader')
                     .test(/\.config.ts$/)

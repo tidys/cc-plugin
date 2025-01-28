@@ -196,7 +196,7 @@ npm i @xuyanfeng/cc-editor -g
 
 serve环境下的工作空间路径，即`cc-plugin.config.ts`所在的目录。
 
-## 插件携带了一下静态文件如何处理
+## 插件携带了静态文件如何处理
 
 举例：插件携带了一个`1.exe`文件，需要按照以下步骤处理
 
@@ -291,3 +291,12 @@ const manifest: CocosPluginManifest = {
 - cc-plugin.config.ts
 
 具体的细节，cc-plugin会自动帮你处理，好处是只需要一个工程，就能同时适配v2/v3版本的creator，维护起来更加方便简单。
+
+## 支持混淆
+server模式下不会生效，在pack模式下默认开启，如果想关闭，只需在`cc-plugin.config.ts`如下配置
+```ts
+const options: CocosPluginOptions = {
+    // ...
+    obscure: false;
+}
+```

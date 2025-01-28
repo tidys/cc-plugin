@@ -64,7 +64,7 @@ class Serve extends plugin_api_1.PluginApi {
         api.registerCommand('serve', (0, commonOptions_1.getBuildOptions)('开发插件'), (type, opts) => __awaiter(this, void 0, void 0, function* () {
             var _a;
             (0, commonOptions_1.checkBuildType)(type, true);
-            service_1.cocosPluginService.init(type);
+            service_1.cocosPluginService.init(type, service_1.ServiceMode.Serve);
             log_1.log.blue((0, printf_1.default)('%-20s %s', 'service root:    ', service.root));
             log_1.log.blue((0, printf_1.default)('%-20s %s', 'service context: ', service.context));
             const { output } = service.projectConfig.options;

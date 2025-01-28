@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cocosPluginService = exports.CocosPluginService = void 0;
+exports.cocosPluginService = exports.CocosPluginService = exports.ServiceMode = void 0;
 const declare_1 = require("./declare");
 const Path = __importStar(require("path"));
 const serve_1 = __importDefault(require("./commands/serve"));
@@ -43,6 +43,11 @@ const plugin_mgr_1 = require("./plugin-mgr");
 const create_1 = __importDefault(require("./commands/create"));
 const FsExtra = __importStar(require("fs-extra"));
 const const_1 = require("./const");
+var ServiceMode;
+(function (ServiceMode) {
+    ServiceMode[ServiceMode["Serve"] = 0] = "Serve";
+    ServiceMode[ServiceMode["Pack"] = 1] = "Pack";
+})(ServiceMode || (exports.ServiceMode = ServiceMode = {}));
 const ccpConfigJson = "cc-plugin.json";
 class CocosPluginService {
     constructor(context) {
@@ -50,6 +55,7 @@ class CocosPluginService {
         this.plugins = [];
         this.projectConfig = this.defaults;
         this.userWebpackConfig = { plugins: [] };
+        this.mode = ServiceMode.Serve;
         this.pluginMgr = new plugin_mgr_1.PluginMgr(this);
         this.context = context || process.cwd();
         this.root = Path.join(__dirname, '..');
@@ -174,7 +180,14 @@ class CocosPluginService {
             plugin.apply(this.pluginMgr, this);
         });
     }
-    init(type) {
+    isServerMode() {
+        return this.mode === ServiceMode.Serve;
+    }
+    isPackMode() {
+        return this.mode === ServiceMode.Pack;
+    }
+    init(type, mode) {
+        this.mode = mode;
         this.loadEnv();
         const userOptions = this.loadUserOptions();
         if (userOptions) {
@@ -377,7 +390,7 @@ class CocosPluginService {
                     }
                 }
                 if (dirs.length <= 0) {
-                    log_1.log.red(`未配置options.outputProject`);
+                    log_1.log.red(`未配置options.outputProject, 详细配置信息参考： https://www.npmjs.com/package/cc-plugin#%E5%85%B3%E4%BA%8Eoptionsoutputproject`);
                 }
                 else {
                     for (let i = 0; i < dirs.length; i++) {

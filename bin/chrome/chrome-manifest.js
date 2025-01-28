@@ -43,22 +43,26 @@ class ChromeManifestDataBase {
     }
 }
 const permissions = [
+    "storage",
+];
+const host_permissions = [
     "wss://*/*",
     "ws://*/*",
     "<all_urls>",
-    "*://*/*", "http://*/*", "https://*/*",
+    "*://*/*",
+    "http://*/*",
+    "https://*/*",
 ];
-const permissions_v3 = [...permissions,];
 class ChromeManifestDataV3 extends ChromeManifestDataBase {
     constructor(name, version, description = "") {
         super(name, version, description);
-        this.permissions = permissions_v3;
+        this.permissions = permissions;
         this.web_accessible_resources = [{
-                resources: ["*.js"],
+                resources: ["*.js", "*.css"],
                 matches: ["<all_urls>", "*://*/*"],
-                use_dynamic_url: true
+                use_dynamic_url: false,
             }];
-        this.host_permissions = permissions_v3;
+        this.host_permissions = host_permissions;
         this.action = {
             default_popup: "",
             default_icon: {

@@ -191,6 +191,8 @@ class Zip {
                 return 'plugin-v3';
             case declare_1.PluginType.Web:
                 return "web";
+            case declare_1.PluginType.Chrome:
+                return "chrome";
             default:
                 return '';
         }

@@ -157,7 +157,17 @@ export interface CocosPluginManifest {
          */
         view_devtools: string;
         script_content: string;
+        /**
+         * 注入到网页的脚本
+         */
         script_inject: string;
+        /**
+         * 注入到网页的界面，实际发布chrome插件时不会关注这个字段，仅仅是为了方便在web上测试使用vue编写的界面
+         */
+        script_inject_view?: string;
+        /**
+         * 插件的后台脚本
+         */
         script_background: string;
     };
 }
@@ -252,6 +262,12 @@ export interface CocosPluginOptions {
      */
     sourcemap?: string;
     treeShaking?: boolean;
+    /**
+     * 是否混淆代码，默认混淆
+     *
+     * server环境不生效，只针对pack环境
+     */
+    obscure?: boolean;
     /**
      * 静态文件目录，支持绝对路径和相对路径（相对于cc-plugin.config.ts所在目录）
      *

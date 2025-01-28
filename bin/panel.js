@@ -113,21 +113,23 @@ class Panel {
         return '';
     }
     getHeaders() {
-        var _a, _b;
+        var _a, _b, _c;
         let headers = [];
-        if (!this.service.isWeb()) {
-            return headers;
-        }
         // 用户配置的head
         const webHead = ((_a = this.service.projectConfig.manifest.web) === null || _a === void 0 ? void 0 : _a.head) || [];
         headers = headers.concat(webHead);
         // 统计鸟的代码
-        const id = ((_b = this.service.projectConfig.manifest.analysis) === null || _b === void 0 ? void 0 : _b.tongjiniao) || "";
+        const analysis = new analysis_1.Analysis(this.service);
+        let id = ((_b = this.service.projectConfig.manifest.analysis) === null || _b === void 0 ? void 0 : _b.tongjiniao) || "";
         if (id) {
-            const code = new analysis_1.Analysis(this.service).getTongJiNiaoCode(id);
-            if (code) {
-                headers.push(code);
-            }
+            const code = analysis.getTongJiNiaoCode(id);
+            headers = headers.concat(code);
+        }
+        // Google Analytics的代码
+        id = ((_c = this.service.projectConfig.manifest.analysis) === null || _c === void 0 ? void 0 : _c.googleAnalytics) || "";
+        if (id) {
+            const code = analysis.getGoogleAnalyticsCode(id);
+            headers = headers.concat(code);
         }
         return headers;
     }
@@ -158,16 +160,14 @@ class Panel {
         if (chrome) {
             // index索引界面
             const panels = [];
-            const ejsOptions = JSON.stringify([
-                const_1.ChromeConst.html.devtools,
-                const_1.ChromeConst.html.options,
-                const_1.ChromeConst.html.popup,
-            ].map(item => {
-                return {
-                    label: `${item}`,
-                    href: `${item}`,
-                };
-            }));
+            const indexView = [const_1.ChromeConst.html.devtools, const_1.ChromeConst.html.options, const_1.ChromeConst.html.popup,];
+            if (chrome.script_inject_view) {
+                indexView.push(const_1.ChromeConst.html.inject_view);
+            }
+            const opts = indexView.map(item => {
+                return { label: `${item}`, href: `${item}`, };
+            });
+            const ejsOptions = JSON.stringify(opts);
             // TODO: 未处理https，不过影响不大
             panels.push({
                 name: 'index',
@@ -178,11 +178,18 @@ class Panel {
                 type: declare_1.Panel.Type.InnerIndex,
             });
             // 各个界面
-            [
+            const views = [
                 { name: const_1.ChromeConst.html.devtools, entry: chrome.view_devtools },
                 { name: const_1.ChromeConst.html.options, entry: chrome.view_options },
                 { name: const_1.ChromeConst.html.popup, entry: chrome.view_popup }
-            ].map(item => {
+            ];
+            if (chrome.script_inject_view) {
+                views.push({
+                    name: const_1.ChromeConst.html.inject_view,
+                    entry: chrome.script_inject_view,
+                });
+            }
+            views.map(item => {
                 let name = item.name;
                 const suffix = '.html';
                 if (name.endsWith(suffix)) {
