@@ -220,7 +220,7 @@ export default class Base extends PluginApi {
 
             webpackChain.module
                 .rule('image')
-                .test(/\.(png|jpe?g|gif)$/)
+                .test(/\.(png|jpe?g|gif|webp|mp4)$/)
                 .use('url-loader')
                 .loader('url-loader')
                 .options({
