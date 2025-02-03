@@ -239,7 +239,7 @@ class Base extends plugin_api_1.PluginApi {
             });
             webpackChain.module
                 .rule('image')
-                .test(/\.(png|jpe?g|gif)$/)
+                .test(/\.(png|jpe?g|gif|webp|mp4)$/)
                 .use('url-loader')
                 .loader('url-loader')
                 .options({
