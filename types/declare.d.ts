@@ -36,6 +36,10 @@ export interface PanelOptions {
      */
     title: string;
     type: string;
+    /**
+     * 是否为无边框窗口，当type为Floating时才有效
+     */
+    board?: boolean;
     icon?: string;
     width?: number;
     height?: number;
@@ -45,13 +49,32 @@ export interface PanelOptions {
      */
     minWidth?: number;
     minHeight?: number;
+    /**
+     * 自定义面板模板，针对索引面板设计的参数
+     */
     ejs?: string;
+    /**
+     * 自定义面板模板参数
+     */
     ejsOptions?: Record<string, any>;
 }
 export declare const Panel: {
     Type: {
+        /**
+         * Creator支持的面板类型
+         */
         DockAble: string;
+        /**
+         * Creator支持的面板类型
+         */
         Simple: string;
+        /**
+         * 自己实现的，基于electron.BrowserWindow的独立窗口
+         */
+        Floating: string;
+        /**
+         * web页面的索引面板
+         */
         InnerIndex: string;
         Web: string;
     };

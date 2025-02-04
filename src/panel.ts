@@ -67,7 +67,8 @@ export default class Panel {
                 entryName = panel.name;
             }
             if (this.service.isCreatorPlugin() || this.service.isElectron()) {
-                entryName = `panel/${panel.name}`;
+                // entryName和panel.type挂钩，方便判断是否要注入兼容的js逻辑
+                entryName = `${panel.type}/${panel.name}`;
             }
 
             let entryPoint = webpackChain.entryPoints.get(entryName);

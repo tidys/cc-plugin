@@ -1,3 +1,4 @@
+import { Panel } from '../declare';
 import webpack from 'webpack';
 import { ConcatSource } from 'webpack-sources'
 
@@ -21,7 +22,7 @@ export default class RequireV3 {
             const { assets } = compilation;
 
             Object.keys(assets).forEach(e => {
-                if (/\.js$/.test(e)) {
+                if (/\.js$/.test(e) && !e.startsWith(Panel.Type.Floating)) {
                     // @ts-ignore
                     assets[e] = new ConcatSource(code, assets[e]);
                 }
