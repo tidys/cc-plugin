@@ -117,7 +117,8 @@ export class PackageV3 extends PackageInterface {
         this.packageData = packageData;
         this.packageData.package_version = 2;
         this.packageData!.contributions = {
-            builder: './builder.js', // todo 目前这里是写死的，需要后续优化下
+            // TODO: 目前这里是写死的，需要后续优化下
+            builder: './builder.js',
             messages: {},
             menu: [],
             shortcuts: [],
@@ -198,6 +199,24 @@ export class PackageV3 extends PackageInterface {
             label: newLabel,
             message: msgKey,
         })
+
+        /**
+            "shortcuts": [
+                {
+                    "message": "undo",
+                    "when": "panel.hello-world",
+                    "win": "ctrl+z",
+                    "mac": "cmd+z",
+                }
+            ]
+        */
+        if (menuOpts.accelerator) {
+            this.packageData!.contributions!.shortcuts?.push({
+                message: msgKey,
+                win: menuOpts.accelerator,
+                mac: menuOpts.accelerator,
+            });
+        }
     }
 
     /**
