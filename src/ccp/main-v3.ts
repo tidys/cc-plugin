@@ -21,7 +21,9 @@ export function load() {
 }
 
 export function unload() {
-    console.log('unload')
+    if (CCP.wrapper && CCP.wrapper.unload) {
+        CCP.wrapper.unload();
+    }
 }
 
 export const methods = Object.assign(

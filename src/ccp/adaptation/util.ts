@@ -133,17 +133,7 @@ export class Util extends Base {
         return ''
     }
     public init() {
-        let root = join(__dirname, "../..");
-        const name = basename(root);
-        if (this.adaptation.Env.isPluginV2) {
-            if (name !== 'packages') {
-                root = "";
-            }
-        } else if (this.adaptation.Env.isPluginV3) {
-            if (name !== 'extensions') {
-                root = "";
-            }
-        }
+        let root = join(this.adaptation.Project.path, this.adaptation.Env.pluginDirectory);
         if (root && existsSync(root)) {
             const files = readdirSync(root);
             for (let i = 0; i < files.length; i++) {
