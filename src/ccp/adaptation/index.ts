@@ -1,4 +1,4 @@
-import { BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType } from '../../declare';
+import { BuilderOptions, CocosPluginConfig, PanelOptions, Platform, PluginType, Panel as PanelType } from '../../declare';
 
 import { Util } from "./util"
 import { Env } from './env'
@@ -32,10 +32,7 @@ export class Adaptation {
     public Menu = new Menu(this);
     public Download = new Download(this);
     public IP = new IP(this);
-    constructor() {
-        this.Env.init();
-        this.Util.init();
-    }
+
     public require(name: string): any {
         if (this.Env.isPluginV2) {
             // @ts-ignore
@@ -70,6 +67,15 @@ export class Adaptation {
     }
 
     init(pluginConfig: CocosPluginConfig) {
+        this.Env.init();
+        // FIXME: uitl.init会调用编辑器的接口，而Floating类型的面板，是没法调用EditorAPI的，暂时只能通过面板类型进行识别
+        if (typeof __PANEL__ !== 'undefined') {
+            if (__PANEL__.type !== PanelType.Type.Floating) {
+                this.Util.init();
+            }
+        } else {
+            this.Util.init();
+        }
         this.config = pluginConfig;
     }
     get isProcessRenderer() {
@@ -78,5 +84,3 @@ export class Adaptation {
     }
 }
 
-let adaptation: Adaptation = new Adaptation();
-export default adaptation;

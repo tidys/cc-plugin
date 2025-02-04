@@ -9,6 +9,7 @@ declare global {
      * 开发模式下的工作目录，也就是cc-plugin.config.ts所在的目录
      */
     const __DEV_WORKSPACE__: string;
+    const __PANEL__: PanelOptions;
 }
 export interface MenuOptions {
     /**
@@ -72,6 +73,8 @@ export const Panel = {
         Simple: 'simple',
         /**
          * 自己实现的，基于electron.BrowserWindow的独立窗口
+         * 
+         * 注意，不能在该面板中调用编辑器的相关API，只能通过ipcRenderer发送到主进程后，由主进程调用编辑器的接口
          */
         Floating: 'floating',
         /**
@@ -481,3 +484,10 @@ export enum Platform {
     Mac = 'mac',
     Win32 = 'win32',
 };
+
+export enum IpcMsg {
+    /**
+     * 通过Ipc消息获得编辑器的node_modules目录
+     */
+    EditorNodeModules = "editor-node-modules",
+}

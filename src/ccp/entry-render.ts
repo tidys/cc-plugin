@@ -3,10 +3,11 @@ import {
     CocosPluginManifest,
     CocosPluginOptions,
     DefaultCocosPluginOptions,
+    Panel,
     PluginType
 } from '../declare';
 
-import adaptation, { Adaptation } from './adaptation/index';
+import { Adaptation } from './adaptation/index';
 import profile from './profile';
 import { ClientSocket } from './client-socket';
 import { flag } from '../common'
@@ -29,7 +30,7 @@ interface PanelOptions {
 export class CocosCreatorPluginRender {
     public manifest: CocosPluginManifest | null = null;
     public options: CocosPluginOptions | null = null;
-    public Adaptation: Adaptation = adaptation;
+    public Adaptation: Adaptation = new Adaptation();
 
     /**
      * 调用来自插件, export的正好是PanelOptions，和creator插件对上了
@@ -71,7 +72,10 @@ export class CocosCreatorPluginRender {
                 originReady(rootElement, args);
             }
         }
-        if (this.Adaptation.Env.isWeb || this.Adaptation.Env.isElectron) {
+        if (typeof __PANEL__ !== 'undefined' && __PANEL__.type === Panel.Type.Floating) {
+            // 渲染进程是肯定有__PANEL__的全局变量，Floating类型面板需要时机处理vue渲染
+            this.runInWeb(config, options);
+        } else if (this.Adaptation.Env.isWeb || this.Adaptation.Env.isElectron) {
             this.runInWeb(config, options);
         } else if (this.Adaptation.Env.isChrome) {
             const fn = chrome?.devtools?.panels?.create;

@@ -16,7 +16,16 @@ export class CCEditor extends Base {
             return ""
         }
     }
-
+    get node_modules() {
+        if (this.adaptation.Env.isPluginV2) {
+            return ""
+        } else if (this.adaptation.Env.isPluginV3) {
+            // @ts-ignore
+            return Path.join(Editor.App.path, "node_modules")
+        } else {
+            return ""
+        }
+    }
     private _version = '';
     get version() {
         // 因为牵扯到remote，所以对这个变量做了一次缓存

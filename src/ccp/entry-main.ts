@@ -6,12 +6,12 @@ import {
     PluginMainWrapper,
     PluginType,
 } from '../declare';
-import adaptation, {Adaptation} from './adaptation'
+import { Adaptation } from './adaptation'
 
 export class CocosCreatorPluginMain {
     public manifest: CocosPluginManifest | null = null;
     public options: CocosPluginOptions | null = null;
-    public Adaptation: Adaptation = adaptation;
+    public Adaptation: Adaptation = new Adaptation();
     public wrapper: PluginMainWrapper | null = null;
 
     public init(config: CocosPluginConfig, wrapper: PluginMainWrapper) {

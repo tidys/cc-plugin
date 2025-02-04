@@ -1,10 +1,22 @@
 import CCP from './entry-main'
 import { ClientSocket } from './client-socket';
-import { BuilderOptions } from '../declare';
+import { BuilderOptions, IpcMsg, Panel } from '../declare';
 import * as Path from 'path';
 import { BuildInfo } from './builder/type';
+const { ipcMain } = require('electron');
 
+/**
+ * 获取编辑器的node_modules目录，Floating面板初始化时，会使用到编辑器内置的node模块，比如fs-extra
+ * @example 
+ * ```
+ * ipcRenderer.sendSync(IpcMsg.EditorNodeModules)
+ * ```
+ *  */
+function onEditorNodeModules(event: any, data: any) {
+    event.returnValue = CCP.Adaptation.CCEditor.node_modules;
+}
 export function load() {
+    ipcMain.on(IpcMsg.EditorNodeModules, onEditorNodeModules);
     if (CCP.options && CCP.options.server) {
         const { enabled, port, creatorHMR } = CCP.options.server;
         if (!!enabled && creatorHMR) {
@@ -21,6 +33,7 @@ export function load() {
 }
 
 export function unload() {
+    ipcMain.off(IpcMsg.EditorNodeModules, onEditorNodeModules);
     if (CCP.wrapper && CCP.wrapper.unload) {
         CCP.wrapper.unload();
     }

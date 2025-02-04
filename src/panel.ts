@@ -31,23 +31,24 @@ export default class Panel {
     }
     dealPanel(panel: PanelOptions, pluginOptions: CocosPluginOptions) {
         let ejsTemplate = null;
+        const templateWeb = join(this.service.root, './template/web/index.html');
         const floating = panel.type === PanelOptionsType.Type.Floating;
         if (panel.ejs && existsSync(panel.ejs)) {
             ejsTemplate = panel.ejs;
         } else if (this.service.isCreatorPluginV3()) {
             if (floating) {
-                ejsTemplate = join(this.service.root, './template/web/index.html');
+                ejsTemplate = templateWeb;
             } else {
                 ejsTemplate = join(__dirname, '../template/panel-v3.ejs');
             }
         } else if (this.service.isCreatorPluginV2()) {
             if (floating) {
-                ejsTemplate = join(this.service.root, './template/web/index.html');
+                ejsTemplate = templateWeb;
             } else {
                 ejsTemplate = join(__dirname, '../template/panel-v2.ejs');
             }
         } else if (this.service.isWeb() || this.service.isElectron()) {
-            ejsTemplate = join(this.service.root, './template/web/index.html');
+            ejsTemplate = templateWeb;
         }
 
         // let panelMain = panel.main.endsWith(".ts") ? panel.main : `${panel.main}.ts`;
@@ -97,8 +98,13 @@ export default class Panel {
                     })
                 } else {
                     let headers = this.getHeaders();
+                    headers.push(`<script>window.__PANEL__=${JSON.stringify(panel)}</script>`);
                     if (pluginOptions.server?.https) {
                         headers.push(`<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>`);
+                    }
+                    if (floating) {
+                        // FIXME: 不知道为啥，Floating面板没有exports变量，后续有时间再研究
+                        headers.push(`<script> var exports = {}; </script>`)
                     }
                     headers = this.filterHead(headers);
                     options = Object.assign(options, {

@@ -184,6 +184,10 @@ npm i @xuyanfeng/cc-editor -g
 `cc-plugin.json`不建议纳入版本管理，它更像是一个本机配置，满足了不同电脑，配置不同的需求。
 `cc-plugin`检索`outputProject`时会优先从`cc-plugin.json`中读取配置。
 
+## `__PANEL__`
+
+全局变量，cc-plugin.config.ts里面配置的面板信息。
+
 ## `__DEV__` 
 
 用于判断是否为ccp的serve环境，布尔值。
