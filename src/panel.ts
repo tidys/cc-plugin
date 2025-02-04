@@ -31,12 +31,21 @@ export default class Panel {
     }
     dealPanel(panel: PanelOptions, pluginOptions: CocosPluginOptions) {
         let ejsTemplate = null;
+        const floating = panel.type === PanelOptionsType.Type.Floating;
         if (panel.ejs && existsSync(panel.ejs)) {
             ejsTemplate = panel.ejs;
         } else if (this.service.isCreatorPluginV3()) {
-            ejsTemplate = join(__dirname, '../template/panel-v3.ejs');
+            if (floating) {
+                ejsTemplate = join(this.service.root, './template/web/index.html');
+            } else {
+                ejsTemplate = join(__dirname, '../template/panel-v3.ejs');
+            }
         } else if (this.service.isCreatorPluginV2()) {
-            ejsTemplate = join(__dirname, '../template/panel-v2.ejs');
+            if (floating) {
+                ejsTemplate = join(this.service.root, './template/web/index.html');
+            } else {
+                ejsTemplate = join(__dirname, '../template/panel-v2.ejs');
+            }
         } else if (this.service.isWeb() || this.service.isElectron()) {
             ejsTemplate = join(this.service.root, './template/web/index.html');
         }
@@ -75,7 +84,7 @@ export default class Panel {
                     chunks: ['vendor', entryName],
                 };
                 // creator插件必须有模板
-                if (this.service.isCreatorPlugin()) {
+                if (!floating && this.service.isCreatorPlugin()) {
                     options = Object.assign(options, {
                         filename,
                         inject: false,
@@ -110,7 +119,7 @@ export default class Panel {
         }
         return '';
     }
-    private getHeaders() {
+    private getHeaders(): string[] {
         let headers: string[] = [];
         // 用户配置的head
         const webHead = this.service.projectConfig.manifest.web?.head || [];

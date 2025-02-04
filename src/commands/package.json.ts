@@ -1,5 +1,5 @@
 import webpack from 'webpack';
-import { CocosPluginV2, CocosPluginV3, PluginType } from '../declare';
+import { CocosPluginV2, CocosPluginV3, Panel, PluginType } from '../declare';
 import Path from 'path';
 import * as FsExtra from 'fs-extra';
 import { CocosPluginService } from '../service';
@@ -41,7 +41,9 @@ export default class CocosPluginPackageJson {
         // 面板
         packageWorker?.panelReady();
         this.manifest.panels?.map((panel) => {
-            packageWorker?.panelBuild(panel);
+            if (panel.type === Panel.Type.DockAble || panel.type === Panel.Type.Simple) {
+                packageWorker?.panelBuild(panel);
+            }
         })
         // 菜单
         packageWorker?.menuReady();
