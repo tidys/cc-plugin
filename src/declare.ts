@@ -164,6 +164,10 @@ export interface CocosPluginManifest {
      */
     chrome?: {
         /**
+         * 插件的商店地址
+         */
+        url?: string;
+        /**
          * chrome插件的版本
          */
         version: 2 | 3;
@@ -174,20 +178,20 @@ export interface CocosPluginManifest {
         /**
          * 弹出界面
          */
-        view_popup: string;
+        view_popup?: string;
         /**
          * 设置界面
          */
-        view_options: string;
+        view_options?: string;
         /**
          * devtools界面
          */
-        view_devtools: string;
-        script_content: string;
+        view_devtools?: string;
+        script_content?: string;
         /**
          * 注入到网页的脚本
          */
-        script_inject: string;
+        script_inject?: string;
         /**
          * 注入到网页的界面，实际发布chrome插件时不会关注这个字段，仅仅是为了方便在web上测试使用vue编写的界面
          */
@@ -195,7 +199,7 @@ export interface CocosPluginManifest {
         /**
          * 插件的后台脚本
          */
-        script_background: string;
+        script_background?: string;
     }
 }
 export interface AssetDB {

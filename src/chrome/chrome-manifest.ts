@@ -58,6 +58,7 @@ class ChromeManifestDataBase {
 }
 const permissions = [
     "storage",
+    "notifications",
 ];
 const host_permissions = [
     "wss://*/*",

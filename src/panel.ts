@@ -98,9 +98,12 @@ export default class Panel {
                     })
                 } else {
                     let headers = this.getHeaders();
-                    headers.push(`<script>window.__PANEL__=${JSON.stringify(panel)}</script>`);
                     if (pluginOptions.server?.https) {
                         headers.push(`<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>`);
+                    }
+                    if (!this.service.isChromePlugin()) {
+                        // chrome扩展不允许内联脚本
+                        headers.push(`<script>window.__PANEL__=${JSON.stringify(panel)}</script>`);
                     }
                     if (floating) {
                         // FIXME: 不知道为啥，Floating面板没有exports变量，后续有时间再研究
@@ -212,7 +215,7 @@ export default class Panel {
                 panels.push({
                     name: name,
                     title: name,
-                    main: join(this.service.context, item.entry),
+                    main: join(this.service.context, item.entry!),
                     ejs: join(this.service.root, './template/web/index.html'),
                     type: PanelOptionsType.Type.Web,
                 })
@@ -231,7 +234,7 @@ export default class Panel {
                 { name: ChromeConst.script.background, entry: chrome.script_background },
                 { name: ChromeConst.script.inject, entry: chrome.script_inject },
             ].map(item => {
-                const fullPath = join(this.service.context, item.entry);
+                const fullPath = join(this.service.context, item.entry!);
                 if (!existsSync(fullPath)) {
                     log.red(`not exist file: ${fullPath}`);
                     process.exit(0);
