@@ -164,6 +164,10 @@ export interface CocosPluginManifest {
      */
     chrome?: {
         /**
+         * 插件的权限
+         */
+        permissions?: string[];
+        /**
          * 插件的商店地址
          */
         url?: string;

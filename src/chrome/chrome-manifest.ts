@@ -7,7 +7,7 @@ import { log } from '../log';
 import { ChromeConst } from './const';
 
 interface IAction {
-    default_popup: string,
+    default_popup: string | undefined,
     default_icon: {
         "48": string,
     },
@@ -21,17 +21,20 @@ class ChromeManifestDataBase {
     public name: string;
     public description: string = '';
     public icons = { "48": "" }
-    public devtools_page: string = "";
+    /**
+     * 默认为undefined，不会输出
+     */
+    public devtools_page: string | undefined = undefined;
     public content_scripts: Array<{
         matches: string[],
         js: string[],
         run_at: string | "document_start" | "document_end",
         all_frames: boolean,
     }> = [];
-    public options_ui: { page: string, browser_style: boolean, } = {
-        page: "",
-        browser_style: true,
-    };
+    /**
+     * 默认为undefined，不会输出
+     */
+    public options_ui: { page: string, browser_style: boolean, } | undefined = undefined;
 
     constructor(name: string, version: string, description: string = "") {
         this.name = name;
@@ -48,11 +51,17 @@ class ChromeManifestDataBase {
         return this;
     }
     setOptionsPage(page: string) {
-        this.options_ui.page = page;
+        this.options_ui = {
+            page,
+            browser_style: true,
+        };
         return this;
     }
     setDevtoolsPage(page: string) {
         this.devtools_page = page;
+        return this;
+    }
+    makePermissions(permissions: string[]) {
         return this;
     }
 }
@@ -82,7 +91,7 @@ interface ResourcesV3 {
     use_dynamic_url?: boolean;
 }
 class ChromeManifestDataV3 extends ChromeManifestDataBase {
-    private permissions: string[] = permissions;
+    private permissions: string[] = [];
     private web_accessible_resources: ResourcesV3[] = [{
         resources: ["*.js", "*.css"],
         matches: ["<all_urls>", "*://*/*"],
@@ -90,7 +99,7 @@ class ChromeManifestDataV3 extends ChromeManifestDataBase {
     }];
     private host_permissions: string[] = host_permissions;
     private action: IAction = {
-        default_popup: "",
+        default_popup: undefined,
         default_icon: {
             "48": "",
         },
@@ -110,7 +119,7 @@ class ChromeManifestDataV3 extends ChromeManifestDataBase {
         return this;
     }
 
-    setPopupPage(page: string, title: string) {
+    setPopupPage(page: string | undefined, title: string) {
         this.action.default_popup = page;
         this.action.default_title = title;
         return this;
@@ -120,11 +129,16 @@ class ChromeManifestDataV3 extends ChromeManifestDataBase {
         this.action.default_icon["48"] = icon;
         return this;
     }
+    makePermissions(permissions: string[]) {
+        super.makePermissions(permissions);
+        this.permissions = permissions;
+        return this;
+    }
 }
 
 class ChromeManifestDataV2 extends ChromeManifestDataBase {
     private browser_action: IAction = {
-        default_popup: "",
+        default_popup: undefined,
         default_icon: {
             "48": "",
         },
@@ -142,7 +156,7 @@ class ChromeManifestDataV2 extends ChromeManifestDataBase {
         this.background.scripts.push(script);
         return this;
     }
-    setPopupPage(page: string, title: string) {
+    setPopupPage(page: string | undefined, title: string) {
         this.browser_action.default_popup = page;
         this.browser_action.default_title = title;
         return this;
@@ -206,10 +220,21 @@ export class ChromeManifest {
         }
 
         data.addBackgroundScript(ChromeConst.script.background);
-        data.addContentScript(ChromeConst.script.content);
-        data.setOptionsPage(ChromeConst.html.options);
-        data.setPopupPage(ChromeConst.html.popup, manifest.name);
-        data.setDevtoolsPage(ChromeConst.html.devtools);
+        if (this.service.projectConfig.manifest.chrome?.script_content) {
+            data.addContentScript(ChromeConst.script.content);
+        }
+        if (this.service.projectConfig.manifest.chrome?.view_options) {
+            data.setOptionsPage(ChromeConst.html.options);
+        }
+        if (this.service.projectConfig.manifest.chrome?.view_popup) {
+            data.setPopupPage(ChromeConst.html.popup, manifest.name);
+        } else {
+            data.setPopupPage(undefined, manifest.name);
+        }
+        if (this.service.projectConfig.manifest.chrome?.view_devtools) {
+            data.setDevtoolsPage(ChromeConst.html.devtools);
+        }
+        data.makePermissions(this.service.projectConfig.manifest.chrome?.permissions || []);
         this.saveManifestFile(data);
     }
     private saveManifestFile(data: ChromeManifestDataV2 | ChromeManifestDataV3) {
@@ -219,6 +244,7 @@ export class ChromeManifest {
         if (this.bProduction) {
             spaces = 0;
         }
+
         FsExtra.writeJSONSync(packageJsonFile, data, { spaces });
     }
 }

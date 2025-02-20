@@ -195,11 +195,16 @@ export default class Panel {
             });
 
             // 各个界面
-            const views = [
-                { name: ChromeConst.html.devtools, entry: chrome.view_devtools },
-                { name: ChromeConst.html.options, entry: chrome.view_options },
-                { name: ChromeConst.html.popup, entry: chrome.view_popup }
-            ]
+            const views: Array<{ name: string, entry: string }> = []
+            if (chrome.view_devtools) {
+                views.push({ name: ChromeConst.html.devtools, entry: chrome.view_devtools })
+            }
+            if (chrome.view_options) {
+                views.push({ name: ChromeConst.html.options, entry: chrome.view_options })
+            }
+            if (chrome.view_popup) {
+                views.push({ name: ChromeConst.html.popup, entry: chrome.view_popup })
+            }
             if (chrome.script_inject_view) {
                 views.push({
                     name: ChromeConst.html.inject_view,
@@ -234,7 +239,10 @@ export default class Panel {
                 { name: ChromeConst.script.background, entry: chrome.script_background },
                 { name: ChromeConst.script.inject, entry: chrome.script_inject },
             ].map(item => {
-                const fullPath = join(this.service.context, item.entry!);
+                if (!item.entry) {
+                    return;
+                }
+                const fullPath = join(this.service.context, item.entry);
                 if (!existsSync(fullPath)) {
                     log.red(`not exist file: ${fullPath}`);
                     process.exit(0);
