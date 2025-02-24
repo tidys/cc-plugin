@@ -1,5 +1,5 @@
 import { extname } from 'path';
-import adaptation from '../adaptation/index';
+import CCP from '../entry-render';
 
 type ArrayBufferCallback = (
     /**
@@ -160,7 +160,7 @@ export class Drop {
         }
     }
     private tipsNotSupported(name: string) {
-        adaptation.Dialog.message({
+        CCP.Adaptation.Dialog.message({
             type: 'warning',
             buttons: ['OK'],
             title: 'warn',
