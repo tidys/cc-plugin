@@ -135,17 +135,20 @@ export default class Panel {
         const webHead = this.service.projectConfig.manifest.web?.head || [];
         headers = headers.concat(webHead);
         // 统计鸟的代码
-        const analysis = new Analysis(this.service)
+        const analysisCode = new Analysis(this.service)
         let id = this.service.projectConfig.manifest.analysis?.tongjiniao || "";
         if (id) {
-            const code = analysis.getTongJiNiaoCode(id)
+            const code = analysisCode.getTongJiNiaoCode(id)
             headers = headers.concat(code);
         }
         // Google Analytics的代码
-        id = this.service.projectConfig.manifest.analysis?.googleAnalytics || "";
-        if (id) {
-            const code = analysis.getGoogleAnalyticsCode(id)
-            headers = headers.concat(code);
+        const analysis = this.service.projectConfig.manifest.analysis;
+        if (analysis && analysis.googleAnalytics) {
+            const { measurementID } = analysis.googleAnalytics;
+            if (measurementID) {
+                const code = analysisCode.getGoogleAnalyticsCode(measurementID)
+                headers = headers.concat(code);
+            }
         }
         return headers;
     }

@@ -12,6 +12,7 @@ import profile from './profile';
 import { ClientSocket } from './client-socket';
 import { flag } from '../common'
 import { ChromeConst, ChromePanelMsg } from '../chrome/const'
+import { GoogleAnalytics } from './google-analytics';
 interface PanelOptions {
     ready: (rootElement: any, args: {
         /**
@@ -31,12 +32,18 @@ export class CocosCreatorPluginRender {
     public manifest: CocosPluginManifest | null = null;
     public options: CocosPluginOptions | null = null;
     public Adaptation: Adaptation = new Adaptation();
-
+    public GoogleAnalytics: GoogleAnalytics = new GoogleAnalytics();
     /**
      * 调用来自插件, export的正好是PanelOptions，和creator插件对上了
      */
     public init(config: CocosPluginConfig, options: PanelOptions): PanelOptions {
         this.Adaptation.init(config);
+        if (config.manifest.analysis?.googleAnalytics) {
+            const { apiSecret, measurementID } = config.manifest.analysis.googleAnalytics;
+            if (apiSecret && measurementID) {
+                this.GoogleAnalytics.initID(apiSecret, measurementID);
+            }
+        }
         this.manifest = config.manifest;
         this.options = Object.assign(DefaultCocosPluginOptions, config.options);
         profile.init({}, config);

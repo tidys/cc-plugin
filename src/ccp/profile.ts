@@ -13,6 +13,14 @@ export class Profile {
     pluginConfig: CocosPluginConfig | null = null;
     public format: boolean = false;
     public formatIndent: number = 4;
+    /**
+     * 加密key，目前仅针对web运行环境生效。
+     * 
+     * __DEV__环境为了方便测试，不会进行加密。
+     * 
+     * 发布后，才会生效，存储的key也会加密。
+     * 
+     */
     private encryptKey: string = 'cc-plugin';
     /**
      * 配置文件是否放在全局

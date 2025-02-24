@@ -155,9 +155,25 @@ export interface CocosPluginManifest {
          */
         tongjiniao?: string;
         /**
-         * 谷歌统计的ID，id可以在手动添加里面找到，一般来说代码不会发生变化，区别只有ID不同
+         * 谷歌统计服务
          */
-        googleAnalytics?: string;
+        googleAnalytics?: {
+            /**
+             * id可以在手动添加里面找到，一般来说代码不会发生变化，区别只有ID不同
+             * 
+             * 这个ID会出现在html的head标签里面，不填写就不会在head里面注入统计代码
+             */
+            measurementID: string;
+            /**
+             * 需要自己创建密钥，用来发送自定义的统计数据，注意：该项配置依赖measurementID
+             * 
+             * 只有配置了该项，在调用CCP.GoogleAnalytics.fire()事件才会真正的发送出去
+             */
+            apiSecret?: string;
+        };
+        /**
+         * 使用Google的Measurement Protocol的统计服务
+         */
     },
     /**
      * chrome插件
