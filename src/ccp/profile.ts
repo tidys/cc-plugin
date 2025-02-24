@@ -4,7 +4,7 @@ import { homedir } from "os";
 import * as Path from "path";
 import { CocosPluginConfig, PluginType } from "../declare";
 import CCP from "./entry-render";
-import { enc, AES } from 'crypto-js'
+import { enc, AES, MD5 } from 'crypto-js'
 
 export class Profile {
     private Key = 'profile';
@@ -66,18 +66,26 @@ export class Profile {
     private encode(str: string): string {
         return AES.encrypt(str, this.encryptKey).toString();
     }
+    /**
+     * 是否强制加密
+     */
+    public forceEncrypt: boolean = false;
+    public isEncrypt() {
+        return !__DEV__ || this.forceEncrypt;
+    }
     public _read(fileName: string) {
         this.Key = fileName;
         let retData: Record<string, any> = {}
         if (CCP.Adaptation.Env.isWeb || CCP.Adaptation.Env.isChrome) {
             // 从 local storage 中读取
-            if (!__DEV__) {
-                this.Key = this.encode(this.Key)
+            if (this.isEncrypt()) {
+                const uuid = MD5(this.Key).toString(enc.Hex);
+                this.Key = uuid;
             }
             let str = localStorage.getItem(this.Key);
             if (str) {
                 try {
-                    if (!__DEV__) {
+                    if (this.isEncrypt()) {
                         str = this.decode(str);
                     }
                     retData = JSON.parse(str);
@@ -111,7 +119,7 @@ export class Profile {
         let str = JSON.stringify(this.data, null, this.format ? (this.formatIndent || 4) : 0);
         if (CCP.Adaptation.Env.isWeb || CCP.Adaptation.Env.isChrome) {
             try {
-                if (!__DEV__) {
+                if (this.isEncrypt()) {
                     str = this.encode(str);
                 }
                 // Setting the value exceeded the quota.
