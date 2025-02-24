@@ -9,6 +9,7 @@ declare global {
      * 开发模式下的工作目录，也就是cc-plugin.config.ts所在的目录
      */
     const __DEV_WORKSPACE__: string;
+    const __PANEL__: PanelOptions;
 }
 export interface MenuOptions {
     /**
@@ -70,6 +71,8 @@ export declare const Panel: {
         Simple: string;
         /**
          * 自己实现的，基于electron.BrowserWindow的独立窗口
+         *
+         * 注意，不能在该面板中调用编辑器的相关API，只能通过ipcRenderer发送到主进程后，由主进程调用编辑器的接口
          */
         Floating: string;
         /**
@@ -151,14 +154,35 @@ export interface CocosPluginManifest {
          */
         tongjiniao?: string;
         /**
-         * 谷歌统计的ID，id可以在手动添加里面找到，一般来说代码不会发生变化，区别只有ID不同
+         * 谷歌统计服务
          */
-        googleAnalytics?: string;
+        googleAnalytics?: {
+            /**
+             * id可以在手动添加里面找到，一般来说代码不会发生变化，区别只有ID不同
+             *
+             * 这个ID会出现在html的head标签里面，不填写就不会在head里面注入统计代码
+             */
+            measurementID: string;
+            /**
+             * 需要自己创建密钥，用来发送自定义的统计数据，注意：该项配置依赖measurementID
+             *
+             * 只有配置了该项，在调用CCP.GoogleAnalytics.fire()事件才会真正的发送出去
+             */
+            apiSecret?: string;
+        };
     };
     /**
      * chrome插件
      */
     chrome?: {
+        /**
+         * 插件的权限
+         */
+        permissions?: string[];
+        /**
+         * 插件的商店地址
+         */
+        url?: string;
         /**
          * chrome插件的版本
          */
@@ -170,20 +194,20 @@ export interface CocosPluginManifest {
         /**
          * 弹出界面
          */
-        view_popup: string;
+        view_popup?: string;
         /**
          * 设置界面
          */
-        view_options: string;
+        view_options?: string;
         /**
          * devtools界面
          */
-        view_devtools: string;
-        script_content: string;
+        view_devtools?: string;
+        script_content?: string;
         /**
          * 注入到网页的脚本
          */
-        script_inject: string;
+        script_inject?: string;
         /**
          * 注入到网页的界面，实际发布chrome插件时不会关注这个字段，仅仅是为了方便在web上测试使用vue编写的界面
          */
@@ -191,7 +215,7 @@ export interface CocosPluginManifest {
         /**
          * 插件的后台脚本
          */
-        script_background: string;
+        script_background?: string;
     };
 }
 export interface AssetDB {
@@ -480,4 +504,10 @@ export declare enum Platform {
     Ios = "ios",
     Mac = "mac",
     Win32 = "win32"
+}
+export declare enum IpcMsg {
+    /**
+     * 通过Ipc消息获得编辑器的node_modules目录
+     */
+    EditorNodeModules = "editor-node-modules"
 }

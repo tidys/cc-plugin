@@ -116,7 +116,8 @@ class PackageV3 extends PackageInterface {
         this.packageData = packageData;
         this.packageData.package_version = 2;
         this.packageData.contributions = {
-            builder: './builder.js', // todo 目前这里是写死的，需要后续优化下
+            // TODO: 目前这里是写死的，需要后续优化下
+            builder: './builder.js',
             messages: {},
             menu: [],
             shortcuts: [],
@@ -186,6 +187,7 @@ class PackageV3 extends PackageInterface {
         super.panelReady();
     }
     menuBuild(menuOpts) {
+        var _a;
         super.menuBuild(menuOpts);
         let menu = this.packageData.contributions.menu;
         let msgKey = this.addMessage(menuOpts);
@@ -196,6 +198,23 @@ class PackageV3 extends PackageInterface {
             label: newLabel,
             message: msgKey,
         });
+        /**
+            "shortcuts": [
+                {
+                    "message": "undo",
+                    "when": "panel.hello-world",
+                    "win": "ctrl+z",
+                    "mac": "cmd+z",
+                }
+            ]
+        */
+        if (menuOpts.accelerator) {
+            (_a = this.packageData.contributions.shortcuts) === null || _a === void 0 ? void 0 : _a.push({
+                message: msgKey,
+                win: menuOpts.accelerator,
+                mac: menuOpts.accelerator,
+            });
+        }
     }
     /**
      * 3.x的menu格式

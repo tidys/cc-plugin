@@ -62,7 +62,9 @@ class CocosPluginPackageJson {
         // 面板
         packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.panelReady();
         (_a = this.manifest.panels) === null || _a === void 0 ? void 0 : _a.map((panel) => {
-            packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.panelBuild(panel);
+            if (panel.type === declare_1.Panel.Type.DockAble || panel.type === declare_1.Panel.Type.Simple) {
+                packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.panelBuild(panel);
+            }
         });
         // 菜单
         packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.menuReady();

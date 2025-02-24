@@ -31,17 +31,29 @@ class Panel {
     dealPanel(panel, pluginOptions) {
         var _a;
         let ejsTemplate = null;
+        const templateWeb = (0, path_1.join)(this.service.root, './template/web/index.html');
+        const floating = panel.type === declare_1.Panel.Type.Floating;
         if (panel.ejs && (0, fs_extra_1.existsSync)(panel.ejs)) {
             ejsTemplate = panel.ejs;
         }
         else if (this.service.isCreatorPluginV3()) {
-            ejsTemplate = (0, path_1.join)(__dirname, '../template/panel-v3.ejs');
+            if (floating) {
+                ejsTemplate = templateWeb;
+            }
+            else {
+                ejsTemplate = (0, path_1.join)(__dirname, '../template/panel-v3.ejs');
+            }
         }
         else if (this.service.isCreatorPluginV2()) {
-            ejsTemplate = (0, path_1.join)(__dirname, '../template/panel-v2.ejs');
+            if (floating) {
+                ejsTemplate = templateWeb;
+            }
+            else {
+                ejsTemplate = (0, path_1.join)(__dirname, '../template/panel-v2.ejs');
+            }
         }
         else if (this.service.isWeb() || this.service.isElectron()) {
-            ejsTemplate = (0, path_1.join)(this.service.root, './template/web/index.html');
+            ejsTemplate = templateWeb;
         }
         // let panelMain = panel.main.endsWith(".ts") ? panel.main : `${panel.main}.ts`;
         let mainFile = panel.main;
@@ -59,7 +71,8 @@ class Panel {
                 entryName = panel.name;
             }
             if (this.service.isCreatorPlugin() || this.service.isElectron()) {
-                entryName = `panel/${panel.name}`;
+                // entryName和panel.type挂钩，方便判断是否要注入兼容的js逻辑
+                entryName = `${panel.type}/${panel.name}`;
             }
             let entryPoint = webpackChain.entryPoints.get(entryName);
             if (entryPoint) {
@@ -76,7 +89,7 @@ class Panel {
                     chunks: ['vendor', entryName],
                 };
                 // creator插件必须有模板
-                if (this.service.isCreatorPlugin()) {
+                if (!floating && this.service.isCreatorPlugin()) {
                     options = Object.assign(options, {
                         filename,
                         inject: false,
@@ -91,6 +104,14 @@ class Panel {
                     let headers = this.getHeaders();
                     if ((_a = pluginOptions.server) === null || _a === void 0 ? void 0 : _a.https) {
                         headers.push(`<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"/>`);
+                    }
+                    if (!this.service.isChromePlugin()) {
+                        // chrome扩展不允许内联脚本
+                        headers.push(`<script>window.__PANEL__=${JSON.stringify(panel)}</script>`);
+                    }
+                    if (floating) {
+                        // FIXME: 不知道为啥，Floating面板没有exports变量，后续有时间再研究
+                        headers.push(`<script> var exports = {}; </script>`);
                     }
                     headers = this.filterHead(headers);
                     options = Object.assign(options, {
@@ -113,23 +134,26 @@ class Panel {
         return '';
     }
     getHeaders() {
-        var _a, _b, _c;
+        var _a, _b;
         let headers = [];
         // 用户配置的head
         const webHead = ((_a = this.service.projectConfig.manifest.web) === null || _a === void 0 ? void 0 : _a.head) || [];
         headers = headers.concat(webHead);
         // 统计鸟的代码
-        const analysis = new analysis_1.Analysis(this.service);
+        const analysisCode = new analysis_1.Analysis(this.service);
         let id = ((_b = this.service.projectConfig.manifest.analysis) === null || _b === void 0 ? void 0 : _b.tongjiniao) || "";
         if (id) {
-            const code = analysis.getTongJiNiaoCode(id);
+            const code = analysisCode.getTongJiNiaoCode(id);
             headers = headers.concat(code);
         }
         // Google Analytics的代码
-        id = ((_c = this.service.projectConfig.manifest.analysis) === null || _c === void 0 ? void 0 : _c.googleAnalytics) || "";
-        if (id) {
-            const code = analysis.getGoogleAnalyticsCode(id);
-            headers = headers.concat(code);
+        const analysis = this.service.projectConfig.manifest.analysis;
+        if (analysis && analysis.googleAnalytics) {
+            const { measurementID } = analysis.googleAnalytics;
+            if (measurementID) {
+                const code = analysisCode.getGoogleAnalyticsCode(measurementID);
+                headers = headers.concat(code);
+            }
         }
         return headers;
     }
@@ -178,11 +202,16 @@ class Panel {
                 type: declare_1.Panel.Type.InnerIndex,
             });
             // 各个界面
-            const views = [
-                { name: const_1.ChromeConst.html.devtools, entry: chrome.view_devtools },
-                { name: const_1.ChromeConst.html.options, entry: chrome.view_options },
-                { name: const_1.ChromeConst.html.popup, entry: chrome.view_popup }
-            ];
+            const views = [];
+            if (chrome.view_devtools) {
+                views.push({ name: const_1.ChromeConst.html.devtools, entry: chrome.view_devtools });
+            }
+            if (chrome.view_options) {
+                views.push({ name: const_1.ChromeConst.html.options, entry: chrome.view_options });
+            }
+            if (chrome.view_popup) {
+                views.push({ name: const_1.ChromeConst.html.popup, entry: chrome.view_popup });
+            }
             if (chrome.script_inject_view) {
                 views.push({
                     name: const_1.ChromeConst.html.inject_view,
@@ -216,6 +245,9 @@ class Panel {
                 { name: const_1.ChromeConst.script.background, entry: chrome.script_background },
                 { name: const_1.ChromeConst.script.inject, entry: chrome.script_inject },
             ].map(item => {
+                if (!item.entry) {
+                    return;
+                }
                 const fullPath = (0, path_1.join)(this.service.context, item.entry);
                 if (!(0, fs_extra_1.existsSync)(fullPath)) {
                     log_1.log.red(`not exist file: ${fullPath}`);
