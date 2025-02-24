@@ -227,7 +227,14 @@ export class Util extends Base {
     getProperty(keys: Array<string[]>): any {
         for (let i = 0; i < keys.length; i++) {
             const keyArray = keys[i];
-            let obj: any = window;
+            let obj: any = null;
+            if (typeof window !== 'undefined') {
+                obj = window;
+            } else if (typeof global !== 'undefined') {
+                obj = global;
+            } else {
+                return null;
+            }
             for (let j = 0; j < keyArray.length; j++) {
                 const key = keyArray[j];
                 if (obj.hasOwnProperty(key)) {
