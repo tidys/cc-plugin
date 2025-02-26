@@ -123,4 +123,18 @@ export class Panel extends Base {
         }
         return false;
     }
+    executeSceneScript(func: string, args: any): Promise<any> | null {
+        if (this.adaptation.Env.isPluginV3) {
+            const { manifest } = this.adaptation.config!;
+            const options = {
+                name: manifest.name,
+                method: func,
+                args: [args],
+            };
+            // @ts-ignore
+            const ret: Promise<any> = Editor.Message.request('scene', 'execute-scene-script', options);
+            return ret;
+        }
+        return null;
+    }
 }

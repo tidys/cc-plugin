@@ -129,6 +129,11 @@ export class PackageV3 extends PackageInterface {
         if (asset_menu) {
             this.packageData!.contributions!.assets!.menu = asset_menu;
         }
+        if (config.manifest.scene) {
+            this.packageData!.contributions!['scene'] = {
+                script: "scene.js",// 暂时场景脚本文件名写死
+            }
+        }
         config.manifest.messages?.map((msg) => {
             this.addMessageToContributions(msg, msg);
         })

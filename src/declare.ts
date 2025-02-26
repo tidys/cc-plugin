@@ -169,6 +169,10 @@ export interface CocosPluginManifest {
     */
     assets?: string;
     /**
+     * 场景脚本
+     */
+    scene?: string;
+    /**
      * 统计服务
      */
     analysis?: {
@@ -560,7 +564,11 @@ export interface CocosPluginV3 {
             menu?: CocosPluginV3AssetsMenu
         },
         shortcuts?: Array<{ message?: string; win?: string; mac?: string }>;
-        'asset-db': { mount?: { path: string; readonly: boolean } }
+        'asset-db': { mount?: { path: string; readonly: boolean } },
+        /**场景脚本 */
+        scene?: {
+            script: string;
+        };
     };
     panels?: Record<string, PanelOptionsV3>;
     dependencies?: string[];
