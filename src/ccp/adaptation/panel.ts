@@ -117,6 +117,9 @@ export class Panel extends Base {
                     });
                 return true;
             }
+        } else if (this.adaptation.Env.isPluginV3) {
+            // @ts-ignore
+            Editor.Message.send(plugin, functionName, args)
         }
         return false;
     }
