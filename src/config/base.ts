@@ -112,6 +112,12 @@ export default class Base extends PluginApi {
                     const hooksEntry = 'hooks';
                     const hooksFile = Path.resolve(service.root, 'src/ccp/builder/hooks.ts');
                     this.webpackEntry(service, webpackChain, hooksEntry, hooksFile);
+                    //增强资源管理器的主进程代码
+                    const assets = service.projectConfig.manifest.assets;
+                    if (assets) {
+                        const assetFile = Path.resolve(service.context, assets)
+                        this.webpackEntry(service, webpackChain, "assets", assetFile);
+                    }
                 }
                 // 主进程代码
                 let mainFile = ''

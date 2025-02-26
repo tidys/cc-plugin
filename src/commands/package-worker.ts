@@ -1,4 +1,4 @@
-import { CocosPluginConfig, CocosPluginV2, CocosPluginV3, MenuOptions, PanelOptions, PanelOptionsV3 } from '../declare';
+import { CocosPluginConfig, CocosPluginV2, CocosPluginV3, CocosPluginV3AssetsMenu, MenuOptions, PanelOptions, PanelOptionsV3 } from '../declare';
 import { log } from '../log';
 import { trim } from 'lodash'
 import utils from "../utils"
@@ -123,8 +123,30 @@ export class PackageV3 extends PackageInterface {
             menu: [],
             shortcuts: [],
             "asset-db": {},
+            assets: {}
         };
+        const asset_menu = this.dealAssetsMenu();
+        if (asset_menu) {
+            this.packageData!.contributions!.assets!.menu = asset_menu;
+        }
+        config.manifest.messages?.map((msg) => {
+            this.addMessageToContributions(msg, msg);
+        })
         this.addMessageToContributions('onBuilder', 'onBuilder'); // 预定义的事件
+    }
+    private dealAssetsMenu(): CocosPluginV3AssetsMenu | null {
+        const asssets = this.config.manifest.assets;
+        if (asssets) {
+            // 配置直接写死，不让用户配置
+            return {
+                methods: "./assets.js",// 写死的逻辑，和webpackEntry是对应的
+                createMenu: "createMenu",
+                assetMenu: "assetMenu",
+                dbMenu: "dbMenu",
+                panelMenu: "panelMenu"
+            }
+        }
+        return null;
     }
     public assetDbBuild() {
         super.assetDbBuild();
