@@ -133,6 +133,16 @@ class Base extends plugin_api_1.PluginApi {
                     const hooksEntry = 'hooks';
                     const hooksFile = path_1.default.resolve(service.root, 'src/ccp/builder/hooks.ts');
                     this.webpackEntry(service, webpackChain, hooksEntry, hooksFile);
+                    //增强资源管理器的主进程代码
+                    const { assets, scene } = service.projectConfig.manifest;
+                    if (assets) {
+                        const assetFile = path_1.default.resolve(service.context, assets);
+                        this.webpackEntry(service, webpackChain, "assets", assetFile);
+                    }
+                    if (scene) {
+                        const sceneFile = path_1.default.resolve(service.context, scene);
+                        this.webpackEntry(service, webpackChain, "scene", sceneFile);
+                    }
                 }
                 // 主进程代码
                 let mainFile = '';

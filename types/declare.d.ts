@@ -102,7 +102,12 @@ export interface CocosPluginManifest {
     site?: string[];
     author?: string;
     panels?: PanelOptions[];
+    /**
+     * 插件的菜单
+     */
     menus?: MenuOptions[];
+    /**插件的主进程消息，v3版本要求必须手动声明 */
+    messages?: string[];
     i18n_zh?: string;
     i18n_en?: string;
     /**
@@ -141,6 +146,31 @@ export interface CocosPluginManifest {
      *
      */
     asset_db_v2?: AssetDB;
+    /** 增强资源管理面板，只支持 creator v3.x 版本
+     * @example 指向的ts代码如下
+     * ```ts
+     *  import { AssetInfo, MenuItem } from "cc-plugin/src/declare";
+        export function createMenu(assetInfo: AssetInfo): MenuItem[] {
+            return [];
+        }
+        export function assetMenu(assetInfo: AssetInfo): MenuItem[] {
+            return [];
+        }
+        export function dbMenu(assetInfo: AssetInfo): MenuItem[] {
+            return [];
+        }
+        export function panelMenu(assetInfo: AssetInfo): MenuItem[] {
+            return [];
+        }
+     * ```
+     *
+     *
+    */
+    assets?: string;
+    /**
+     * 场景脚本
+     */
+    scene?: string;
     /**
      * 统计服务
      */
@@ -429,6 +459,70 @@ export interface PanelOptionsV3 {
         height?: number;
     };
 }
+/**自定义资源管理器菜单的资源数据 */
+export interface AssetInfo {
+    /**资源用于显示的名字 */
+    displayName: string;
+    /** 可选，继承类*/
+    extends: string[];
+    /**导入器名字 */
+    importer: string;
+    /**是否是文件夹 */
+    isDirectory: boolean;
+    /**是否导入完成 */
+    imported: boolean;
+    /** 是否导入失败 */
+    invalid: boolean;
+    /** 资源名字 */
+    name: string;
+    /** 资源文件所在的磁盘绝对路径 */
+    file: string;
+    /** 是否只读 */
+    readonly: boolean;
+    /**资源类型 */
+    type: string;
+    /** db:// 开头的资源地址 */
+    url: string;
+    /**资源 ID */
+    uuid: string;
+}
+/**返回的菜单数据
+ * 详细参考： https://www.electronjs.org/docs/latest/api/menu-item
+ */
+export interface MenuItem {
+    /**菜单类型*/
+    type?: "normal" | "separator" | "submenu" | "checkbox" | "radio";
+    /** 显示的文本 */
+    label?: string;
+    /** 显示的二级文本 */
+    sublabel?: string;
+    /** 子项菜单 */
+    submenu?: MenuItem[];
+    /**点击事件 */
+    click: Function;
+    /**是否可用，不可用会有置灰样式 */
+    enabled?: boolean;
+    /**是否显示 */
+    visible?: boolean;
+    /**显示快捷键 */
+    accelerator?: string;
+    /**当 type 为 checkbox / radio 时是否选中 */
+    checked?: boolean;
+}
+/**创建自定义菜单的函数 */
+export type AssetMenuFunction = (assetInfo: AssetInfo) => MenuItem[];
+export interface CocosPluginV3AssetsMenu {
+    /**菜单时间的处理函数 */
+    methods: string;
+    /**创建资源菜单现实时触发事件的回调函数*/
+    createMenu: string;
+    /**右击普通资源节点或目录时触发的事件*/
+    assetMenu: string;
+    /**右击资源数据库根节点 assets 时触发的事件 */
+    dbMenu: string;
+    /**右击资源管理面板空白区域时触发的事件 */
+    panelMenu: string;
+}
 export interface CocosPluginV3 {
     name: string;
     version: string;
@@ -450,6 +544,11 @@ export interface CocosPluginV3 {
         messages?: Record<string, {
             methods?: string[];
         }>;
+        /**增强资源管理器面板 */
+        assets?: {
+            /**自定义菜单右键 */
+            menu?: CocosPluginV3AssetsMenu;
+        };
         shortcuts?: Array<{
             message?: string;
             win?: string;
@@ -460,6 +559,10 @@ export interface CocosPluginV3 {
                 path: string;
                 readonly: boolean;
             };
+        };
+        /**场景脚本 */
+        scene?: {
+            script: string;
         };
     };
     panels?: Record<string, PanelOptionsV3>;

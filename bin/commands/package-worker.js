@@ -111,6 +111,7 @@ class PackageV2 extends PackageInterface {
 exports.PackageV2 = PackageV2;
 class PackageV3 extends PackageInterface {
     constructor(config, packageData) {
+        var _a;
         super(config);
         this.packageData = null;
         this.packageData = packageData;
@@ -122,8 +123,35 @@ class PackageV3 extends PackageInterface {
             menu: [],
             shortcuts: [],
             "asset-db": {},
+            assets: {}
         };
+        const asset_menu = this.dealAssetsMenu();
+        if (asset_menu) {
+            this.packageData.contributions.assets.menu = asset_menu;
+        }
+        if (config.manifest.scene) {
+            this.packageData.contributions['scene'] = {
+                script: "scene.js", // 暂时场景脚本文件名写死
+            };
+        }
+        (_a = config.manifest.messages) === null || _a === void 0 ? void 0 : _a.map((msg) => {
+            this.addMessageToContributions(msg, msg);
+        });
         this.addMessageToContributions('onBuilder', 'onBuilder'); // 预定义的事件
+    }
+    dealAssetsMenu() {
+        const asssets = this.config.manifest.assets;
+        if (asssets) {
+            // 配置直接写死，不让用户配置
+            return {
+                methods: "./assets.js", // 写死的逻辑，和webpackEntry是对应的
+                createMenu: "createMenu",
+                assetMenu: "assetMenu",
+                dbMenu: "dbMenu",
+                panelMenu: "panelMenu"
+            };
+        }
+        return null;
     }
     assetDbBuild() {
         super.assetDbBuild();
