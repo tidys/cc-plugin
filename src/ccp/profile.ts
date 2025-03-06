@@ -3,10 +3,12 @@ import { ensureFileSync } from "fs-extra";
 import { homedir } from "os";
 import * as Path from "path";
 import { CocosPluginConfig, PluginType } from "../declare";
-import CCP from "./entry-render";
+import CCPRender from "./entry-render";
+import CCPMain from "./entry-main";
 import { enc, AES, MD5 } from 'crypto-js'
 
 export class Profile {
+
     private Key = 'profile';
     private data: Record<string, any> = {}
     private nativeFile: string = '';// electron环境使用的
@@ -57,8 +59,14 @@ export class Profile {
         if (this.global) {
             return Path.join(homedir(), '.ccp', 'profile', this.Key);
         } else {
-            return Path.join(CCP.Adaptation.Project.path, 'settings', this.Key);
+            return Path.join(this.Adaptation.Project.path, 'settings', this.Key);
         }
+    }
+    private get Adaptation() {
+        if (process['type'] === 'renderer') {
+            return CCPRender.Adaptation;
+        }
+        return CCPMain.Adaptation;
     }
     private decode(str: string) {
         return AES.decrypt(str, this.encryptKey).toString(enc.Utf8);
@@ -76,7 +84,7 @@ export class Profile {
     public _read(fileName: string) {
         this.Key = fileName;
         let retData: Record<string, any> = {}
-        if (CCP.Adaptation.Env.isWeb || CCP.Adaptation.Env.isChrome) {
+        if (this.Adaptation.Env.isWeb || this.Adaptation.Env.isChrome) {
             // 从 local storage 中读取
             if (this.isEncrypt()) {
                 const uuid = MD5(this.Key).toString(enc.Hex);
@@ -117,7 +125,7 @@ export class Profile {
 
     private _write() {
         let str = JSON.stringify(this.data, null, this.format ? (this.formatIndent || 4) : 0);
-        if (CCP.Adaptation.Env.isWeb || CCP.Adaptation.Env.isChrome) {
+        if (this.Adaptation.Env.isWeb || this.Adaptation.Env.isChrome) {
             try {
                 if (this.isEncrypt()) {
                     str = this.encode(str);
