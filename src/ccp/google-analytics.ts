@@ -83,7 +83,9 @@ export class GoogleAnalytics {
     private endPoint = "https://www.google-analytics.com/mp/collect";
     private fingerprint: string = '';
     constructor() {
-        this.fingerprint = this.generateBrowserFingerprint();
+        if (typeof navigator !== 'undefined' && typeof screen !== 'undefined' && typeof document !== 'undefined') {
+            this.fingerprint = this.generateBrowserFingerprint();
+        }
     }
     public initID(apiSecret: string, measurementID: string) {
         this.apiSecret = apiSecret;

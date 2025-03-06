@@ -123,18 +123,18 @@ export class Panel extends Base {
         }
         return false;
     }
-    executeSceneScript(func: string, args: any): Promise<any> | null {
+    executeSceneScript<T>(func: string, ...args: any): Promise<T> {
         if (this.adaptation.Env.isPluginV3) {
             const { manifest } = this.adaptation.config!;
             const options = {
                 name: manifest.name,
                 method: func,
-                args: [args],
+                args,
             };
             // @ts-ignore
-            const ret: Promise<any> = Editor.Message.request('scene', 'execute-scene-script', options);
+            const ret: Promise<T> = Editor.Message.request('scene', 'execute-scene-script', options);
             return ret;
         }
-        return null;
+        return Promise.reject(new Error('暂未实现'));
     }
 }

@@ -4,6 +4,31 @@ import { basename, dirname, join } from 'path';
 import { UrlWithParsedQuery, UrlWithStringQuery, parse } from "url"
 
 export class Util extends Base {
+    async sceneForcus(nodeIDs: string[]) {
+        if (this.adaptation.Env.isPluginV3) {
+            // @ts-ignore
+            await Editor.Message.request("scene", "focus-camera", nodeIDs)
+        }
+    }
+    getSceneSelectedNode(): string[] {
+        if (this.adaptation.Env.isPluginV3) {
+            //@ts-ignore   
+            return Editor.Selection.getSelected("node")
+        }
+        return []
+    }
+    /**
+     * 
+     * @param nodeID 节点的短ID，比如：41NAGYbtBH/q9gtN1ovFn7
+     */
+    setSceneSelectedNode(nodeID: string[]) {
+        if (this.adaptation.Env.isPluginV3) {
+            // @ts-ignore
+            Editor.Selection.clear("node");
+            // @ts-ignore
+            Editor.Selection.select("node", nodeID);
+        }
+    }
     async globArray(rules: string[]): Promise<string[]> {
         let ret: string[] = [];
         for (let rule of rules) {

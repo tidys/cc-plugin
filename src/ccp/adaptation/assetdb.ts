@@ -90,7 +90,12 @@ export class AssetDB extends Base {
             Editor.Message.broadcast("ui-kit:touch-asset", uuid);
         }
     }
-    async queryAssets(assetType: AssetsType = AssetsType.Texture): Promise<AssetsInfo[]> {
+    async queryAssets(
+        assetType: AssetsType = AssetsType.Texture,
+        options: {
+            /**是否只检索文件，过滤掉目录 */
+            onlyFiles?: boolean
+        } = {}): Promise<AssetsInfo[]> {
         const typeMap = {};
         if (this.adaptation.Env.isPluginV2) {
             typeMap[AssetsType.Texture] = 'texture';
@@ -128,18 +133,34 @@ export class AssetDB extends Base {
             results.forEach((item: any) => {
                 // creator的数据
                 const { isDirectory, visible, file, path, readonly, type, url, uuid } = item;
-                const info = new AssetsInfo();
-                info.url = url;
-                info.path = file;
-                info.uuid = uuid;
-                info.type = assetType;
-                ret.push(info)
+                let canPush = true;
+                if (options.onlyFiles && isDirectory) {
+                    canPush = false;
+                }
+                if (canPush) {
+                    const info = new AssetsInfo();
+                    info.url = url;
+                    info.path = file;
+                    info.uuid = uuid;
+                    info.type = assetType;
+                    ret.push(info)
+                }
             })
             return ret;
         } else {
 
         }
         return []
+    }
+    /**
+     * 
+     * @param uuid 要打开的资源的uuid
+     */
+    async open(uuid: string) {
+        if (this.adaptation.Env.isPluginV3) {
+            //@ts-ignore
+            await Editor.Message.request("asset-db", "open-asset", uuid)
+        }
     }
     create(url: string, data: string) {
         if (this.adaptation.Env.isPluginV2) {
