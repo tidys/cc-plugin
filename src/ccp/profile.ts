@@ -62,11 +62,15 @@ export class Profile {
             return Path.join(this.Adaptation.Project.path, 'settings', this.Key);
         }
     }
-    private get Adaptation() {
-        if (process['type'] === 'renderer') {
+    public get Adaptation() {
+        if (typeof process !== 'undefined') {
+            if (process['type'] === 'renderer') {
+                return CCPRender.Adaptation;
+            }
+            return CCPMain.Adaptation;
+        } else {
             return CCPRender.Adaptation;
         }
-        return CCPMain.Adaptation;
     }
     private decode(str: string) {
         return AES.decrypt(str, this.encryptKey).toString(enc.Utf8);
