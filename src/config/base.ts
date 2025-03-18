@@ -106,14 +106,14 @@ export default class Base extends PluginApi {
                 i18n_en && this.webpackEntry(service, webpackChain, 'i18n/en', i18n_en);
                 // builder&hooks
                 if (service.isCreatorPluginV3()) {
+                    const { assets, scene, hooks, builder } = service.projectConfig.manifest;
                     const builderEntry = 'builder';
-                    const builderFile = Path.resolve(service.root, 'src/ccp/builder/builder.ts')
+                    const builderFile = builder ? resolve(service.context, builder) : Path.resolve(service.root, 'src/ccp/builder/builder.ts')
                     this.webpackEntry(service, webpackChain, builderEntry, builderFile);
                     const hooksEntry = 'hooks';
-                    const hooksFile = Path.resolve(service.root, 'src/ccp/builder/hooks.ts');
+                    const hooksFile = hooks ? resolve(service.context, hooks) : Path.resolve(service.root, 'src/ccp/builder/hooks.ts');
                     this.webpackEntry(service, webpackChain, hooksEntry, hooksFile);
                     //增强资源管理器的主进程代码
-                    const { assets, scene } = service.projectConfig.manifest;
                     if (assets) {
                         const assetFile = Path.resolve(service.context, assets)
                         this.webpackEntry(service, webpackChain, "assets", assetFile);
