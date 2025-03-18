@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "fs";
 import { Base } from "./base";
 import axios from 'axios';
-import { basename, dirname, extname, join } from "path";
+import { basename, dirname, extname, join, normalize, sep } from "path";
 import { UrlWithParsedQuery, UrlWithStringQuery, parse } from "url"
 
 const Path = require('path'); // 为了适配浏览器
@@ -12,6 +12,12 @@ export enum AssetsType {
 }
 export class AssetsInfo {
     url: string;
+    /** engine的原始类型 */
+    originType: string;
+    /**
+     * 子资源，plist
+     */
+    sub: string = "";
     type: AssetsType;
     uuid: string;
     /**
@@ -95,6 +101,10 @@ export class AssetDB extends Base {
         options: {
             /**是否只检索文件，过滤掉目录 */
             onlyFiles?: boolean
+            /**
+             * 对查询结果进行过滤，返回true则会返回该资源
+             */
+            filter?: (data: any, info: AssetsInfo) => boolean,
         } = {}): Promise<AssetsInfo[]> {
         const typeMap = {};
         if (this.adaptation.Env.isPluginV2) {
@@ -115,8 +125,16 @@ export class AssetDB extends Base {
                         info.url = url;
                         info.path = path;
                         info.uuid = uuid;
+                        info.originType = type;
                         info.type = assetType;
-                        ret.push(info)
+
+                        if (options.filter) {
+                            if (options.filter(item, info)) {
+                                ret.push(info);
+                            }
+                        } else {
+                            ret.push(info)
+                        }
                     })
                     resolve(ret);
                 })
@@ -140,10 +158,30 @@ export class AssetDB extends Base {
                 if (canPush) {
                     const info = new AssetsInfo();
                     info.url = url;
-                    info.path = file;
+                    if (type === 'cc.SpriteFrame') {
+                        // cc.SpirteFrame没有file，使用磁盘文件
+                        const arr = normalize(url).split(sep)
+                        const sub = arr.pop();
+                        if (sub === "spriteFrame") {
+                            info.sub = "";
+                        } else {
+                            info.sub = sub!;
+                        }
+                        const texturUrl = arr.join("/");
+                        info.path = this.adaptation.Util.urlToFspath(texturUrl);
+                    } else {
+                        info.path = file
+                    }
                     info.uuid = uuid;
+                    info.originType = type;
                     info.type = assetType;
-                    ret.push(info)
+                    if (options.filter) {
+                        if (options.filter(item, info)) {
+                            ret.push(info);
+                        }
+                    } else {
+                        ret.push(info)
+                    }
                 }
             })
             return ret;

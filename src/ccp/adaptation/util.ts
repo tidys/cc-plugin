@@ -79,8 +79,10 @@ export class Util extends Base {
             // @ts-ignore
             const uuid = Editor.Utils.UuidUtils.decompressUuid(shortUUID);
             return uuid;
-        } else {
-
+        } else if (this.adaptation.Env.isPluginV3) {
+            // @ts-ignore
+            const uuid = Editor.Utils.UUID.decompressUUID(shortUUID);
+            return uuid;
         }
         return ''
     }
@@ -105,10 +107,15 @@ export class Util extends Base {
         }
         return ''
     }
+    /**
+     * 
+     * @param uuid 如果uuid中包含 @ 的子资源，会自动忽略
+     */
     async uuidToFspath(uuid: string): Promise<string> {
         if (this.adaptation.Env.isPluginV2) {
 
         } else if (this.adaptation.Env.isPluginV3) {
+            uuid = uuid.split("@")[0];
             // @ts-ignore
             const res = await Editor.Message.request("asset-db", "query-asset-info", uuid)
             if (res && res.file) {
