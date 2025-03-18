@@ -173,6 +173,16 @@ export interface CocosPluginManifest {
      */
     scene?: string;
     /**
+     * creator v3 的hooks脚本，如果用户配置了，就使用用户的脚本，否则使用内置的
+     * 
+     * https://docs.cocos.com/creator/3.2/manual/zh/editor/publish/custom-build-plugin.html#%E6%9E%84%E5%BB%BA%E8%BF%9B%E7%A8%8B-hooks-%E8%84%9A%E6%9C%AC
+     */
+    hooks?: string;
+    /**
+     * creator v3 的builder脚本，如果用户配置了，就使用用户的脚本，否则使用内置的
+     */
+    builder?: string;
+    /**
      * 统计服务
      */
     analysis?: {
@@ -587,6 +597,10 @@ export interface PluginMainWrapper {
         onBeforeBuild?: Function;
     };
     messages?: Record<string, Function>;
+    /**
+     * mcp服务，目前是运行在主进程
+     */
+    mcp?: PluginMcpTool[];
 }
 
 // 目前先加一些自己关心的，后续慢慢添加完善
@@ -618,4 +632,20 @@ export enum IpcMsg {
      * 通过Ipc消息获得编辑器的node_modules目录
      */
     EditorNodeModules = "editor-node-modules",
+}
+
+export interface PluginMcpTool {
+    name: string;
+    description: string;
+    callback: (args: any) => Promise<string | null>;
+    inputSchema: {
+        type: string;
+        properties: {
+            [key: string]: {
+                type: string;
+                description: string;
+            };
+        };
+        required: string[];
+    };
 }

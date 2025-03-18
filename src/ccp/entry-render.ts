@@ -13,6 +13,7 @@ import { ClientSocket } from './client-socket';
 import { flag } from '../common'
 import { ChromeConst, ChromePanelMsg } from '../chrome/const'
 import { GoogleAnalytics } from './google-analytics';
+import { mcp, Mcp } from './mcp';
 interface PanelOptions {
     ready: (rootElement: any, args: {
         /**
@@ -33,6 +34,10 @@ export class CocosCreatorPluginRender {
     public options: CocosPluginOptions | null = null;
     public Adaptation: Adaptation = new Adaptation();
     public GoogleAnalytics: GoogleAnalytics = new GoogleAnalytics();
+    /**
+     * 方便用户持有，在渲染进程进程链接mcp服务器
+     */
+    public mcp: Mcp = mcp;
     /**
      * 调用来自插件, export的正好是PanelOptions，和creator插件对上了
      */
