@@ -3,6 +3,7 @@ import { ClientSocket } from './client-socket';
 import { BuilderOptions, IpcMsg, Panel } from '../declare';
 import * as Path from 'path';
 import { BuildInfo } from './builder/type';
+import { mcp } from './mcp';
 const { ipcMain } = require('electron');
 
 /**
@@ -34,6 +35,7 @@ export function load() {
 
 export function unload() {
     ipcMain.off(IpcMsg.EditorNodeModules, onEditorNodeModules);
+    mcp.disconnect();
     if (CCP.wrapper && CCP.wrapper.unload) {
         CCP.wrapper.unload();
     }

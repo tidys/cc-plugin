@@ -13,7 +13,15 @@ export class Mcp {
     private socket: WebSocket | null = null;
 
     private cmds: Record<string, (args: any) => Promise<string | null>> = {};
+    disconnect() {
+        if (this.socket) {
+            this.socket.close();
+            this.socket = null;
+            console.log("mcp socket disconnect");
+        }
+    }
     connect() {
+        this.disconnect();
         this.getListTools().forEach((tool: PluginMcpTool) => {
             this.cmds[tool.name] = tool.callback;
         });

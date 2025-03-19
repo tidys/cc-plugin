@@ -18,7 +18,6 @@ export class CocosCreatorPluginMain {
         this.initMcp(wrapper);
     }
     private initMcp(wrapper: PluginMainWrapper) {
-        debugger
         if (wrapper.mcp && wrapper.mcp.length) {
             mcp.connect();
         }
