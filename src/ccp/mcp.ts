@@ -1,3 +1,4 @@
+import WebSocket from "ws";
 import CCP from './entry-main'
 import { PluginMcpTool } from "../declare";
 enum CMD {
@@ -24,7 +25,7 @@ export class Mcp {
         };
         this.socket.onmessage = (e) => {
             (async () => {
-                const ret = JSON.parse(e.data);
+                const ret = JSON.parse(e.data.toString());
                 const { cmd, data } = ret;
                 if (CMD.CmdRun === cmd) {
                     const { tool, args } = data;

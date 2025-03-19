@@ -95,6 +95,7 @@
   },
   "description": "专为Cocos Creator插件开发的cli，一次编写，同时发布v2，v3版本，免去多版本同步的问题。",
   "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.7.0",
     "@types/axios": "^0.14.0",
     "@types/chroma-js": "^2.1.3",
     "@types/chrome": "0.0.293",
@@ -108,9 +109,11 @@
     "@types/rechoir": "^0.6.1",
     "@types/webpack": "^5.28.0",
     "@types/webpack-sources": "^3.2.0",
+    "@types/ws": "^8.18.0",
     "eslint": "7.32.0",
     "husky": "^3.1.0",
-    "wasm-loader": "^1.3.0"
+    "wasm-loader": "^1.3.0",
+    "ws": "^8.18.1"
   },
   "directories": {
     "doc": "doc",
