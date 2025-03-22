@@ -634,18 +634,45 @@ export enum IpcMsg {
     EditorNodeModules = "editor-node-modules",
 }
 
+/**
+ * MCP Tools 数据结构，详细请参考：https://modelcontextprotocol.io/docs/concepts/tools
+ */
 export interface PluginMcpTool {
+    /**
+     * 接口的名字，需要保证唯一性
+     */
     name: string;
+    /**
+     * 接口是否有效，默认有效
+     */
+    valid?: boolean;
+    /**
+     * 人类可读的接口详细描述（中英文都支持），描述越清晰，AI识别的越精准。
+     */
     description: string;
+    /**
+     * 接口的回调函数
+     * @param args 接口的参数，与inputSchema.properties呼应
+     * @returns 返回值支持
+     */
     callback: (args: any) => Promise<string | null>;
+    /**
+     * 接口的参数，数据格式规范为json schema，参考 https://json-schema.org/
+     */
     inputSchema: {
-        type: string;
+        type: 'object' | 'array';
+        /**
+         * 参数定义
+         */
         properties: {
             [key: string]: {
-                type: string;
+                type: 'number' | 'string' | 'array' | 'object' | 'boolean' | 'null';
                 description: string;
             };
         };
+        /**
+         * 哪些参数必须有
+         */
         required: string[];
     };
 }
