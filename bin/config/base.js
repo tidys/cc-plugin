@@ -127,14 +127,14 @@ class Base extends plugin_api_1.PluginApi {
                 i18n_en && this.webpackEntry(service, webpackChain, 'i18n/en', i18n_en);
                 // builder&hooks
                 if (service.isCreatorPluginV3()) {
+                    const { assets, scene, hooks, builder } = service.projectConfig.manifest;
                     const builderEntry = 'builder';
-                    const builderFile = path_1.default.resolve(service.root, 'src/ccp/builder/builder.ts');
+                    const builderFile = builder ? (0, path_1.resolve)(service.context, builder) : path_1.default.resolve(service.root, 'src/ccp/builder/builder.ts');
                     this.webpackEntry(service, webpackChain, builderEntry, builderFile);
                     const hooksEntry = 'hooks';
-                    const hooksFile = path_1.default.resolve(service.root, 'src/ccp/builder/hooks.ts');
+                    const hooksFile = hooks ? (0, path_1.resolve)(service.context, hooks) : path_1.default.resolve(service.root, 'src/ccp/builder/hooks.ts');
                     this.webpackEntry(service, webpackChain, hooksEntry, hooksFile);
                     //增强资源管理器的主进程代码
-                    const { assets, scene } = service.projectConfig.manifest;
                     if (assets) {
                         const assetFile = path_1.default.resolve(service.context, assets);
                         this.webpackEntry(service, webpackChain, "assets", assetFile);

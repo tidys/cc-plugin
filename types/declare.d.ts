@@ -172,6 +172,16 @@ export interface CocosPluginManifest {
      */
     scene?: string;
     /**
+     * creator v3 的hooks脚本，如果用户配置了，就使用用户的脚本，否则使用内置的
+     *
+     * https://docs.cocos.com/creator/3.2/manual/zh/editor/publish/custom-build-plugin.html#%E6%9E%84%E5%BB%BA%E8%BF%9B%E7%A8%8B-hooks-%E8%84%9A%E6%9C%AC
+     */
+    hooks?: string;
+    /**
+     * creator v3 的builder脚本，如果用户配置了，就使用用户的脚本，否则使用内置的
+     */
+    builder?: string;
+    /**
      * 统计服务
      */
     analysis?: {
@@ -581,6 +591,10 @@ export interface PluginMainWrapper {
         onBeforeBuild?: Function;
     };
     messages?: Record<string, Function>;
+    /**
+     * mcp服务，目前是运行在主进程
+     */
+    mcp?: PluginMcpTool[];
 }
 export interface BuilderOptions {
     buildPath: string;
@@ -613,4 +627,46 @@ export declare enum IpcMsg {
      * 通过Ipc消息获得编辑器的node_modules目录
      */
     EditorNodeModules = "editor-node-modules"
+}
+/**
+ * MCP Tools 数据结构，详细请参考：https://modelcontextprotocol.io/docs/concepts/tools
+ */
+export interface PluginMcpTool {
+    /**
+     * 接口的名字，需要保证唯一性
+     */
+    name: string;
+    /**
+     * 接口是否有效，默认有效
+     */
+    valid?: boolean;
+    /**
+     * 人类可读的接口详细描述（中英文都支持），描述越清晰，AI识别的越精准。
+     */
+    description: string;
+    /**
+     * 接口的回调函数
+     * @param args 接口的参数，与inputSchema.properties呼应
+     * @returns 返回值支持
+     */
+    callback: (args: any) => Promise<string | null>;
+    /**
+     * 接口的参数，数据格式规范为json schema，参考 https://json-schema.org/
+     */
+    inputSchema: {
+        type: 'object' | 'array';
+        /**
+         * 参数定义
+         */
+        properties: {
+            [key: string]: {
+                type: 'number' | 'string' | 'array' | 'object' | 'boolean' | 'null';
+                description: string;
+            };
+        };
+        /**
+         * 哪些参数必须有
+         */
+        required: string[];
+    };
 }
