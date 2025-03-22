@@ -18,8 +18,10 @@ export class CocosCreatorPluginMain {
         this.initMcp(wrapper);
     }
     private initMcp(wrapper: PluginMainWrapper) {
-        if (wrapper.mcp && wrapper.mcp.length) {
+        if (mcp.getListTools().length) {
             mcp.connect();
+        } else {
+            console.log(`未找到有效tools，不会和mcp-server建立链接`);
         }
     }
 }

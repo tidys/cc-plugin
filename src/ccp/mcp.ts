@@ -48,7 +48,9 @@ export class Mcp {
         };
     }
     public getListTools(): any[] {
-        return CCP.wrapper?.mcp || [];
+        const tools = CCP.wrapper?.mcp || [];
+        // 只有设置为false时，才无效
+        return tools.filter(el => !(el.valid === false));
     }
     test(data: any) {
         this.send(CMD.Test, data);
