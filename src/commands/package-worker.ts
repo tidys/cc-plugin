@@ -4,7 +4,7 @@ import { trim } from 'lodash'
 import utils from "../utils"
 import { ProjectConfig } from 'service';
 import { CreatorV3Limit } from '../const';
-import { getV3MethodFunctionName, getV3PanelRecvMessageFunctionName } from '../common';
+import { getV3MethodFunctionName, getV3PanelRecvMessageFunctionName, getValidPanels } from '../common';
 export abstract class PackageInterface {
     protected config: CocosPluginConfig;
 
@@ -182,7 +182,7 @@ export class PackageV3 extends PackageInterface {
         this.packageData!.editor = ">=3.0.0";
         this.packageData!.panels = {}
         // 预定义发送到面板的message
-        this.config.manifest.panels?.forEach(panel => {
+        getValidPanels(this.config.manifest.panels).forEach(panel => {
             /** 对应package.json的contributions.messages
              * "panelID-recv_entry": {
              *      "methods": ["panelID.recv_entry"]

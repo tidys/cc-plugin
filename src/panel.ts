@@ -8,6 +8,7 @@ import { template } from "lodash";
 import { ChromeConst } from './chrome/const';
 import { log } from './log'
 import { Analysis } from './analysis';
+import { getValidPanels } from './common';
 
 export default class Panel {
     private service: CocosPluginService;
@@ -258,7 +259,7 @@ export default class Panel {
         }
     }
     dealPanels() {
-        let panels: PanelOptions[] | undefined = this.service.projectConfig.manifest.panels;
+        let panels: PanelOptions[] | undefined = getValidPanels(this.service.projectConfig.manifest.panels);
         const options: CocosPluginOptions = this.service.projectConfig.options;
         if (panels && panels.length) {
             if (this.service.isWeb()) {
@@ -272,6 +273,7 @@ export default class Panel {
                 panels.push({
                     name: 'index',
                     title: "index",
+                    valid: true,
                     main: join(this.service.root, "src/index/index.ts"),
                     ejs: join(this.service.root, "src/index/index.ejs"),
                     ejsOptions: { panels: optionsPanels },

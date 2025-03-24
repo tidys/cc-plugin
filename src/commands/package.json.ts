@@ -4,6 +4,7 @@ import Path from 'path';
 import * as FsExtra from 'fs-extra';
 import { CocosPluginService } from '../service';
 import { PackageInterface, PackageV2, PackageV3 } from './package-worker';
+import { getValidMenus, getValidPanels } from '../common';
 
 export default class CocosPluginPackageJson {
     private service;
@@ -40,14 +41,14 @@ export default class CocosPluginPackageJson {
         packageWorker?.assetDbBuild();
         // 面板
         packageWorker?.panelReady();
-        this.manifest.panels?.map((panel) => {
+        getValidPanels(this.manifest.panels).map((panel) => {
             if (panel.type === Panel.Type.DockAble || panel.type === Panel.Type.Simple) {
                 packageWorker?.panelBuild(panel);
             }
         })
         // 菜单
         packageWorker?.menuReady();
-        this.manifest.menus?.map((menu) => {
+        getValidMenus(this.manifest.menus).map((menu) => {
             packageWorker?.menuBuild(menu);
         })
         const dependencies = this.getDependencies();
