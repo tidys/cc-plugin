@@ -20,13 +20,24 @@ export interface MenuOptions {
     path: string;
     icon?: string;
     accelerator?: string;
+    /**
+     * 菜单是否有效，默认有效，设置为false后，菜单不会被构建打包
+     */
+    valid?: boolean;
     message: {
         panel?: string;
         name: string;
     };
 }
 export interface PanelOptions {
+    /**
+     * 指向面板的入口脚本
+     */
     main: string;
+    /**
+     * 面板是否有效，默认有效，设置为false后，面板不会被构建打包
+     */
+    valid?: boolean;
     /**
      * creator插件面板的名字，是面板的key值，打开面板需要这个key
      * web版本，如果没有title，就会使用该字段

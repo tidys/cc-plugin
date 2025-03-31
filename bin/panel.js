@@ -10,6 +10,7 @@ const html_webpack_plugin_1 = __importDefault(require("html-webpack-plugin"));
 const const_1 = require("./chrome/const");
 const log_1 = require("./log");
 const analysis_1 = require("./analysis");
+const common_1 = require("./common");
 class Panel {
     constructor(service, webpackChain) {
         this.service = service;
@@ -261,7 +262,7 @@ class Panel {
         }
     }
     dealPanels() {
-        let panels = this.service.projectConfig.manifest.panels;
+        let panels = (0, common_1.getValidPanels)(this.service.projectConfig.manifest.panels);
         const options = this.service.projectConfig.options;
         if (panels && panels.length) {
             if (this.service.isWeb()) {
@@ -275,6 +276,7 @@ class Panel {
                 panels.push({
                     name: 'index',
                     title: "index",
+                    valid: true,
                     main: (0, path_1.join)(this.service.root, "src/index/index.ts"),
                     ejs: (0, path_1.join)(this.service.root, "src/index/index.ejs"),
                     ejsOptions: { panels: optionsPanels },

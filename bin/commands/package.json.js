@@ -30,6 +30,7 @@ const declare_1 = require("../declare");
 const path_1 = __importDefault(require("path"));
 const FsExtra = __importStar(require("fs-extra"));
 const package_worker_1 = require("./package-worker");
+const common_1 = require("../common");
 class CocosPluginPackageJson {
     constructor(service) {
         this.bProduction = false;
@@ -42,7 +43,6 @@ class CocosPluginPackageJson {
         });
     }
     buildPackageJsonFile() {
-        var _a, _b;
         let packageJson = {
             name: this.manifest.name,
             version: this.manifest.version,
@@ -61,14 +61,14 @@ class CocosPluginPackageJson {
         packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.assetDbBuild();
         // 面板
         packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.panelReady();
-        (_a = this.manifest.panels) === null || _a === void 0 ? void 0 : _a.map((panel) => {
+        (0, common_1.getValidPanels)(this.manifest.panels).map((panel) => {
             if (panel.type === declare_1.Panel.Type.DockAble || panel.type === declare_1.Panel.Type.Simple) {
                 packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.panelBuild(panel);
             }
         });
         // 菜单
         packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.menuReady();
-        (_b = this.manifest.menus) === null || _b === void 0 ? void 0 : _b.map((menu) => {
+        (0, common_1.getValidMenus)(this.manifest.menus).map((menu) => {
             packageWorker === null || packageWorker === void 0 ? void 0 : packageWorker.menuBuild(menu);
         });
         const dependencies = this.getDependencies();

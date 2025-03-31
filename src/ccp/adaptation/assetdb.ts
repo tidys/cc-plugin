@@ -207,8 +207,29 @@ export class AssetDB extends Base {
                 console.log(err, result);
             });
         } else {
-
+            // @ts-ignore
+            Editor.Message.request("asset-db", "create-asset", url, data);
         }
+    }
+    /**
+     * 
+     * @param url 存储的路径url
+     * @param nodeUUID 场景中的节点UUID
+     * @returns 新创建资源的UUID
+     */
+    async createPrefab(url: string, nodeUUID: string): Promise<string> {
+        if (this.adaptation.Env.isPluginV2) {
+
+        } else if (this.adaptation.Env.isPluginV3) {
+            // @ts-ignore
+            const ret = await Editor.Message.request("scene", "create-prefab", nodeUUID, url);
+            console.log(ret);
+            return ret || ""
+        }
+        return ""
+    }
+    createScene() {
+
     }
 
     async fileData(url: string): Promise<string | ArrayBuffer> {

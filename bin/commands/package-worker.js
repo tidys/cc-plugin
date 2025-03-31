@@ -179,12 +179,11 @@ class PackageV3 extends PackageInterface {
         };
     }
     panelReady() {
-        var _a;
         super.panelReady();
         this.packageData.editor = ">=3.0.0";
         this.packageData.panels = {};
         // 预定义发送到面板的message
-        (_a = this.config.manifest.panels) === null || _a === void 0 ? void 0 : _a.forEach(panel => {
+        (0, common_1.getValidPanels)(this.config.manifest.panels).forEach(panel => {
             /** 对应package.json的contributions.messages
              * "panelID-recv_entry": {
              *      "methods": ["panelID.recv_entry"]
