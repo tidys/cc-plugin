@@ -32,6 +32,11 @@ export class Mcp {
                 const tools = this.getListTools();
                 this.send(CMD.ListTools, tools);
             };
+            this.socket.onclose = (e) => {
+                // mcp-server重启了，主动发起链接
+                this.socket = null;
+                this.connect();
+            }
             this.socket.onmessage = (e) => {
                 (async () => {
                     const ret = JSON.parse(e.data.toString());
