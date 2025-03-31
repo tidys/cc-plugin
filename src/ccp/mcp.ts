@@ -13,6 +13,15 @@ export class Mcp {
     private socket: WebSocket | null = null;
 
     private cmds: Record<string, (args: any) => Promise<string | null>> = {};
+    unload() {
+        if (this.socket) {
+            this.socket.onclose = () => { };
+            this.socket.onopen = () => { };
+            this.socket.onmessage = () => { };
+            this.socket.onerror = () => { };
+            this.disconnect();
+        }
+    }
     disconnect() {
         if (this.socket) {
             this.socket.close();
@@ -35,7 +44,13 @@ export class Mcp {
             this.socket.onclose = (e) => {
                 // mcp-server重启了，主动发起链接
                 this.socket = null;
-                this.connect();
+                setTimeout(() => {
+                    this.connect()
+                }, 2 * 1000);
+            }
+            this.socket.onerror = (e) => {
+                this.socket = null;
+                // 后续会接着触发onclose
             }
             this.socket.onmessage = (e) => {
                 (async () => {

@@ -35,7 +35,7 @@ export function load() {
 
 export function unload() {
     ipcMain.off(IpcMsg.EditorNodeModules, onEditorNodeModules);
-    mcp.disconnect();
+    mcp.unload();
     if (CCP.wrapper && CCP.wrapper.unload) {
         CCP.wrapper.unload();
     }
