@@ -8,7 +8,7 @@ export class CocosCreatorPluginMain {
     public Adaptation: Adaptation = new Adaptation();
     public wrapper: PluginMainWrapper | null = null;
     /**方便用户持有，然后进行链接 */
-    public mcp: Mcp = mcp;
+    public mcp: Mcp | null = null;
 
     public init(config: CocosPluginConfig, wrapper: PluginMainWrapper) {
         this.manifest = config.manifest;
@@ -18,6 +18,7 @@ export class CocosCreatorPluginMain {
         this.initMcp(wrapper);
     }
     private initMcp(wrapper: PluginMainWrapper) {
+        this.mcp = mcp;
         if (mcp.getListTools().length) {
             mcp.connect();
         } else {
