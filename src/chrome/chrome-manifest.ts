@@ -195,6 +195,10 @@ export class ChromeManifest {
             }
         }
         if (icon_res) {
+            // chrome后来要求不能以./开头，否则上传的时候会提示找不到icon
+            if (icon_res.startsWith('./')) {
+                icon_res = icon_res.substring(2);
+            }
             const distDir = this.service.projectConfig.options.output!;
             const icon_src_path = join(this.service.context, icon_res);
             if (!existsSync(icon_src_path)) {
