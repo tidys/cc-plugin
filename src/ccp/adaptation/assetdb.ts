@@ -38,11 +38,11 @@ export class AssetDB extends Base {
      * @param url 导入到项目的地址，比如： db://assets/
      */
     async import(files: string[], url: string): Promise<Array<ImportResult>> {
+        const ret: ImportResult[] = [];
         if (this.adaptation.Env.isWeb) {
-            return [];
+            return ret;
         } else if (this.adaptation.Env.isPluginV2) {
             return new Promise((resolve, reject) => {
-                const ret: ImportResult[] = [];
                 // @ts-ignore
                 Editor.assetdb.import(files, url, (err: number, results: Array<{ url: string; parentUuid: string, uuid: string, path: string, type: string }>) => {
                     if (err) {
@@ -66,26 +66,35 @@ export class AssetDB extends Base {
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 if (existsSync(file)) {
+                    const urlFs = this.adaptation.Util.urlToFspath(url)
+                    const fileUrl = this.adaptation.Util.fspathToUrl(join(urlFs, basename(file)));
                     // @ts-ignore
-                    const results = await Editor.Message.request("asset-db", "import-asset",
+                    const result = await Editor.Message.request("asset-db", "import-asset",
                         file, // 本地文件的绝对路径
-                        url, // 导入数据库的url地址
+                        fileUrl, // 导入数据库的url地址
                         {
                             overwrite: true,// 强制覆盖
                             rename: true,// 冲突时否自动更名，默认 false
                         }
                     );
+                    ret.push({
+                        uuid: result.uuid || "",
+                        url: result.url || "",
+                        path: result.file || "",
+                        type: result.type || "", // cc.ImageAsset ...
+                    })
                 }
             }
         }
-        return [];
+        return ret;
     }
     refresh(url: string) {
         if (this.adaptation.Env.isPluginV2) {
             // @ts-ignore
             Editor.assetdb.refresh(url);
         } else {
-            // 暂时不需要实现，编辑器会自动刷新
+            // @ts-ignore
+            Editor.Message.request('asset-db', 'refresh-asset', url);
         }
     }
     hint(uuid: string) {
