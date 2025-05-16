@@ -33,6 +33,19 @@ export interface ImportResult {
 }
 export class AssetDB extends Base {
     /**
+     * 判断目录是否在assets下边
+     */
+    public isUnderAssets(file: string) {
+        if (this.adaptation.Env.isPlugin) {
+            file = file.replace(/\\/g, "/");
+            let assetsPath = join(this.adaptation.Project.path, "assets").replace(/\\/g, "/");;
+            if (file.indexOf(assetsPath) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
      * 导入文件到项目中，如果导入失败，则会返回空数组
      * @param files 导入的文件，绝对路径
      * @param url 导入到项目的地址，比如： db://assets/
