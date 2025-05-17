@@ -45,12 +45,12 @@ export class Shell extends Base {
 
         //     }
         // }
-        if (this.adaptation.Env.isPluginV2) {
+        if (this.adaptation.Env.isPlugin) {
             // @ts-ignore
-            Electron.remote?.shell?.showItemInFolder(path);
-        } else if (this.adaptation.Env.isPluginV3) {
-            // @ts-ignore
-            Electron.remote?.shell?.showItemInFolder(path);
+            const fn = Electron.remote?.shell?.showItemInFolder
+                || Electron.shell?.showItemInFolder
+                || null;
+            fn && fn(path);
         }
     }
     // TODO: remote的问题：The remote module is deprecated. Use https://github.com/electron/remote instead.
