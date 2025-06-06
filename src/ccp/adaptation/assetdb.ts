@@ -46,6 +46,20 @@ export class AssetDB extends Base {
         return false;
     }
     /**
+     * 
+     * @param uuid 删除资源的uuid
+     */
+    async delete(uuid: string) {
+        if (this.adaptation.Env.isPluginV2) {
+
+        } else if (this.adaptation.Env.isPluginV3) {
+            const fspath = await this.adaptation.Util.uuidToFspath(uuid);
+            const url = this.adaptation.Util.fspathToUrl(fspath);
+            // @ts-ignore
+            Editor.Message.request('asset-db', 'delete-asset', uuid);
+        }
+    }
+    /**
      * 导入文件到项目中，如果导入失败，则会返回空数组
      * @param files 导入的文件，绝对路径
      * @param url 导入到项目的地址，比如： db://assets/

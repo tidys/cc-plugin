@@ -1,5 +1,7 @@
+import { homedir } from "os";
 import { Base } from "./base";
 import * as Path from "path";
+import { existsSync, readFileSync } from "fs";
 // 为啥取这个名字，因为被Editor编辑器占用了
 export class CCEditor extends Base {
     /**
@@ -59,5 +61,29 @@ export class CCEditor extends Base {
             }
         }
         return true;
+    }
+    /**
+     * 获取编辑器设置的脚本编辑器
+     */
+    getScriptEditor(): string | null {
+        const file = Path.join(homedir(), '.CocosCreator', 'profiles', 'settings.json');
+        if (!existsSync(file)) {
+            return null;
+        }
+        try {
+            const data = JSON.parse(readFileSync(file, 'utf-8'));
+            let ret = data['script-editor']
+            if (ret) {
+                return ret;
+            }
+            ret = data['script-editor-list'];
+            if (ret && Array.isArray(ret) && ret.length) {
+                return ret[0].value || null;
+            }
+            return null;
+        } catch (e) {
+            return null;
+        }
+
     }
 }
